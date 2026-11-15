@@ -32,6 +32,7 @@
 
 - [x] Провести read-only инвентаризацию Ludory, Eskizno, Dachametr, Twork на exact remote SHA: [Stage 1 inventory](../knowledge/research/project-inventory.md).
 - [x] Пилотно перенести два подтверждённых решения из Ludory и Dachametr с source SHA и CI evidence: [patterns](../knowledge/patterns/).
+- [x] Уточнить безопасные локальные evidence Eskizno/Twork и независимо воспроизвести оба pilot pattern: [Stage 2 evidence](../knowledge/research/stage-2-evidence.md).
 - [ ] Заполнить `knowledge/incidents/` и `knowledge/decisions/` только после появления source-bound случаев; не создавать их ради полноты каталога.
 - [ ] Добавить специализированные Skills по нескольким наиболее повторяемым задачам.
 - [ ] Подготовить проектные профили подключения.

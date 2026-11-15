@@ -8,5 +8,5 @@
 
 **План миграции:** исследовать реальные алгоритмы и логи, извлечь проверенные шаблоны с обезличенными примерами; не переносить секреты/токены и не записывать исторические PASS без проверки.
 
-**Статус:** Stage 1 inventory зафиксирован на `196f99b4583555ee1b0b170115d6c613e77ce705`; patterns не импортированы, пока не появится current CI evidence без выхода за read-only границу. См. [inventory](../../knowledge/research/project-inventory.md).
+**Статус:** Stage 2 локально подтвердил selected offline fence/lease/replay/classification tests, syntax и algorithm lock на `196f99b4583555ee1b0b170115d6c613e77ce705`; GitHub Actions run и platform acceptance отсутствуют. Patterns не импортированы: local `ok` не доказывает внешнее принятие. См. [inventory](../../knowledge/research/project-inventory.md) и [evidence report](../../knowledge/research/stage-2-evidence.md).
 

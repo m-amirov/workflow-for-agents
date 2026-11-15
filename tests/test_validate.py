@@ -40,6 +40,9 @@ status: VERIFIED
 source_repository: https://github.com/example/source
 source_sha: {source_sha}
 reuse_scope: Тестовый сценарий
+source_verification: SOURCE_REVIEWED
+ci_verification: NOT_RUN
+cross_project_verification: NOT_RUN
 ---
 
 # {title}
@@ -140,6 +143,14 @@ reuse_scope: Тестовый сценарий
         self.write_pattern("first.md", title="Один заголовок")
         self.write_pattern("second.md", title="Один заголовок", source_sha="b" * 40)
         self.assertTrue(any("duplicate knowledge pattern title" in issue
+                            for issue in self.failures()))
+
+    def test_detects_invalid_knowledge_verification_status(self) -> None:
+        pattern = self.write_pattern("invalid-verification-status.md")
+        pattern.write_text(pattern.read_text(encoding="utf-8").replace(
+            "ci_verification: NOT_RUN", "ci_verification: NEVER_CHECKED"
+        ), encoding="utf-8")
+        self.assertTrue(any("invalid ci_verification" in issue
                             for issue in self.failures()))
 
 

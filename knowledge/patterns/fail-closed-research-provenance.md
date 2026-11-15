@@ -4,6 +4,9 @@ status: VERIFIED
 source_repository: https://github.com/m-amirov/dachametr
 source_sha: c474c916095651aaa95079193a05af8f0d51558c
 reuse_scope: Табличные исследования, market gates, SEO, аналитика и любое решение, где неполные наблюдения нельзя превращать в числовой или положительный вывод.
+source_verification: SOURCE_REVIEWED
+ci_verification: CI_VERIFIED
+cross_project_verification: LOCAL_TESTED
 ---
 
 # Fail-closed provenance для исследовательских данных и решений gate
@@ -38,4 +41,4 @@ reuse_scope: Табличные исследования, market gates, SEO, а�
 
 ## Проверка повторного применения
 
-На копии fixture намеренно добавить невалидный UTF-8, `U+FFFD`, измерение без источника, подменённое значение и решение `GO` без измеренных данных. Каждый случай должен завершаться ошибкой. Отдельно проверить, что корректная строка с `NOT_MEASURED` проходит валидацию и не становится нулевой метрикой.
+Независимый stdlib fixture в [tests/test_knowledge_pattern_reuse.py](../../tests/test_knowledge_pattern_reuse.py) использует абстрактные аналитические наблюдения, а не fixtures Dachametr. Он отвергает измерение без источника, `U+FFFD`, несогласованные status/value и `GO` с неизвестной обязательной метрикой; корректное `UNKNOWN` остаётся `BLOCKED`, а не превращается в `0` или `NO_GO`. Это `LOCAL_TESTED` применимость принципа, не подтверждение внешнего источника.

@@ -2,7 +2,7 @@
 
 Центральная база правил, переиспользуемых навыков (Agent Skills), инструкций, инженерных регламентов и проверенных знаний для Codex и других ИИ-агентов.
 
-> **Статус:** Foundation / приёмка выполнена в доступной локальной среде. Десять Skills, user/project install/sync, manifest integrity, глобальный main-first и реальные positive/negative Codex CLI evals проверены; защищённый GitHub main с PR/squash отдельно не воспроизводился.
+> **Статус:** Foundation / приёмка выполнена в доступной локальной среде. Knowledge Stage 2 добавил source-bound local evidence для Eskizno/Twork и независимые повторные проверки двух pilot patterns; protected GitHub main с PR/squash, физические устройства и внешние platform gates остаются отдельными статусами, а не PASS по умолчанию.
 
 ## Принцип
 

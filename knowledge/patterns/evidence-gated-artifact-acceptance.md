@@ -4,6 +4,9 @@ status: VERIFIED
 source_repository: https://github.com/m-amirov/ludory
 source_sha: 933c73b195eaf3bfffd12a31ab1cbadb27989eea
 reuse_scope: Сборка, экспорт, пакетирование и релизные проверки, где техническая целостность не равна правам, внешней приёмке или публикации.
+source_verification: SOURCE_REVIEWED
+ci_verification: CI_VERIFIED
+cross_project_verification: LOCAL_TESTED
 ---
 
 # Отдельная приёмка физических артефактов и release-решения
@@ -38,4 +41,4 @@ reuse_scope: Сборка, экспорт, пакетирование и рел�
 
 ## Проверка повторного применения
 
-Создать локальный fixture-артефакт и убедиться, что проверка принимает только полный ожидаемый набор. Отдельно проверить отказ для path traversal, симлинка, duplicate/case-collision, изменённого байта и непредусмотренного файла. Затем проверить, что зелёный пакетный gate не меняет release decision при отсутствующем rights или platform evidence.
+Независимый stdlib fixture в [tests/test_knowledge_pattern_reuse.py](../../tests/test_knowledge_pattern_reuse.py) создаёт иной ZIP-пакет и проверяет: допустимый набор, SHA mismatch после изменения содержимого, лишний файл, traversal и case-collision. Он также подтверждает, что `PACKAGE_PASS` оставляет rights `BLOCKED`, а внешний release gate `NOT_RUN`. Это `LOCAL_TESTED` на центральном репозитории, а не правовая или platform-приёмка.

@@ -12,5 +12,5 @@
 
 Не переносить «всё полезное» из PR без проверки. Каждая запись должна отличать наблюдение, подтверждённый вывод, гипотезу и рекомендацию; содержать ссылки на доступный источник и границы применимости.
 
-Шаблон инцидента находится в [KNOWLEDGE_LIFECYCLE.md](../docs/KNOWLEDGE_LIFECYCLE.md). Для pattern обязательны exact source SHA, статус подтверждения, ссылки на источник, границы и повторная проверка; минимальную структуру контролирует `python scripts/validate.py`. Инвентаризация источников Stage 1: [project-inventory.md](research/project-inventory.md).
+Шаблон инцидента находится в [KNOWLEDGE_LIFECYCLE.md](../docs/KNOWLEDGE_LIFECYCLE.md). Для pattern обязательны exact source SHA, статус подтверждения, ссылки на источник, границы и повторная проверка; source, CI и cross-project evidence фиксируются отдельно, минимальную структуру контролирует `python scripts/validate.py`. Инвентаризация источников Stage 1 и уточнения Stage 2: [project-inventory.md](research/project-inventory.md), [stage-2-evidence.md](research/stage-2-evidence.md).
 

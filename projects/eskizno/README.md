@@ -8,5 +8,5 @@
 
 **План миграции:** проверить конкретные версии исправлений и сценарии на планшете и десктопе; сохранить только доказанные наблюдения и воспроизводимые тесты.
 
-**Статус:** Stage 1 inventory зафиксирован на `7e10b7db7c5b37ab3ed1e004ebf85234bd9faf15`; конкретные patterns не импортированы: current CI/device evidence недоступны. См. [inventory](../../knowledge/research/project-inventory.md).
+**Статус:** Stage 2 локально подтвердил selected model/history/events tests и typecheck на `7e10b7db7c5b37ab3ed1e004ebf85234bd9faf15`; GitHub Actions run, persistence и physical stylus/device evidence по-прежнему недоступны. Patterns не импортированы. См. [inventory](../../knowledge/research/project-inventory.md) и [evidence report](../../knowledge/research/stage-2-evidence.md).
 

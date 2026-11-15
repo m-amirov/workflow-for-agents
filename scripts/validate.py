@@ -21,12 +21,16 @@ IMPLEMENTED_RE = re.compile(
 )
 KNOWLEDGE_PATTERN_REQUIRED_FIELDS = (
     "title", "status", "source_repository", "source_sha", "reuse_scope",
+    "source_verification", "ci_verification", "cross_project_verification",
 )
 KNOWLEDGE_PATTERN_REQUIRED_SECTIONS = (
     "Контекст", "Механизм", "Алгоритм", "Ограничения и антипримеры",
     "Источники", "Проверка повторного применения",
 )
 KNOWLEDGE_STATUSES = {"VERIFIED", "PARTIAL", "UNKNOWN"}
+KNOWLEDGE_VERIFICATION_STATUSES = {
+    "SOURCE_REVIEWED", "LOCAL_TESTED", "CI_VERIFIED", "PARTIAL", "BLOCKED", "UNKNOWN", "NOT_RUN",
+}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -97,6 +101,9 @@ def validate_knowledge_patterns(root: Path) -> tuple[list[str], int]:
                 errors.append(f"{rel}: missing required field {field}")
         if fields.get("status") and fields["status"] not in KNOWLEDGE_STATUSES:
             errors.append(f"{rel}: invalid status {fields['status']!r}")
+        for field in ("source_verification", "ci_verification", "cross_project_verification"):
+            if fields.get(field) and fields[field] not in KNOWLEDGE_VERIFICATION_STATUSES:
+                errors.append(f"{rel}: invalid {field} {fields[field]!r}")
         source_repository = fields.get("source_repository", "")
         if source_repository and not re.fullmatch(r"https://github\.com/[^/\s]+/[^/\s/]+/?", source_repository):
             errors.append(f"{rel}: invalid source_repository")
