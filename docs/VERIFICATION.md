@@ -6,7 +6,9 @@
 - **Исходный baseline до этой приёмки:** `779e1560376dc3f10e20418fd271b42da376413e`.
 - **Codex CLI:** `0.167.2`, Windows, PowerShell 7/Windows PowerShell 5.1.
 - **Реальные Codex evals:** [eval report](../evals/results/2026-11-15-codex-cli-foundation.md).
-- **Финальный SHA и CI run:** добавляются после commit/push этого изменения; старый run не переносится на новый SHA.
+- **Проверенный code/evidence commit:** `02ea837c1137c0e5a0bd7a9b6926b2d59e6d5160`.
+- **GitHub Actions:** [run #43720151759](https://github.com/m-amirov/workflow-for-agents/actions/runs/43720151759).
+- **Результат:** SUCCESS; Python и обе Windows smoke jobs завершились успешно.
 
 ## Что реально выполнено
 
@@ -40,4 +42,4 @@
 
 **Foundation закрыт по доступным локальным release gates:** структура, install/sync, manifest integrity, реальная активация двух Skills и локальный main-first сценарий имеют наблюдаемое доказательство. Protected-main/PR/squash остаётся отдельным `NOT RUN`, а не выдуманным `PASS`.
 
-После commit/push нужно заменить pending-строку выше ссылкой на CI run, относящийся к точному новому SHA. Старые GitHub Actions runs не считаются доказательством нового кода.
+Run #43720151759 относится к exact code/evidence commit выше; последующий документационный commit не меняет проверенные Skills и установщик. Старые GitHub Actions runs не считаются доказательством нового кода.
