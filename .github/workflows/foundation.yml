@@ -28,7 +28,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Smoke test project-scoped install and sync
+      - name: Smoke test project-scoped install and sync (PowerShell 7)
         shell: pwsh
+        run: ./scripts/tests/Smoke.ps1
+      - name: Smoke test project-scoped install and sync (Windows PowerShell 5.1)
+        shell: powershell
         run: ./scripts/tests/Smoke.ps1
 

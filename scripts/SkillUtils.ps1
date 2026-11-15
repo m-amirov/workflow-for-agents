@@ -100,6 +100,7 @@ function Read-Manifest {
         if ($Require) { throw "Manifest missing: $Path; run install.ps1 first" }
         return (New-Manifest)
     }
+    Assert-NotLinked $Path
     $doc = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($null -eq $doc -or $doc.schema -ne 1 -or $doc.source -ne 'workflow-for-agents' -or
         $null -eq $doc.installed) { throw "Invalid or incompatible manifest: $Path" }
@@ -113,6 +114,22 @@ function Read-Manifest {
     return $doc
 }
 
+
+function Get-SkillVersion {
+    param([hashtable]$Map)
+    $lines = @(
+        foreach ($key in @($Map.Keys | Sort-Object)) {
+            "$key=$($Map[$key])"
+        }
+    )
+    $data = [System.Text.Encoding]::UTF8.GetBytes(($lines -join "`n"))
+    $hash = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return [System.BitConverter]::ToString($hash.ComputeHash($data)).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $hash.Dispose() }
+}
+
 function New-ManifestEntry {
     param([object]$Skill, [hashtable]$Map)
     $files = @(
@@ -123,6 +140,7 @@ function New-ManifestEntry {
     return [pscustomobject]@{
         name = $Skill.Name
         sourceRelative = $Skill.SourceRelative
+        sourceVersion = (Get-SkillVersion $Map)
         files = $files
     }
 }

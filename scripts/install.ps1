@@ -13,6 +13,7 @@ $ErrorActionPreference = 'Stop'
 $repo = Get-RepoRoot $RepositoryRoot
 $destination = Get-SkillsDestination $Scope $ProjectPath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
+if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
 $available = Get-AvailableSkills $repo
 $selected = @(Get-SelectedNames $available $Skills -All:$All)
 $manifest = Read-Manifest $manifestPath
@@ -39,7 +40,7 @@ foreach ($name in $selected) {
 }
 
 if ($planned.Count -eq 0) { Write-Output "No changes"; return }
-foreach ($plan in $planned) { Write-Output "INSTALL $($plan.Skill.Name) -> $($plan.Target)" }
+foreach ($plan in $planned) { Write-Output "INSTALL $($plan.Skill.Name) version $(Get-SkillVersion $plan.Hashes) -> $($plan.Target)" }
 if ($DryRun) { Write-Output "DRY RUN: no filesystem changes"; return }
 
 if (-not (Test-Path -LiteralPath $destination)) {

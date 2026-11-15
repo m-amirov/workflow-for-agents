@@ -12,6 +12,7 @@ $ErrorActionPreference = 'Stop'
 $repo = Get-RepoRoot $RepositoryRoot
 $destination = Get-SkillsDestination $Scope $ProjectPath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
+if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
 $manifest = Read-Manifest $manifestPath -Require
 $available = Get-AvailableSkills $repo
 $installed = @($manifest.installed)
@@ -107,9 +108,11 @@ foreach ($plan in $plans) {
         if ($entry.name -eq $plan.Name) {
             $replacement = New-ManifestEntry $plan.Skill $plan.NewMap
             $entry.files = @($replacement.files)
+            $entry | Add-Member -NotePropertyName sourceVersion -NotePropertyValue $replacement.sourceVersion -Force
         }
     }
 }
 Write-Manifest $manifestPath $manifest
+foreach ($plan in $plans) { Write-Output "VERSION $($plan.Name): $(Get-SkillVersion $plan.NewMap)" }
 Write-Output "Synchronized $changes file change(s); manifest: $manifestPath"
 
