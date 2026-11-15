@@ -23,6 +23,7 @@ Windows PowerShell пример для одного локально клони�
     $src = ".\skills\development\root-cause-debugging"
     $dst = Join-Path $HOME ".agents\skills\root-cause-debugging"
     if (Test-Path $dst) { throw "Папка уже существует; сравните изменения перед копированием" }
+    New-Item -ItemType Directory -Path (Split-Path $dst -Parent) -Force | Out-Null
     Copy-Item -Path $src -Destination $dst -Recurse
 
 Пример не является валидированной полной процедурой установки. Повторную синхронизацию пока выполнять вручную с проверкой конфликтов.
