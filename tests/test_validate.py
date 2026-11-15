@@ -63,6 +63,19 @@ class RepositoryValidationTests(unittest.TestCase):
         )
         self.assertTrue(any("catalog is not marked implemented" in issue for issue in self.failures()))
 
+    def test_detects_missing_eval_coverage(self) -> None:
+        fixture = self.root / "evals" / "cases" / "foundation.json"
+        fixture.unlink()
+        self.assertTrue(any("Missing foundation eval" in issue for issue in self.failures()))
+
+    def test_detects_empty_eval_prompt(self) -> None:
+        import json
+        fixture = self.root / "evals" / "cases" / "foundation.json"
+        data = json.loads(fixture.read_text(encoding="utf-8"))
+        data["cases"][0]["positive"]["prompt"] = ""
+        fixture.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        self.assertTrue(any("missing positive" in issue for issue in self.failures()))
+
     def test_detects_missing_description(self) -> None:
         skill = self.root / "skills" / "core" / "task-planning" / "SKILL.md"
         content = skill.read_text(encoding="utf-8")

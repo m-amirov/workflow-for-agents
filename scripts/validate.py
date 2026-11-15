@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 import re
 import sys
@@ -104,6 +105,43 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
         for name in sorted(names.keys() - implemented):
             errors.append(f"SKILL.md for {name!r} exists but catalog is not marked implemented")
 
+
+    fixture = root / "evals" / "cases" / "foundation.json"
+    if not fixture.is_file():
+        errors.append("Missing foundation eval fixture")
+    else:
+        try:
+            suite = json.loads(fixture.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            errors.append(f"Invalid foundation eval fixture: {exc}")
+        else:
+            if not isinstance(suite, dict) or suite.get("schema") != 1 or not isinstance(suite.get("cases"), list):
+                errors.append("Invalid foundation eval fixture schema")
+            else:
+                covered: set[str] = set()
+                for index, case in enumerate(suite["cases"]):
+                    if not isinstance(case, dict):
+                        errors.append(f"Eval case {index}: expected object")
+                        continue
+                    name = case.get("skill")
+                    if not isinstance(name, str) or name not in names or name in covered:
+                        errors.append(f"Eval case {index}: unknown or duplicate skill: {name!r}")
+                        continue
+                    covered.add(name)
+                    for variant in ("positive", "negative"):
+                        value = case.get(variant)
+                        if not isinstance(value, dict) or any(
+                            not isinstance(value.get(field), str) or not value[field].strip()
+                            for field in ("prompt", "expected_behavior")
+                        ):
+                            errors.append(f"Eval case {index}: missing {variant} prompt/expected_behavior")
+                    prohibited = case.get("prohibited_behavior")
+                    if not isinstance(prohibited, list) or not prohibited or any(
+                        not isinstance(item, str) or not item.strip() for item in prohibited
+                    ):
+                        errors.append(f"Eval case {index}: missing prohibited behavior")
+                for name in sorted(set(names) - covered):
+                    errors.append(f"No foundation eval case for {name}")
     return errors, {"skills": len(skills), "links": links}
 
 

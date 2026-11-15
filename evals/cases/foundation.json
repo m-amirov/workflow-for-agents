@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "status": "designed-not-executed",
+  "description": "Positive and negative task prompts for future agent activation evaluations; only structural coverage is checked in CI.",
+  "cases": [
+    {
+      "skill": "task-planning",
+      "positive": {
+        "prompt": "Спланируй внедрение новой архитектуры импорта и определи критерии приёмки.",
+        "expected_behavior": "Включи зависимости, риски, порядок работ и проверяемые критерии."
+      },
+      "negative": {
+        "prompt": "Исправь опечатку в названии переменной.",
+        "expected_behavior": "Не заставляй создавать план для тривиального изменения."
+      },
+      "prohibited_behavior": [
+        "Не выдумывать структуру проекта"
+      ]
+    },
+    {
+      "skill": "codebase-exploration",
+      "positive": {
+        "prompt": "Найди в неизвестном репозитории точку входа в систему авторизации.",
+        "expected_behavior": "Построй маршрут вызовов и укажи реальные файлы."
+      },
+      "negative": {
+        "prompt": "Вот точный файл и две строки, поменяй число 3 на 4.",
+        "expected_behavior": "Не обходить весь репозиторий при очевидном локальном изменении."
+      },
+      "prohibited_behavior": [
+        "Не предполагать пути без исследования"
+      ]
+    },
+    {
+      "skill": "root-cause-debugging",
+      "positive": {
+        "prompt": "После перезагрузки страницы исчезает сохранённый эскиз; изучи лог и исправь.",
+        "expected_behavior": "Выяви первопричину, регрессионный тест и фактические проверки."
+      },
+      "negative": {
+        "prompt": "Предложи нейтральную формулировку заголовка страницы.",
+        "expected_behavior": "Не запускать расследование бага для стилистической задачи."
+      },
+      "prohibited_behavior": [
+        "Не скрывать ошибку повторными попытками без причины"
+      ]
+    },
+    {
+      "skill": "regression-testing",
+      "positive": {
+        "prompt": "Исправили ошибку зума; закрепи её тестом, который раньше падал.",
+        "expected_behavior": "Покажи воспроизведение и защиту от повторения."
+      },
+      "negative": {
+        "prompt": "Проверь грамматику в README.",
+        "expected_behavior": "Не навязывать тесты к исправлению документации."
+      },
+      "prohibited_behavior": [
+        "Не создавать бессмысленные тесты"
+      ]
+    },
+    {
+      "skill": "git-workflow",
+      "positive": {
+        "prompt": "Изменение готово в временной ветке, смержи его в main и очисти ветку.",
+        "expected_behavior": "Проверь merge, gates, SHA и безопасно удали свою временную ветку."
+      },
+      "negative": {
+        "prompt": "Объясни разницу Git fetch и Git pull без изменения файлов.",
+        "expected_behavior": "Не модифицируй репозиторий в ответ на вопрос."
+      },
+      "prohibited_behavior": [
+        "Не удалять незамерженные ветки"
+      ]
+    },
+    {
+      "skill": "visual-audit",
+      "positive": {
+        "prompt": "Проверь скриншоты мобильного интерфейса на визуальные дефекты.",
+        "expected_behavior": "Дай конкретные findings и сохрани утверждённый дизайн."
+      },
+      "negative": {
+        "prompt": "Отформатируй SQL запрос.",
+        "expected_behavior": "Не применять UI-аудит к коду базы данных."
+      },
+      "prohibited_behavior": [
+        "Не менять утверждённые цвета без запроса"
+      ]
+    },
+    {
+      "skill": "minimal-change",
+      "positive": {
+        "prompt": "Исправь локальный баг парсера без рефакторинга других модулей.",
+        "expected_behavior": "Найди минимальный дифф и проверь соседние контракты."
+      },
+      "negative": {
+        "prompt": "Мы проектируем новый продукт с нуля и хотим исследование.",
+        "expected_behavior": "Не ограничивай проектирование искусственным патчем."
+      },
+      "prohibited_behavior": [
+        "Не менять несвязанные файлы"
+      ]
+    },
+    {
+      "skill": "code-review",
+      "positive": {
+        "prompt": "Проведи независимый обзор PR по диффу и актуальному HEAD.",
+        "expected_behavior": "Покажи severity, места ошибок и статус тестов."
+      },
+      "negative": {
+        "prompt": "Напиши новую функцию форматирования дат.",
+        "expected_behavior": "Не подменяй реализацию задачи ревью."
+      },
+      "prohibited_behavior": [
+        "Не считать слова автора доказательством PASS"
+      ]
+    },
+    {
+      "skill": "release-verification",
+      "positive": {
+        "prompt": "Проверь готовность сборки для публикации в Яндекс Играх.",
+        "expected_behavior": "Сверь exact SHA, обязательные gates, билд и результаты."
+      },
+      "negative": {
+        "prompt": "Расскажи, что такое семантическое версионирование.",
+        "expected_behavior": "Не объявляй релиз готовым, когда о нём не спрашивали."
+      },
+      "prohibited_behavior": [
+        "Не объявлять PASS без проверки"
+      ]
+    },
+    {
+      "skill": "browser-qa",
+      "positive": {
+        "prompt": "Протестируй планшетную вёрстку в браузере на горизонтальный скролл.",
+        "expected_behavior": "Укажи реальные browser/viewport, шаги и скриншоты."
+      },
+      "negative": {
+        "prompt": "Объясни CSS flex-basis теоретически.",
+        "expected_behavior": "Не заявляй реальное browser QA без запуска."
+      },
+      "prohibited_behavior": [
+        "Не выдавать анализ исходника за проверку браузера"
+      ]
+    }
+  ]
+}
