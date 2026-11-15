@@ -109,6 +109,18 @@ function Read-Manifest {
         if (-not $entry.name -or $names.ContainsKey([string]$entry.name)) {
             throw "Invalid or duplicate manifest skill entry"
         }
+        if ([string]$entry.sourceRelative -notmatch '^[^/\\]+(?:/[^/\\]+)*$') {
+            throw "Invalid manifest source path: $($entry.sourceRelative)"
+        }
+        $fileEntries = @($entry.files)
+        if ($fileEntries.Count -eq 0) {
+            throw "Manifest skill has no managed files: $($entry.name)"
+        }
+        $fileMap = Get-ManifestEntryMap $entry
+        $expectedVersion = Get-SkillVersion $fileMap
+        if ([string]$entry.sourceVersion -ne $expectedVersion) {
+            throw "Manifest source version does not match file hashes: $($entry.name)"
+        }
         $names[[string]$entry.name] = $true
     }
     return $doc

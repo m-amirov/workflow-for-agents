@@ -21,5 +21,5 @@
 - check: автоматический или ручной способ оценки.
 - provenance: откуда взят проверяемый сценарий.
 
-Теперь есть `evals/cases/foundation.json` с 10 парами positive/negative prompts. Валидатор в CI проверяет наличие и структуру кейсов, **но не запускает реальные модели и не измеряет точность срабатывания Skill**. Реальный evaluator и интеграционная приёмка Codex остаются отдельными задачами.
+В `evals/cases/foundation.json` сохранены 10 пар positive/negative prompts. Валидатор CI проверяет только структуру; реальные Codex CLI activation-evals выполнены для `git-workflow` и `root-cause-debugging`. Команды, наблюдаемые tool events и ограничения сохранены в [результате](results/2026-11-15-codex-cli-foundation.md). Для остальных восьми Skills activation остаётся `NOT RUN`.
 

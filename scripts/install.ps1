@@ -25,6 +25,9 @@ foreach ($name in $selected) {
     $target = Join-Path $destination $name
     $managed = @($manifest.installed | Where-Object { $_.name -eq $name })
     if ($managed.Count -gt 1) { throw "Duplicate installed skill: $name" }
+    if ($managed.Count -eq 1 -and $managed[0].sourceRelative -ne $skill.SourceRelative) {
+        throw "Skill source path changed; verify migration before installing: $name"
+    }
 
     if (Test-Path -LiteralPath $target) {
         if ($managed.Count -eq 0) { throw "Destination is unmanaged and must not be overwritten: $target" }

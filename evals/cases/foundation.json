@@ -1,7 +1,8 @@
 {
   "schema": 1,
-  "status": "designed-not-executed",
-  "description": "Positive and negative task prompts for future agent activation evaluations; only structural coverage is checked in CI.",
+  "status": "partially-executed-real-codex",
+  "description": "Ten positive/negative prompts are structurally validated; real Codex CLI activation evidence exists for git-workflow and root-cause-debugging only.",
+  "execution_reference": "../results/2026-11-15-codex-cli-foundation.md",
   "cases": [
     {
       "skill": "task-planning",
