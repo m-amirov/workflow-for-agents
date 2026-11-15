@@ -33,7 +33,7 @@
 
 ## 4. Общие навыки разработки
 
-Приоритетные навыки: `task-planning`, `codebase-exploration`, `root-cause-debugging`, `regression-testing`, `code-review`, `minimal-change`, `git-workflow`, `release-verification`.
+Приоритетные навыки: `task-planning`, `codebase-exploration`, `root-cause-debugging`, `regression-testing`, `code-review`, `minimal-change`, `git-workflow`, `release-verification`. `git-workflow` требует начинать и заканчивать в `main`, а временные ветки удалять лишь после доказанного переноса результата.
 
 Для интерфейсов: `visual-audit`, `responsive-design`, `interaction-design`, `accessibility-audit`, `browser-qa`.
 
@@ -83,4 +83,3 @@ MCP — отдельный механизм доступа к инструмен
 ## 10. Главное архитектурное правило
 
 Не строить «мультиагентную платформу» ради самой платформы. Сначала надёжные небольшие Skills, понятное подключение и воспроизводимые доказательства качества. Новую автоматизацию создавать только для подтверждённой повторяющейся задачи.
-

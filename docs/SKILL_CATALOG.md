@@ -10,7 +10,7 @@
 | Testing | regression-testing | Защитить исправление от повторного сбоя | implemented |
 | Development | code-review | Проверить код и архитектурные риски | planned |
 | Development | minimal-change | Внести локальное изменение без лишнего рефакторинга | planned |
-| Development | git-workflow | Ветки, worktrees, PR, merge | planned |
+| Development | git-workflow | Main-first: работа в main, merge проверенного результата и очистка своих временных веток | implemented |
 | Testing | release-verification | Проверить сборку и release gates | planned |
 | Design | visual-audit | Независимая оценка UI и визуальной целостности | implemented |
 | Frontend | responsive-design | Адаптивность и геометрия экрана | planned |
@@ -35,4 +35,3 @@
 - Поведение лучше оформить как Skill, а не как короткое глобальное правило, одноразовую заметку или длинную роль агента.
 
 Начать с 8–10 базовых, затем добавлять специальные по фактической необходимости. Не считать эту таблицу перечнем готовых инструментов.
-
