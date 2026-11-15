@@ -70,7 +70,27 @@ try {
     Assert $failed 'sync failed to detect new source/local file collision'
     Assert ((Get-Content -LiteralPath $unmanaged -Raw).Contains('user data')) 'collision overwrote local data'
 
-    Write-Output 'PASS: dry-run, version manifest, install, idempotency, local edit protection, update/add/remove sync, unmanaged file protection, collision'
+    # The CI runner uses an ephemeral user profile; verify real user-scoped path without overwriting existing data.
+    $userRoot = Join-Path (Join-Path $HOME '.agents') 'skills'
+    $userTarget = Join-Path $userRoot 'task-planning'
+    $userManifest = Join-Path $userRoot '.workflow-for-agents.manifest.json'
+    if ((Test-Path -LiteralPath $userTarget) -or (Test-Path -LiteralPath $userManifest)) {
+        throw 'Unsafe user-scope test: existing managed skill or manifest in HOME'
+    }
+    try {
+        & $install -Scope user -RepositoryRoot $source -Skills task-planning -DryRun | Out-Null
+        Assert (-not (Test-Path -LiteralPath $userTarget)) 'user-scope dry-run changed HOME'
+        & $install -Scope user -RepositoryRoot $source -Skills task-planning | Out-Null
+        Assert (Test-Path -LiteralPath (Join-Path $userTarget 'SKILL.md')) 'user-scope install failed'
+        & $sync -Scope user -RepositoryRoot $source | Out-Null
+        Assert (Test-Path -LiteralPath $userManifest) 'user-scope sync has no manifest'
+    }
+    finally {
+        if (Test-Path -LiteralPath $userTarget) { Remove-Item -LiteralPath $userTarget -Recurse -Force }
+        if (Test-Path -LiteralPath $userManifest) { Remove-Item -LiteralPath $userManifest -Force }
+    }
+
+    Write-Output 'PASS: user/project scope, dry-run, version manifest, install, idempotency, local edit protection, update/add/remove sync, unmanaged file protection, collision'
 }
 finally {
     if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }
