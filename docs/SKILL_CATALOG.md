@@ -5,18 +5,18 @@
 | Категория | Skill | Когда использовать | Статус |
 |---|---|---|---|
 | Core | task-planning | Разложить техническую задачу на проверяемые шаги | implemented |
-| Development | codebase-exploration | Найти правильное место изменения по коду | planned |
+| Development | codebase-exploration | Найти правильное место изменения по коду | implemented |
 | Development | root-cause-debugging | Ошибка, регрессия, нестабильное поведение | implemented |
 | Testing | regression-testing | Защитить исправление от повторного сбоя | implemented |
-| Development | code-review | Проверить код и архитектурные риски | planned |
-| Development | minimal-change | Внести локальное изменение без лишнего рефакторинга | planned |
+| Development | code-review | Проверить код и архитектурные риски | implemented |
+| Development | minimal-change | Внести локальное изменение без лишнего рефакторинга | implemented |
 | Development | git-workflow | Main-first: работа в main, merge проверенного результата и очистка своих временных веток | implemented |
-| Testing | release-verification | Проверить сборку и release gates | planned |
+| Testing | release-verification | Проверить сборку и release gates | implemented |
 | Design | visual-audit | Независимая оценка UI и визуальной целостности | implemented |
 | Frontend | responsive-design | Адаптивность и геометрия экрана | planned |
 | Design | interaction-design | Жесты, состояния и взаимодействия | planned |
 | Frontend | accessibility-audit | Доступность UI | planned |
-| Testing | browser-qa | Сценарии в реальном браузере | planned |
+| Testing | browser-qa | Сценарии в реальном браузере | implemented |
 | Domain | interactive-fiction | Ветвления, решения, переменные, концовки | planned |
 | Domain | game-visual-integrity | Ассеты, шрифты, CG, изображения и экраны игры | planned |
 | Domain | drawing-editor | Холст, стилус, кисти, фигуры, слои | planned |
