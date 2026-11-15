@@ -28,7 +28,7 @@ try {
     Assert (Test-Path -LiteralPath (Join-Path $targetSkill 'SKILL.md')) 'install did not copy skill'
     Assert (Test-Path -LiteralPath $manifest) 'install did not save manifest'
     $installedManifest = Get-Content -LiteralPath $manifest -Raw -Encoding UTF8 | ConvertFrom-Json
-    Assert ($installedManifest.installed[0].sourceVersion -match '^[a-f0-9]{64}
+    Assert ($installedManifest.installed[0].sourceVersion -match '^[a-f0-9]{64}$') 'source version fingerprint not recorded'
 
     & $install -Scope project -ProjectPath $project -RepositoryRoot $source -Skills task-planning | Out-Null
     $target = Join-Path $targetSkill 'SKILL.md'
