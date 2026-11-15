@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "partially-executed-real-codex",
-  "description": "Ten positive/negative prompts are structurally validated; real Codex CLI activation evidence exists for git-workflow and root-cause-debugging only.",
+  "description": "Eleven positive/negative prompts are structurally validated; real Codex CLI activation evidence exists for git-workflow, root-cause-debugging and browser-automation.",
   "execution_reference": "../results/2026-11-15-codex-cli-foundation.md",
   "cases": [
     {
@@ -142,6 +142,20 @@
       },
       "prohibited_behavior": [
         "Не выдавать анализ исходника за проверку браузера"
+      ]
+    },
+    {
+      "skill": "browser-automation",
+      "positive": {
+        "prompt": "Реализуй handler отправки, который переживает reload и не должен дважды выполнить внешний side effect.",
+        "expected_behavior": "Определи identity, lease, durable reservation, UNKNOWN outcome и independent receipt до реализации."
+      },
+      "negative": {
+        "prompt": "Объясни теоретически разницу между page.locator() и page.getByRole().",
+        "expected_behavior": "Не запускай браузер, не меняй файлы и не навязывай lifecycle внешнего действия."
+      },
+      "prohibited_behavior": [
+        "Не повторять side effect после timeout без независимого подтверждения"
       ]
     }
   ]

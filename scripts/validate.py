@@ -31,6 +31,8 @@ KNOWLEDGE_STATUSES = {"VERIFIED", "PARTIAL", "UNKNOWN"}
 KNOWLEDGE_VERIFICATION_STATUSES = {
     "SOURCE_REVIEWED", "LOCAL_TESTED", "CI_VERIFIED", "PARTIAL", "BLOCKED", "UNKNOWN", "NOT_RUN",
 }
+BROWSER_AUTOMATION_EVAL_IDS = {f"BA-{number:02d}" for number in range(1, 11)}
+BROWSER_AUTOMATION_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -129,6 +131,41 @@ def validate_knowledge_patterns(root: Path) -> tuple[list[str], int]:
         if sources and not LINK_RE.search(sources):
             errors.append(f"{rel}: sources section must contain a Markdown link")
     return errors, len(patterns)
+
+
+def validate_browser_automation_evals(root: Path) -> tuple[list[str], int]:
+    errors: list[str] = []
+    fixture = root / "evals" / "cases" / "browser-automation" / "scenarios.json"
+    if not fixture.is_file():
+        return ["Missing browser automation eval suite"], 0
+    try:
+        suite = json.loads(fixture.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"Invalid browser automation eval suite: {error}"], 0
+    if not isinstance(suite, dict) or suite.get("schema") != 1 or suite.get("skill") != "browser-automation":
+        return ["Invalid browser automation eval suite schema"], 0
+    scenarios = suite.get("scenarios")
+    if not isinstance(scenarios, list):
+        return ["Browser automation eval suite must contain scenarios"], 0
+    seen: set[str] = set()
+    for index, scenario in enumerate(scenarios):
+        if not isinstance(scenario, dict):
+            errors.append(f"Browser automation eval {index}: expected object")
+            continue
+        identifier = scenario.get("id")
+        if not isinstance(identifier, str) or identifier not in BROWSER_AUTOMATION_EVAL_IDS or identifier in seen:
+            errors.append(f"Browser automation eval {index}: unknown or duplicate id: {identifier!r}")
+            continue
+        seen.add(identifier)
+        for field in ("scenario", "prompt", "expected_behavior", "verification"):
+            if not isinstance(scenario.get(field), str) or not scenario[field].strip():
+                errors.append(f"Browser automation eval {identifier}: missing {field}")
+        status = scenario.get("status")
+        if status not in BROWSER_AUTOMATION_EVAL_STATUSES:
+            errors.append(f"Browser automation eval {identifier}: invalid status {status!r}")
+    for identifier in sorted(BROWSER_AUTOMATION_EVAL_IDS - seen):
+        errors.append(f"Browser automation eval suite missing {identifier}")
+    return errors, len(scenarios)
 
 
 def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
@@ -233,7 +270,9 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
                     errors.append(f"No foundation eval case for {name}")
     pattern_errors, patterns = validate_knowledge_patterns(root)
     errors.extend(pattern_errors)
-    return errors, {"skills": len(skills), "links": links, "patterns": patterns}
+    browser_eval_errors, browser_evals = validate_browser_automation_evals(root)
+    errors.extend(browser_eval_errors)
+    return errors, {"skills": len(skills), "links": links, "patterns": patterns, "browser_evals": browser_evals}
 
 
 def main() -> int:
@@ -245,7 +284,8 @@ def main() -> int:
         print(f"ERROR: {issue}", file=sys.stderr)
     print(
         f"Validated {summary['skills']} skill(s), {summary['links']} internal link(s), "
-        f"{summary['patterns']} knowledge pattern(s); {len(errors)} error(s)"
+        f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s); "
+        f"{len(errors)} error(s)"
     )
     return 1 if errors else 0
 

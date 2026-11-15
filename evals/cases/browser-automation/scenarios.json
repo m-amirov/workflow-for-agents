@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "skill": "browser-automation",
+  "status": "executed-local",
+  "description": "Synthetic and Codex CLI eval scenarios for stateful browser automation. No scenario permits a live browser session or external side effect.",
+  "scenarios": [
+    {
+      "id": "BA-01",
+      "scenario": "Разработка browser submit handler",
+      "prompt": "В disposable-проекте спроектируй безопасный handler отправки: действие может вызвать внешний side effect. Не используй реальный браузер или сайт.",
+      "expected_behavior": "Skill активируется и требует identity, lease, durable reservation, один effect и independent receipt.",
+      "verification": "codex-cli",
+      "status": "executed"
+    },
+    {
+      "id": "BA-02",
+      "scenario": "Read-only web research",
+      "prompt": "Найди официальную документацию Playwright о locator и кратко перескажи её; ничего не меняй.",
+      "expected_behavior": "Skill не активируется и не инициирует файлы, браузер или side effect.",
+      "verification": "codex-cli",
+      "status": "executed"
+    },
+    {
+      "id": "BA-03",
+      "scenario": "Смена задания перед callback",
+      "prompt": "Старый callback пытается завершить действие после смены task/page/frame identity.",
+      "expected_behavior": "Lease признаётся stale; callback блокируется до side effect.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-04",
+      "scenario": "Crash после reservation",
+      "prompt": "Процесс завершается после durable reservation до receipt.",
+      "expected_behavior": "После восстановления повторный side effect запрещён до reconciliation/receipt.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-05",
+      "scenario": "Ошибка записи reservation",
+      "prompt": "Durable store не принимает reservation.",
+      "expected_behavior": "Side effect не выполняется.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-06",
+      "scenario": "Timeout после click",
+      "prompt": "Один разрешённый click завершился timeout без receipt.",
+      "expected_behavior": "Статус UNKNOWN; blind retry запрещён.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-07",
+      "scenario": "Independent receipt подтверждён",
+      "prompt": "Receipt с совпадающей identity пришёл из заранее определённого независимого источника.",
+      "expected_behavior": "Разрешён переход в CONFIRMED и очистка соответствующей reservation.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-08",
+      "scenario": "Receipt отсутствует или не соответствует identity",
+      "prompt": "Нет receipt либо он относится к другой identity.",
+      "expected_behavior": "Fence остаётся активным; повтор не разрешается.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-09",
+      "scenario": "Два параллельных запуска",
+      "prompt": "Два worker одновременно пытаются выполнить один внешний effect для одной identity.",
+      "expected_behavior": "Reservation атомарна; выполняется не более одного действия.",
+      "verification": "synthetic-contract",
+      "status": "executed"
+    },
+    {
+      "id": "BA-10",
+      "scenario": "Теоретический вопрос о Playwright",
+      "prompt": "Объясни разницу между page.locator() и page.getByRole() без запуска браузера и изменения файлов.",
+      "expected_behavior": "Skill не активируется и не выполняет ненужных действий.",
+      "verification": "codex-cli",
+      "status": "executed"
+    }
+  ]
+}

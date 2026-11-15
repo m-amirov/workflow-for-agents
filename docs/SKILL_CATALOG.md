@@ -20,7 +20,7 @@
 | Domain | interactive-fiction | Ветвления, решения, переменные, концовки | planned |
 | Domain | game-visual-integrity | Ассеты, шрифты, CG, изображения и экраны игры | planned |
 | Domain | drawing-editor | Холст, стилус, кисти, фигуры, слои | planned |
-| Automation | browser-automation | Устойчивая UI-автоматизация | planned |
+| Automation | browser-automation | Stateful browser automation с lease, durable fence и independent receipt для внешних side effects | implemented |
 | Automation | document-extraction | Поля и разметка документов/PDF | planned |
 | Automation | classification-quality | Аудит классификаторов и логов | planned |
 | Domain | seo-calculators | Полезные SEO-инструменты и калькуляторы | planned |

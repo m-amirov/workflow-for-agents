@@ -153,6 +153,20 @@ cross_project_verification: NOT_RUN
         self.assertTrue(any("invalid ci_verification" in issue
                             for issue in self.failures()))
 
+    def test_detects_missing_browser_automation_eval_suite(self) -> None:
+        suite = self.root / "evals" / "cases" / "browser-automation" / "scenarios.json"
+        suite.unlink()
+        self.assertTrue(any("Missing browser automation eval suite" in issue
+                            for issue in self.failures()))
+
+    def test_detects_missing_required_browser_automation_case(self) -> None:
+        import json
+        suite = self.root / "evals" / "cases" / "browser-automation" / "scenarios.json"
+        data = json.loads(suite.read_text(encoding="utf-8"))
+        data["scenarios"] = [case for case in data["scenarios"] if case["id"] != "BA-09"]
+        suite.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        self.assertTrue(any("missing BA-09" in issue for issue in self.failures()))
+
 
 if __name__ == "__main__":
     unittest.main()
