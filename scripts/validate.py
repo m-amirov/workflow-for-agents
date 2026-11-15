@@ -10,13 +10,23 @@ import sys
 from urllib.parse import unquote
 
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 FRONTMATTER_RE = re.compile(r"\A---\s*\n(?P<meta>.*?)\n---\s*\n", re.DOTALL)
 LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 FIELD_RE = re.compile(r"^(name|description):\s*(.*?)\s*$", re.MULTILINE)
+KNOWLEDGE_FIELD_RE = re.compile(r"^([a-z][a-z0-9_]*):\s*(.*?)\s*$", re.MULTILINE)
 IMPLEMENTED_RE = re.compile(
     r"^\|\s*[^|]+\|\s*([a-z0-9-]+)\s*\|[^|]*\|\s*implemented\s*\|\s*$",
     re.MULTILINE,
 )
+KNOWLEDGE_PATTERN_REQUIRED_FIELDS = (
+    "title", "status", "source_repository", "source_sha", "reuse_scope",
+)
+KNOWLEDGE_PATTERN_REQUIRED_SECTIONS = (
+    "Контекст", "Механизм", "Алгоритм", "Ограничения и антипримеры",
+    "Источники", "Проверка повторного применения",
+)
+KNOWLEDGE_STATUSES = {"VERIFIED", "PARTIAL", "UNKNOWN"}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -40,6 +50,78 @@ def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
             text = raw.strip("'\"")
         result[key] = text
     return result, errors
+
+
+def parse_knowledge_metadata(content: str) -> tuple[dict[str, str], list[str]]:
+    match = FRONTMATTER_RE.match(content)
+    if not match:
+        return {}, ["Missing YAML frontmatter beginning with ---"]
+    result: dict[str, str] = {}
+    errors: list[str] = []
+    for field in KNOWLEDGE_FIELD_RE.finditer(match.group("meta")):
+        key, value = field.group(1), field.group(2).strip().strip("'\"")
+        if key in result:
+            errors.append(f"Duplicate frontmatter key: {key}")
+        else:
+            result[key] = value
+    return result, errors
+
+
+def knowledge_section_body(content: str, heading: str) -> str | None:
+    match = re.search(rf"^## {re.escape(heading)}\s*$", content, re.MULTILINE)
+    if not match:
+        return None
+    next_heading = re.search(r"^## ", content[match.end():], re.MULTILINE)
+    end = match.end() + next_heading.start() if next_heading else len(content)
+    return content[match.end():end].strip()
+
+
+def validate_knowledge_patterns(root: Path) -> tuple[list[str], int]:
+    errors: list[str] = []
+    patterns_root = root / "knowledge" / "patterns"
+    if not patterns_root.is_dir():
+        return ["Missing knowledge/patterns directory"], 0
+    titles: dict[str, Path] = {}
+    patterns = sorted(path for path in patterns_root.glob("*.md") if path.name != "README.md")
+    for path in patterns:
+        rel = path.relative_to(root)
+        try:
+            content = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"{rel}: cannot read: {error}")
+            continue
+        fields, faults = parse_knowledge_metadata(content)
+        errors.extend(f"{rel}: {issue}" for issue in faults)
+        for field in KNOWLEDGE_PATTERN_REQUIRED_FIELDS:
+            if not fields.get(field, "").strip():
+                errors.append(f"{rel}: missing required field {field}")
+        if fields.get("status") and fields["status"] not in KNOWLEDGE_STATUSES:
+            errors.append(f"{rel}: invalid status {fields['status']!r}")
+        source_repository = fields.get("source_repository", "")
+        if source_repository and not re.fullmatch(r"https://github\.com/[^/\s]+/[^/\s/]+/?", source_repository):
+            errors.append(f"{rel}: invalid source_repository")
+        source_sha = fields.get("source_sha", "")
+        if source_sha and not SHA_RE.fullmatch(source_sha):
+            errors.append(f"{rel}: invalid source_sha")
+        title = fields.get("title", "").strip()
+        if title:
+            normalized = title.casefold()
+            if normalized in titles:
+                errors.append(
+                    f"{rel}: duplicate knowledge pattern title (also {titles[normalized].relative_to(root)})"
+                )
+            else:
+                titles[normalized] = path
+        for heading in KNOWLEDGE_PATTERN_REQUIRED_SECTIONS:
+            body = knowledge_section_body(content, heading)
+            if body is None:
+                errors.append(f"{rel}: missing required section {heading}")
+            elif not body:
+                errors.append(f"{rel}: empty required section {heading}")
+        sources = knowledge_section_body(content, "Источники")
+        if sources and not LINK_RE.search(sources):
+            errors.append(f"{rel}: sources section must contain a Markdown link")
+    return errors, len(patterns)
 
 
 def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
@@ -142,7 +224,9 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
                         errors.append(f"Eval case {index}: missing prohibited behavior")
                 for name in sorted(set(names) - covered):
                     errors.append(f"No foundation eval case for {name}")
-    return errors, {"skills": len(skills), "links": links}
+    pattern_errors, patterns = validate_knowledge_patterns(root)
+    errors.extend(pattern_errors)
+    return errors, {"skills": len(skills), "links": links, "patterns": patterns}
 
 
 def main() -> int:
@@ -152,7 +236,10 @@ def main() -> int:
     errors, summary = validate_repository(args.root)
     for issue in errors:
         print(f"ERROR: {issue}", file=sys.stderr)
-    print(f"Validated {summary['skills']} skill(s), {summary['links']} internal link(s); {len(errors)} error(s)")
+    print(
+        f"Validated {summary['skills']} skill(s), {summary['links']} internal link(s), "
+        f"{summary['patterns']} knowledge pattern(s); {len(errors)} error(s)"
+    )
     return 1 if errors else 0
 
 

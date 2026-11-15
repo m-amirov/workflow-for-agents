@@ -30,6 +30,46 @@ class RepositoryValidationTests(unittest.TestCase):
         errors, _ = module.validate_repository(self.root)
         return errors
 
+    def write_pattern(self, name: str, *, title: str = "Проверяемый паттерн",
+                      source_sha: str = "a" * 40,
+                      context: str = "Контекст описан.") -> Path:
+        pattern = self.root / "knowledge" / "patterns" / name
+        pattern.write_text(f"""---
+title: {title}
+status: VERIFIED
+source_repository: https://github.com/example/source
+source_sha: {source_sha}
+reuse_scope: Тестовый сценарий
+---
+
+# {title}
+
+## Контекст
+
+{context}
+
+## Механизм
+
+Механизм описан.
+
+## Алгоритм
+
+1. Выполнить проверку.
+
+## Ограничения и антипримеры
+
+Не применять без источника.
+
+## Источники
+
+- [Исходный тест](https://github.com/example/source/blob/{source_sha}/test.md)
+
+## Проверка повторного применения
+
+Проверить ожидаемый отказ.
+""", encoding="utf-8")
+        return pattern
+
     def test_repository_is_valid(self) -> None:
         self.assertEqual([], self.failures())
 
@@ -82,6 +122,25 @@ class RepositoryValidationTests(unittest.TestCase):
         content = content.replace("description: >-", "description: ''\n  #")
         skill.write_text(content, encoding="utf-8")
         self.assertTrue(any("description must contain" in issue for issue in self.failures()))
+
+    def test_detects_knowledge_pattern_missing_source_sha(self) -> None:
+        pattern = self.write_pattern("missing-source-sha.md")
+        pattern.write_text(pattern.read_text(encoding="utf-8").replace(
+            "source_sha: " + "a" * 40 + "\n", ""
+        ), encoding="utf-8")
+        self.assertTrue(any("missing required field source_sha" in issue
+                            for issue in self.failures()))
+
+    def test_detects_empty_knowledge_pattern_section(self) -> None:
+        self.write_pattern("empty-section.md", context="")
+        self.assertTrue(any("empty required section Контекст" in issue
+                            for issue in self.failures()))
+
+    def test_detects_duplicate_knowledge_pattern_title(self) -> None:
+        self.write_pattern("first.md", title="Один заголовок")
+        self.write_pattern("second.md", title="Один заголовок", source_sha="b" * 40)
+        self.assertTrue(any("duplicate knowledge pattern title" in issue
+                            for issue in self.failures()))
 
 
 if __name__ == "__main__":
