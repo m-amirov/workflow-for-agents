@@ -1,0 +1,25 @@
+# Secrets and private local state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.token
+secrets/
+.local/
+*.log
+
+# Editors and runtimes
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+__pycache__/
+.pytest_cache/
+*.py[cod]
+node_modules/
+dist/
+build/
+
