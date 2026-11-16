@@ -6,16 +6,31 @@ param(
     [ValidateSet('ceos-migrated')][string]$Set = '',
     [string]$Profile = '',
     [switch]$DryRun,
+    [switch]$Recover,
+    [ValidateSet('None','AfterFirstSwap','BeforeManifest','AfterManifest','InterruptAfterFirstSwap')]
+    [string]$TestFailurePoint = 'None',
     [string]$HomePath = '',
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'SkillUtils.ps1')
+. (Join-Path $PSScriptRoot 'SyncTransaction.ps1')
 
-$repo = Get-RepoRoot $RepositoryRoot
 $destination = Get-SkillsDestination $Scope $ProjectPath $HomePath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
 if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
+if ($Recover) {
+    if ($DryRun -or $Skills.Count -gt 0 -or $Set -or $Profile -or $TestFailurePoint -ne 'None') {
+        throw 'Use -Recover without selection, DryRun or test failure injection'
+    }
+    Restore-SyncTransaction -Destination $destination -ManifestPath $manifestPath
+    return
+}
+Assert-NoPendingSyncTransaction $destination
+if ($TestFailurePoint -ne 'None' -and ($Scope -ne 'user' -or -not $HomePath)) {
+    throw 'TestFailurePoint is allowed only with explicit -Scope user -HomePath disposable fixture'
+}
+$repo = Get-RepoRoot $RepositoryRoot
 $legacy = Get-LegacyCeosOwnership $HomePath
 if ($Set) { Assert-NoLegacyCeosCollision $legacy (Get-SkillSetNames $Set) }
 $manifest = Read-Manifest $manifestPath -Require
@@ -103,32 +118,6 @@ foreach ($plan in $plans) {
     }
 }
 
-foreach ($plan in $plans) {
-    foreach ($action in $plan.Actions) {
-        $relative = $action.Path.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
-        $destinationFile = Join-Path $plan.Target $relative
-        if ($action.Operation -eq 'REMOVE') {
-            Remove-Item -LiteralPath $destinationFile -Force
-            continue
-        }
-        $sourceFile = Join-Path $plan.Skill.Directory $relative
-        $parent = Split-Path -Parent $destinationFile
-        if (-not (Test-Path -LiteralPath $parent)) {
-            New-Item -ItemType Directory -Path $parent -Force | Out-Null
-        }
-        Copy-Item -LiteralPath $sourceFile -Destination $destinationFile -Force
-    }
-    $actual = Get-FileHashes $plan.Target
-    Assert-SameManagedFiles $plan.NewMap $actual $plan.Name
-    foreach ($entry in @($manifest.installed)) {
-        if ($entry.name -eq $plan.Name) {
-            $replacement = New-ManifestEntry $plan.Skill $plan.NewMap
-            $entry.files = @($replacement.files)
-            $entry | Add-Member -NotePropertyName sourceVersion -NotePropertyValue $replacement.sourceVersion -Force
-        }
-    }
-}
-Write-Manifest $manifestPath $manifest
+Invoke-TransactionalSync -Destination $destination -ManifestPath $manifestPath -Manifest $manifest -Plans $plans -TestFailurePoint $TestFailurePoint
 foreach ($plan in $plans) { Write-Output "VERSION $($plan.Name): $(Get-SkillVersion $plan.NewMap)" }
 Write-Output "Synchronized $changes file change(s); manifest: $manifestPath"
-

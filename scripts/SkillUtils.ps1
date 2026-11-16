@@ -482,3 +482,16 @@ function Write-Manifest {
     }
 }
 
+
+function Get-SyncTransactionPath {
+    param([string]$Destination)
+    return (Join-Path $Destination '.workflow-for-agents.sync-transaction')
+}
+
+function Assert-NoPendingSyncTransaction {
+    param([string]$Destination)
+    $transaction = Get-SyncTransactionPath $Destination
+    if (Test-Path -LiteralPath $transaction) {
+        throw "Pending sync transaction: $transaction. Stop all writes and use sync.ps1 -Recover after inspection."
+    }
+}

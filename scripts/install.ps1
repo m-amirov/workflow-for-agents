@@ -17,6 +17,7 @@ $repo = Get-RepoRoot $RepositoryRoot
 $destination = Get-SkillsDestination $Scope $ProjectPath $HomePath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
 if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
+Assert-NoPendingSyncTransaction $destination
 $available = Get-AvailableSkills $repo
 if ($Profile) {
     if ($Scope -ne 'project') { throw 'Project profiles can only be installed with -Scope project' }
