@@ -186,6 +186,26 @@ cross_project_verification: NOT_RUN
         suite.unlink()
         self.assertTrue(any("Missing classification quality eval suite" in issue for issue in self.failures()))
 
+    def test_detects_inconsistent_classification_execution_and_result(self) -> None:
+        import json
+        suite = self.root / "evals" / "cases" / "classification-quality" / "scenarios.json"
+        data = json.loads(suite.read_text(encoding="utf-8"))
+        case = next(case for case in data["scenarios"] if case["id"] == "CQ-01")
+        case["status"] = "not-run"
+        case["result"] = "PASS"
+        suite.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        self.assertTrue(any("inconsistent execution/result" in issue for issue in self.failures()))
+
+    def test_allows_blocked_classification_execution_with_blocked_result(self) -> None:
+        import json
+        suite = self.root / "evals" / "cases" / "classification-quality" / "scenarios.json"
+        data = json.loads(suite.read_text(encoding="utf-8"))
+        case = next(case for case in data["scenarios"] if case["id"] == "CQ-01")
+        case["status"] = "blocked"
+        case["result"] = "BLOCKED"
+        suite.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        self.assertEqual([], self.failures())
+
 
 if __name__ == "__main__":
     unittest.main()

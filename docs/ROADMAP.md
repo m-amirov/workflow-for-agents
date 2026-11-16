@@ -35,7 +35,7 @@
 - [x] Уточнить безопасные локальные evidence Eskizno/Twork и независимо воспроизвести оба pilot pattern: [Stage 2 evidence](../knowledge/research/stage-2-evidence.md).
 - [x] Реализовать и проверить первый специализированный Skill `browser-automation`: [source evidence](../knowledge/research/browser-automation-evidence.md), [Codex eval](../evals/results/2026-11-15-browser-automation-codex-cli.md).
 - [x] Реализовать и проверить `drawing-editor` на source-bound контрактах Eskizno: [source evidence](../knowledge/research/drawing-editor-evidence.md), [Codex eval](../evals/results/2026-11-16-drawing-editor-codex-cli.md).
-- [x] Реализовать `classification-quality` на offline replay контрактах Twork: [source evidence](../knowledge/research/classification-quality-evidence.md).
+- [x] Реализовать `classification-quality` на offline replay контрактах Twork: [source evidence](../knowledge/research/classification-quality-evidence.md), [eval evidence](../evals/results/2026-11-16-classification-quality-codex-cli.md). Это не измерение качества Twork или внешняя platform acceptance.
 - [ ] Заполнить `knowledge/incidents/` и `knowledge/decisions/` только после появления source-bound случаев; не создавать их ради полноты каталога.
 - [ ] Добавить специализированные Skills по нескольким наиболее повторяемым задачам.
 - [ ] Подготовить проектные профили подключения.

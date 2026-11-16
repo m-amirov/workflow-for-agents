@@ -36,6 +36,7 @@ BROWSER_AUTOMATION_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"
 DRAWING_EDITOR_EVAL_IDS = {f"DE-{number:02d}" for number in range(1, 11)}
 DRAWING_EDITOR_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 CLASSIFICATION_QUALITY_EVAL_IDS = {f"CQ-{number:02d}" for number in range(1, 13)}
+CLASSIFICATION_QUALITY_EVAL_RESULTS = {"PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT RUN"}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -220,7 +221,16 @@ def validate_classification_quality_evals(root: Path) -> tuple[list[str], int]:
         seen.add(identifier)
         for field in ("scenario", "prompt", "expected_behavior", "verification"):
             if not isinstance(scenario.get(field), str) or not scenario[field].strip(): errors.append(f"Classification quality eval {identifier}: missing {field}")
-        if scenario.get("status") not in BROWSER_AUTOMATION_EVAL_STATUSES: errors.append(f"Classification quality eval {identifier}: invalid status")
+        status = scenario.get("status")
+        result = scenario.get("result")
+        if status not in BROWSER_AUTOMATION_EVAL_STATUSES:
+            errors.append(f"Classification quality eval {identifier}: invalid status")
+        if result not in CLASSIFICATION_QUALITY_EVAL_RESULTS:
+            errors.append(f"Classification quality eval {identifier}: invalid result")
+        elif ((status == "executed" and result == "NOT RUN") or
+              (status in {"prepared", "not-run"} and result != "NOT RUN") or
+              (status == "blocked" and result != "BLOCKED")):
+            errors.append(f"Classification quality eval {identifier}: inconsistent execution/result")
     errors.extend(f"Classification quality eval suite missing {identifier}" for identifier in sorted(CLASSIFICATION_QUALITY_EVAL_IDS - seen))
     return errors, len(scenarios)
 
