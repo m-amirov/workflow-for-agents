@@ -95,3 +95,23 @@ response, not a complete audit of hidden activation or every file read.
   available.
 - Run GitHub Actions on the final central commit; that result is recorded only
   after the commit is pushed.
+
+## Stage 7.1 freshness follow-up
+
+The operational preflight now uses read-only `git ls-remote origin
+refs/heads/main`. It reports `CURRENT`, `LOCAL_STALE`, `PROFILE_STALE`, or
+`REMOTE_UNVERIFIED` and blocks rollout unless all three of target `HEAD`,
+profile `source_sha`, and remote `main` agree. No fetch, pull, reset or
+checkout is performed.
+
+At the follow-up check, Ludory, Eskizno and Dachametr were `CURRENT`. Twork
+remote `main` had advanced to `ad90501d307c42840eb2d727c31ae2355196e3be` while
+the profile remains pinned at `00a54d4d1d532332aef085ef7868cc66d5695e87`;
+the preflight returned `PROFILE_STALE` and blocked rollout. The older SHA
+remains historical evidence, not current rollout authorization.
+
+The available CSS-only Codex CLI run exited `0` and said `drawing-editor` was
+not needed. This is an observable response only; it does not prove hidden
+Skill-loading behaviour. The complete CLI matrix remains partial because the
+transport previously returned WebSocket/HTTP `403` and batch runs were not
+reliable.

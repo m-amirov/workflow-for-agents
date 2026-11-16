@@ -154,6 +154,30 @@ function New-PreflightFinding {
     return [pscustomobject]@{ Class = $Class; Code = $Code; Message = $Message }
 }
 
+function Get-ProfileRemoteFreshness {
+    param([string]$ProjectPath, [object]$Profile, [switch]$HistoricalPinned)
+    try {
+        $head = Invoke-GitText $ProjectPath @('rev-parse', 'HEAD')
+        $remoteMain = Invoke-GitText $ProjectPath @('ls-remote', 'origin', 'refs/heads/main')
+    }
+    catch {
+        return [pscustomobject]@{ Status = 'REMOTE_UNVERIFIED'; Head = $null; RemoteMain = $null; Message = "Cannot verify origin/main read-only: $($_.Exception.Message)" }
+    }
+    if (-not $remoteMain) {
+        return [pscustomobject]@{ Status = 'REMOTE_UNVERIFIED'; Head = $head; RemoteMain = $null; Message = 'origin has no refs/heads/main' }
+    }
+    $remoteSha = ($remoteMain -split '\s+')[0]
+    $profileSha = [string]$Profile.source_sha
+    if ($remoteSha -ne $profileSha) {
+        $kind = if ($HistoricalPinned) { 'historical pinned evidence' } else { 'rollout profile' }
+        return [pscustomobject]@{ Status = 'PROFILE_STALE'; Head = $head; RemoteMain = $remoteSha; Message = "$kind source_sha $profileSha is not current origin/main $remoteSha" }
+    }
+    if ($head -ne $remoteSha) {
+        return [pscustomobject]@{ Status = 'LOCAL_STALE'; Head = $head; RemoteMain = $remoteSha; Message = "Target HEAD $head is behind or differs from origin/main $remoteSha" }
+    }
+    return [pscustomobject]@{ Status = 'CURRENT'; Head = $head; RemoteMain = $remoteSha; Message = "Target HEAD, profile source_sha and origin/main are $remoteSha" }
+}
+
 function Invoke-ProjectProfilePreflight {
     [OutputType([pscustomobject])]
     param(
@@ -193,6 +217,11 @@ function Invoke-ProjectProfilePreflight {
     if ($head -ne [string]$document.source_sha) {
         $blocked = $true
         $findings += New-PreflightFinding 'STALE_EVIDENCE' 'source-sha' "HEAD $head differs from profile source_sha $($document.source_sha); refresh the profile before rollout"
+    }
+    $freshness = Get-ProfileRemoteFreshness -ProjectPath $project -Profile $document
+    if ($freshness.Status -ne 'CURRENT') {
+        $blocked = $true
+        $findings += New-PreflightFinding $freshness.Status 'remote-freshness' $freshness.Message
     }
 
     $destination = Get-SkillsDestination 'project' $project

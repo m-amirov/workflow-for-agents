@@ -50,12 +50,14 @@ try {
     $profileRemote = Join-Path $tmp 'profile-remote.git'
     & git init --bare --quiet $profileRemote
     & git init --quiet $profileProject
+    & git -C $profileProject branch -M main
     & git -C $profileProject config user.email 'smoke@example.invalid'
     & git -C $profileProject config user.name 'Workflow Smoke'
     Set-Content -LiteralPath (Join-Path $profileProject 'README.md') -Value 'fixture' -Encoding UTF8
     & git -C $profileProject add README.md
     & git -C $profileProject commit --quiet -m 'fixture'
     & git -C $profileProject remote add origin $profileRemote
+    & git -C $profileProject push --quiet -u origin main
     $profileHead = (& git -C $profileProject rev-parse HEAD).Trim()
     $profileRoot = Join-Path $source 'projects\fixture'
     New-Item -ItemType Directory -Path $profileRoot, (Join-Path $profileProject '.agents\skills\fixture-local') -Force | Out-Null
@@ -80,6 +82,28 @@ try {
     Assert (-not (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills\task-planning'))) 'profile dry-run created destination'
     & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture | Out-Null
     Assert (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills\task-planning\SKILL.md')) 'profile install did not copy selected skill'
+    $currentFreshness = Get-ProfileRemoteFreshness -ProjectPath $profileProject -Profile $profileDocument
+    Assert ($currentFreshness.Status -eq 'CURRENT') 'matching local/profile/remote SHA was not CURRENT'
+    Set-Content -LiteralPath (Join-Path $profileProject 'LOCAL-STALE.md') -Value 'not pushed' -Encoding UTF8
+    & git -C $profileProject add LOCAL-STALE.md
+    & git -C $profileProject commit --quiet -m 'local stale fixture'
+    $localStale = Get-ProfileRemoteFreshness -ProjectPath $profileProject -Profile $profileDocument
+    Assert ($localStale.Status -eq 'LOCAL_STALE') 'unpushed local HEAD was not LOCAL_STALE'
+    & git -C $profileProject reset --hard --quiet $profileHead
+    Set-Content -LiteralPath (Join-Path $profileProject 'REMOTE-STALE.md') -Value 'pushed' -Encoding UTF8
+    & git -C $profileProject add REMOTE-STALE.md
+    & git -C $profileProject commit --quiet -m 'remote stale fixture'
+    $remoteHead = (& git -C $profileProject rev-parse HEAD).Trim()
+    & git -C $profileProject push --quiet origin main
+    $profileStale = Get-ProfileRemoteFreshness -ProjectPath $profileProject -Profile $profileDocument
+    Assert ($profileStale.Status -eq 'PROFILE_STALE') 'advanced remote main was not PROFILE_STALE'
+    & git --git-dir $profileRemote update-ref refs/heads/main $profileHead
+    & git -C $profileProject reset --hard --quiet $profileHead
+    $unavailableUrl = Join-Path $tmp 'missing-remote.git'
+    & git -C $profileProject remote set-url origin $unavailableUrl
+    $unverified = Get-ProfileRemoteFreshness -ProjectPath $profileProject -Profile $profileDocument
+    Assert ($unverified.Status -eq 'REMOTE_UNVERIFIED') 'unavailable remote was not REMOTE_UNVERIFIED'
+    & git -C $profileProject remote set-url origin $profileRemote
     & $sync -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture | Out-Null
     $profileManifest = Join-Path $profileProject '.agents\skills\.workflow-for-agents.manifest.json'
     $profileManifestOriginal = Get-Content -LiteralPath $profileManifest -Raw -Encoding UTF8
