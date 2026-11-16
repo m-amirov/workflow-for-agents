@@ -126,12 +126,55 @@ Test-only инъекции -TestFailurePoint работают **только** �
 Скрипт install.ps1 также блокирует запись при pending sync transaction,
 но не объявляется транзакционным установщиком.
 
+## Stage 10: глобальный read-only preflight
+
+Перед обсуждением миграции глобальных Skills используйте автономный аудит:
+
+```powershell
+.\scripts\global-preflight.ps1 -Set ceos-migrated
+.\scripts\global-preflight.ps1 -All
+.\scripts\global-preflight.ps1 -All -OutputFormat Json
+.\scripts\global-preflight.ps1 -All -HomePath 'C:\Temp\wfa-fixture' -OutputFormat Json
+```
+
+Preflight только читает `~/.agents/skills/`, `~/.codex/skills/` и связанные
+manifest/ownership metadata. Он не вызывает `install.ps1`, `sync.ps1` или
+`sync.ps1 -Recover`, не создаёт каталоги, временные файлы, backups или
+manifest, не удаляет legacy CEOS ownership и не меняет `AGENTS.md`, hooks,
+config или другие пользовательские настройки. `-HomePath` предназначен для
+disposable fixture; без него аудит явно помечается как read-only аудит текущего
+HOME. Если HOME недоступен, это не заменяется синтетическим PASS.
+
+`-Set ceos-migrated` проверяет ровно 15 source-bound Skills из CEOS source
+SHA `c8cc13bd3852409be93097ee823e9cd35e512b73`. `-All` читает полный каталог
+Skills, фактически помеченных `implemented`, поэтому его размер не закреплён
+навсегда. Отчёт содержит отдельные inventory и target rows, статус владельца,
+наличие `SKILL.md`, абсолютный путь, SHA-256 `SKILL.md`, доступный content
+fingerprint с областью хеширования, source/version metadata, declared functional overlaps и
+backup-backed migration plan.
+
+Статусы preflight fail-closed: `NOT_INSTALLED`, `CURRENT`,
+`UPDATE_AVAILABLE`, `USER_MODIFIED`, `LEGACY_CEOS_MANAGED`,
+`UNMANAGED_COLLISION`, `OWNERSHIP_UNVERIFIED`, `INVALID_MANIFEST` и
+`UNSAFE_PATH`. Совпадение имени или содержимого без подтверждённого manifest
+не считается владением. Symlink/junction/reparse point и path traversal не
+обходятся. `READY` означает только отсутствие обнаруженных конфликтов в этом
+отчёте; он не является разрешением на реальную установку или миграцию.
+
+`Current SHA` и `Target SHA` в JSON/text table — SHA-256 `SKILL.md`.
+`CurrentVersion` и `TargetVersion` — детерминированные SHA-256 fingerprints;
+для managed-копии `CurrentVersion` покрывает manifest-listed files, для
+unmanaged-кандидата только `SKILL.md`, а source `TargetVersion` покрывает
+source tree. Область указана как `FingerprintScope`. Неподтверждённый owner остаётся
+`OWNERSHIP_UNVERIFIED`, даже если эти SHA совпадают.
+
 ## Валидация
 
 ```powershell
 python scripts/validate.py
 python -m unittest discover -s tests -v
 .\scripts\tests\Smoke.ps1
+.\scripts\tests\GlobalPreflightSmoke.ps1
 ```
 
 Проверяются имена, frontmatter, каталог, локальные ссылки и структура eval-кейсов. Тесты установки/sync используют временные проектные каталоги и проверяют конфликтные ситуации. `foundation.yml` запускает Python на Ubuntu и smoke-тесты на Windows PowerShell 7 и 5.1.

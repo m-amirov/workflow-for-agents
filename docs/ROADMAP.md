@@ -128,6 +128,33 @@ policy и Python реализация написаны самостоятель�
 
 Не запускать оркестрацию нескольких агентов, централизованную БД или сложный индексатор раньше, чем простая файловая библиотека покажет ограничения.
 
+## Этап 10: Global Skills Compatibility Audit & Migration Preflight
+
+**Статус:** `implemented` для автономного read-only preflight и disposable
+regression fixtures; реальная миграция глобальных Skills — `NOT RUN` и требует
+отдельного разрешения владельца. Последний source-bound CEOS SHA:
+`c8cc13bd3852409be93097ee823e9cd35e512b73`.
+
+- [x] Добавлен `scripts/global-preflight.ps1` поверх существующих
+  `SkillUtils` manifest/SHA/legacy/pending-transaction механизмов.
+- [x] Поддержаны `-Set ceos-migrated`, полный `-All`, `-OutputFormat Json` и
+  явный disposable `-HomePath`; preflight не вызывает install/sync/recovery и
+  не создаёт файлы в проверяемом HOME.
+- [x] Инвентаризируются оба global Skills root, WFA manifest, legacy CEOS
+  manifest, `SKILL.md` SHA, content fingerprints, source metadata и activation
+  overlaps; неизвестное владение классифицируется fail-closed.
+- [x] Добавлены 16 disposable сценариев: пустой/current/partial HOME, legacy
+  CEOS, unmanaged/user-modified collisions, invalid/missing/traversal manifest,
+  junction, pending transaction, повторяемость и пользовательские settings.
+- [x] Добавлены отдельные PS7/PS5.1 CI smoke entrypoints.
+- [x] Подготовлен backup-backed migration plan без исполнения ownership change.
+- [ ] Отдельный просмотр отчёта владельцем и явное разрешение каждой реальной
+  ownership migration; до этого не запускать install/sync на конфликтующих rows.
+- [ ] GitHub Actions на финальном Stage 10 SHA — проверяется после публикации
+  изменений в `origin/main`; реальный HOME gate фиксируется отдельным evidence.
+
+Результат и ограничения: [Stage 10 global Skills preflight report](migrations/2026-11-16-stage-10-global-skills-preflight.md).
+
 ## Порядок ближайшей работы
 
 1. Закрыть текущий CI на финальном SHA после публикации изменений в `main`.

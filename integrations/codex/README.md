@@ -72,6 +72,33 @@ CEOS ownership установка возвращает `BLOCKED` с конкре
 
 Установщик сохраняет manifest с хешами файлов и версией содержимого Skill. `sync.ps1` отказывается затирать локальные изменения и чужие файлы. Подробности — [скрипты](../../scripts/README.md).
 
+## Stage 10: preflight перед глобальной миграцией
+
+Для инвентаризации текущего HOME используйте только read-only preflight:
+
+```powershell
+.\scripts\global-preflight.ps1 -Set ceos-migrated
+.\scripts\global-preflight.ps1 -All -OutputFormat Json
+```
+
+Для disposable HOME можно передать явный `-HomePath`. Preflight проверяет
+`~/.agents/skills/`, `~/.codex/skills/`, WFA manifest, legacy
+`.codex/ceos/installation.json`, SHA-256 и pending transaction. Он не
+устанавливает и не синхронизирует Skills, не выполняет recovery, не создаёт
+backup и не меняет `AGENTS.md`, hooks, config или manifest. Отсутствующий
+manifest не даёт права на перезапись.
+
+`NOT_INSTALLED` и неизменённый управляемый `UPDATE_AVAILABLE` — кандидаты для
+отдельного будущего dry-run. `LEGACY_CEOS_MANAGED`, `USER_MODIFIED`,
+`UNMANAGED_COLLISION`, `OWNERSHIP_UNVERIFIED`, `INVALID_MANIFEST` и
+`UNSAFE_PATH` требуют ручного разрешения или восстановления и не могут быть
+переведены в новый owner автоматически. Функциональное пересечение migrated
+и собственных Skills только фиксируется в отчёте; Skill не удаляется из-за
+пересечения назначения.
+
+Подробный план Stage 10 и результат последнего аудита: [global Skills
+preflight report](../../docs/migrations/2026-11-16-stage-10-global-skills-preflight.md).
+
 ## Постоянная инструкция main-first
 
 Установка папки `git-workflow` сама по себе не гарантирует его вызов на каждой задаче. Содержимое [готового фрагмента](AGENTS.main-first.md) нужно включить в глобальный `~/.codex/AGENTS.md` или проектный `AGENTS.md`, сохранив существующие инструкции. **Этот файл сейчас не меняется установщиком.**

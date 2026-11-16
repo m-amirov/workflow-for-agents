@@ -495,3 +495,287 @@ function Assert-NoPendingSyncTransaction {
         throw "Pending sync transaction: $transaction. Stop all writes and use sync.ps1 -Recover after inspection."
     }
 }
+
+function Test-PreflightPathWithinRoot {
+    param([string]$Path, [string]$Root)
+    $rootFull = [System.IO.Path]::GetFullPath($Root).TrimEnd([char[]]@('\','/'))
+    $pathFull = [System.IO.Path]::GetFullPath($Path).TrimEnd([char[]]@('\','/'))
+    return $pathFull.Equals($rootFull, [System.StringComparison]::OrdinalIgnoreCase) -or
+        $pathFull.StartsWith($rootFull + [System.IO.Path]::DirectorySeparatorChar,
+            [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Get-PreflightTreeSnapshot {
+    [OutputType([pscustomobject])]
+    param(
+        [string]$Directory,
+        [string[]]$HashFiles = @()
+    )
+
+    $result = [ordered]@{
+        Exists = $false
+        Safe = $true
+        Error = $null
+        AllFiles = @()
+        Files = @{}
+        MissingFiles = @()
+        SkillMdPresent = $false
+        SkillMdSha256 = $null
+        Version = $null
+    }
+    if (-not (Test-Path -LiteralPath $Directory -PathType Container)) {
+        return [pscustomobject]$result
+    }
+
+    try {
+        $root = Get-Item -LiteralPath $Directory -Force
+        if (($root.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            $result.Safe = $false
+            $result.Error = "Reparse point: $Directory"
+            return [pscustomobject]$result
+        }
+        $result.Exists = $true
+        $hashSet = @{}
+        foreach ($relative in @($HashFiles)) {
+            if (-not $relative) { continue }
+            $hashSet[[string]$relative.Replace('\','/')] = $true
+        }
+
+        $queue = New-Object System.Collections.Queue
+        $queue.Enqueue($root)
+        $allFiles = New-Object System.Collections.Generic.List[string]
+        $hashes = @{}
+        while ($queue.Count -gt 0) {
+            $current = $queue.Dequeue()
+            foreach ($item in @(Get-ChildItem -LiteralPath $current.FullName -Force)) {
+                if (-not (Test-PreflightPathWithinRoot $item.FullName $Directory)) {
+                    throw "Path escaped expected Skill directory: $($item.FullName)"
+                }
+                if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                    throw "Reparse point inside Skill directory: $($item.FullName)"
+                }
+                if ($item.PSIsContainer) {
+                    $queue.Enqueue($item)
+                    continue
+                }
+                $relative = Get-RelativeFilePath $item.FullName $Directory
+                $allFiles.Add($relative)
+                if ($hashSet.ContainsKey($relative)) {
+                    $hashes[$relative] = (Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+                }
+            }
+        }
+        $result.AllFiles = @($allFiles | Sort-Object)
+        $result.Files = $hashes
+        $missing = @($hashSet.Keys | Where-Object { -not $hashes.ContainsKey($_) } | Sort-Object)
+        $result.MissingFiles = $missing
+        $result.SkillMdPresent = $result.AllFiles -contains 'SKILL.md'
+        if ($hashes.ContainsKey('SKILL.md')) { $result.SkillMdSha256 = $hashes['SKILL.md'] }
+        if ($hashSet.Count -gt 0 -and $missing.Count -eq 0) {
+            $result.Version = Get-SkillVersion $hashes
+        }
+    }
+    catch {
+        $result.Safe = $false
+        $result.Error = $_.Exception.Message
+    }
+    return [pscustomobject]$result
+}
+
+function Get-PreflightManifestInspection {
+    [OutputType([pscustomobject])]
+    param([string]$Path)
+
+    $result = [ordered]@{
+        Path = [System.IO.Path]::GetFullPath($Path)
+        Present = $false
+        State = 'ABSENT'
+        Error = $null
+        Entries = @()
+        EntryByName = @{}
+    }
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return [pscustomobject]$result
+    }
+    $result.Present = $true
+    try {
+        Assert-NotLinked $Path
+        $document = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($null -eq $document -or $document.schema -ne 1 -or
+            $document.source -ne 'workflow-for-agents' -or $null -eq $document.installed) {
+            throw 'Manifest schema/source/installed contract is invalid'
+        }
+        $names = @{}
+        $entries = New-Object System.Collections.Generic.List[object]
+        foreach ($entry in @($document.installed)) {
+            $name = [string]$entry.name
+            if ($name -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$' -or $names.ContainsKey($name)) {
+                throw "Invalid or duplicate manifest skill entry: $name"
+            }
+            $sourceRelative = [string]$entry.sourceRelative
+            if ($sourceRelative -notmatch '^[^/\\]+(?:/[^/\\]+)*$' -or
+                $sourceRelative -match '(^|/)\.\.?(?:/|$)') {
+                throw "Unsafe manifest source path: $sourceRelative"
+            }
+            $map = @{}
+            foreach ($file in @($entry.files)) {
+                $key = [string]$file.path
+                $sha = [string]$file.sha256
+                if ($key -notmatch '^[^/\\]+(?:/[^/\\]+)*$' -or
+                    $key -match '(^|/)\.\.?(?:/|$)' -or $map.ContainsKey($key) -or
+                    $sha -notmatch '^[a-fA-F0-9]{64}$') {
+                    throw "Unsafe or invalid manifest file: $key"
+                }
+                $map[$key] = $sha.ToLowerInvariant()
+            }
+            if ($map.Count -eq 0) { throw "Manifest skill has no managed files: $name" }
+            $expectedVersion = Get-SkillVersion $map
+            if ([string]$entry.sourceVersion -ne $expectedVersion) {
+                throw "Manifest source version does not match file hashes: $name"
+            }
+            $record = [pscustomobject]@{
+                Name = $name
+                SourceRelative = $sourceRelative
+                SourceVersion = [string]$entry.sourceVersion
+                Files = $map
+            }
+            $names[$name] = $true
+            $entries.Add($record)
+        }
+        $result.Entries = @($entries | Sort-Object Name)
+        foreach ($entry in $result.Entries) { $result.EntryByName[$entry.Name] = $entry }
+        $result.State = 'VALID'
+    }
+    catch {
+        $result.State = if ($_.Exception.Message -match 'Reparse point|Unsafe') { 'UNSAFE_PATH' } else { 'INVALID_MANIFEST' }
+        $result.Error = $_.Exception.Message
+    }
+    return [pscustomobject]$result
+}
+
+function Get-PreflightLegacyManifestInspection {
+    [OutputType([pscustomobject])]
+    param([string]$HomePath)
+
+    $path = Join-Path (Join-Path $HomePath '.codex') 'ceos\installation.json'
+    $result = [ordered]@{
+        Path = [System.IO.Path]::GetFullPath($path)
+        Present = $false
+        State = 'ABSENT'
+        Error = $null
+        Version = $null
+        Skills = @()
+        SkillByName = @{}
+    }
+    try {
+        foreach ($parent in @((Join-Path $HomePath '.codex'), (Join-Path (Join-Path $HomePath '.codex') 'ceos'))) {
+            if (Test-Path -LiteralPath $parent -PathType Container) {
+                $parentItem = Get-Item -LiteralPath $parent -Force
+                if (($parentItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                    throw "Reparse point in legacy CEOS path: $parent"
+                }
+            }
+        }
+    }
+    catch {
+        $result.State = 'UNSAFE_PATH'
+        $result.Error = $_.Exception.Message
+        return [pscustomobject]$result
+    }
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        return [pscustomobject]$result
+    }
+    $result.Present = $true
+    try {
+        Assert-NotLinked $path
+        $document = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($null -eq $document) { throw 'Legacy CEOS manifest is empty' }
+        if ($document.PSObject.Properties.Name -contains 'version') { $result.Version = [string]$document.version }
+        $records = New-Object System.Collections.Generic.List[object]
+        if ($document.PSObject.Properties.Name -contains 'skills') {
+            foreach ($property in @($document.skills.PSObject.Properties)) {
+                $sourceProperty = $property.Value.PSObject.Properties['source']
+                $versionProperty = $property.Value.PSObject.Properties['version']
+                $shaProperty = $property.Value.PSObject.Properties['sha256']
+                $records.Add([pscustomobject]@{
+                    Name = [string]$property.Name
+                    Evidence = 'legacy-ceos-manifest.skills'
+                    Source = if ($null -ne $sourceProperty) { [string]$sourceProperty.Value } else { $null }
+                    Version = if ($null -ne $versionProperty) { [string]$versionProperty.Value } else { $null }
+                    Sha256 = if ($null -ne $shaProperty) { [string]$shaProperty.Value } else { $null }
+                })
+            }
+        }
+        if ($document.PSObject.Properties.Name -contains 'installed') {
+            foreach ($installed in @($document.installed)) {
+                $name = [string]$installed.name
+                if ($name) {
+                    $sourceProperty = $installed.PSObject.Properties['source']
+                    $versionProperty = $installed.PSObject.Properties['version']
+                    $shaProperty = $installed.PSObject.Properties['sha256']
+                    $records.Add([pscustomobject]@{
+                        Name = $name
+                        Evidence = 'legacy-ceos-manifest.installed'
+                        Source = if ($null -ne $sourceProperty) { [string]$sourceProperty.Value } else { $null }
+                        Version = if ($null -ne $versionProperty) { [string]$versionProperty.Value } else { $null }
+                        Sha256 = if ($null -ne $shaProperty) { [string]$shaProperty.Value } else { $null }
+                    })
+                }
+            }
+        }
+        $unique = @($records | Where-Object { $_.Name } | Sort-Object Name, Evidence | Group-Object Name | ForEach-Object { $_.Group[0] })
+        $result.Skills = $unique
+        foreach ($skill in $unique) { $result.SkillByName[$skill.Name] = $skill }
+        $result.State = 'VALID'
+    }
+    catch {
+        $result.State = if ($_.Exception.Message -match 'Reparse point') { 'UNSAFE_PATH' } else { 'INVALID_MANIFEST' }
+        $result.Error = $_.Exception.Message
+    }
+    return [pscustomobject]$result
+}
+
+function Get-PreflightImplementedSkillNames {
+    param([string]$RepoRoot)
+    $catalog = Join-Path $RepoRoot 'docs\SKILL_CATALOG.md'
+    if (-not (Test-Path -LiteralPath $catalog -PathType Leaf)) {
+        throw "Skill catalog not found: $catalog"
+    }
+    $names = @()
+    foreach ($line in @(Get-Content -LiteralPath $catalog -Encoding UTF8)) {
+        if ($line -match '^\|\s*[^|]+\|\s*([a-z0-9-]+)\s*\|[^|]*\|\s*implemented\s*\|\s*$') {
+            $names += $Matches[1]
+        }
+    }
+    return @($names | Select-Object -Unique | Sort-Object)
+}
+
+function Get-PreflightSkillMetadata {
+    param([string]$Path)
+    $result = [ordered]@{
+        Name = $null
+        Description = ''
+        Migration = $null
+        SourceSha = $null
+        Status = $null
+        Overlaps = @()
+    }
+    $content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $frontmatter = ''
+    if ($content -match '(?s)^---\r?\n(.*?)\r?\n---') { $frontmatter = $Matches[1] }
+    if ($frontmatter) {
+        if ($frontmatter -match '(?m)^name:\s*(?:>[-+]?\s*)?([^\r\n]+)') { $result.Name = $Matches[1].Trim() }
+        if ($frontmatter -match '(?ms)^description:\s*(.*?)(?=^metadata:|^---|\z)') {
+            $result.Description = (($Matches[1] -replace '[\r\n]+', ' ').Trim() -replace '^>[-+]?\s*', '').Trim()
+        }
+        foreach ($field in @('migration','source_sha','status','overlaps')) {
+            $pattern = '(?m)^\s*' + [regex]::Escape($field) + ':\s*([^\r\n]+)'
+            if ($frontmatter -match $pattern) {
+                $value = $Matches[1].Trim().Trim([char]39).Trim([char]34)
+                if ($field -eq 'overlaps') { $result.Overlaps = @($value -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }
+                else { $result[[string]($field.Substring(0,1).ToUpperInvariant() + $field.Substring(1).Replace('_',''))] = $value }
+            }
+        }
+    }
+    return [pscustomobject]$result
+}
