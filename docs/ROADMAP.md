@@ -110,6 +110,20 @@ evidence.
 на SHA \`3c2e31016b62a052a4c2231891264ec12cf10f3f\`;
 policy и Python реализация написаны самостоятельно.
 
+## Stage 9C: Transactional Global Sync
+
+**Статус:** реализованы staging, rollback и явное recovery;
+локальная/CI проверка фиксируется по точному SHA отдельно.
+
+- [x] Staged full Skill snapshots с сохранением unmanaged local files.
+- [x] Backup manifest, transaction journal, sha256 verification до и после замены.
+- [x] Автоматический rollback при обрабатываемой ошибке commit.
+- [x] Pending state блокирует install и sync, включая DryRun.
+- [x] Явный sync -Recover с защитой post-interruption user edits.
+- [x] Failure-injection в disposable HOME для обоих PowerShell runtimes.
+- [ ] Реальная пользовательская установка и синхронизация: NOT RUN.
+- [ ] Настоящая atomicity при power loss/конкурентном writer: НЕ ГАРАНТИРУЕТСЯ.
+
 ## Антицели
 
 Не запускать оркестрацию нескольких агентов, централизованную БД или сложный индексатор раньше, чем простая файловая библиотека покажет ограничения.
