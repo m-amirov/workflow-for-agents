@@ -779,3 +779,16 @@ function Get-PreflightSkillMetadata {
     }
     return [pscustomobject]$result
 }
+
+function Get-InstallTransactionPath {
+    param([string]$Destination)
+    return (Join-Path $Destination '.workflow-for-agents.install-transaction')
+}
+
+function Assert-NoPendingInstallTransaction {
+    param([string]$Destination)
+    $transaction = Get-InstallTransactionPath $Destination
+    if (Test-Path -LiteralPath $transaction) {
+        throw "Pending install transaction: $transaction. Stop writes and use install.ps1 -Recover after inspection."
+    }
+}

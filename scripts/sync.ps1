@@ -23,10 +23,12 @@ if ($Recover) {
     if ($DryRun -or $Skills.Count -gt 0 -or $Set -or $Profile -or $TestFailurePoint -ne 'None') {
         throw 'Use -Recover without selection, DryRun or test failure injection'
     }
+    Assert-NoPendingInstallTransaction $destination
     Restore-SyncTransaction -Destination $destination -ManifestPath $manifestPath
     return
 }
 Assert-NoPendingSyncTransaction $destination
+Assert-NoPendingInstallTransaction $destination
 if ($TestFailurePoint -ne 'None') {
     if ($Scope -ne 'user' -or -not $HomePath) {
         throw 'TestFailurePoint is allowed only with explicit -Scope user -HomePath disposable fixture'

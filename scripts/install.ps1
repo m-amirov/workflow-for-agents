@@ -7,17 +7,51 @@ param(
     [ValidateSet('ceos-migrated')][string]$Set = '',
     [string]$Profile = '',
     [switch]$DryRun,
+    [switch]$Recover,
+    [string]$BackupPath = '',
+    [ValidateSet('None','AfterFirstMove','BeforeManifest','AfterManifest','InterruptAfterFirstMove','InterruptDuringStaging')]
+    [string]$TestFailurePoint = 'None',
     [string]$HomePath = '',
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'SkillUtils.ps1')
+. (Join-Path $PSScriptRoot 'SyncTransaction.ps1')
+. (Join-Path $PSScriptRoot 'InstallTransaction.ps1')
 
-$repo = Get-RepoRoot $RepositoryRoot
 $destination = Get-SkillsDestination $Scope $ProjectPath $HomePath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
 if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
+if ($Recover) {
+    if ($DryRun -or $Skills.Count -gt 0 -or $All -or $Set -or $Profile -or
+        $BackupPath -or $TestFailurePoint -ne 'None') {
+        throw 'Use -Recover alone without Skills, All, Set, Profile, DryRun, BackupPath or TestFailurePoint'
+    }
+    Assert-NoPendingSyncTransaction $destination
+    Restore-InstallTransaction -Destination $destination -ManifestPath $manifestPath
+    return
+}
+Assert-NoPendingInstallTransaction $destination
 Assert-NoPendingSyncTransaction $destination
+if ($TestFailurePoint -ne 'None') {
+    if ($Scope -ne 'user' -or -not $HomePath) {
+        throw 'Install test fault injection requires explicit -Scope user -HomePath disposable fixture'
+    }
+    $testHome = [System.IO.Path]::GetFullPath($HomePath).TrimEnd([char[]]@('\','/'))
+    $realHome = [System.IO.Path]::GetFullPath($HOME).TrimEnd([char[]]@('\','/'))
+    $tempPrefix = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([char[]]@('\','/')) + [System.IO.Path]::DirectorySeparatorChar
+    if ($testHome.Equals($realHome,[System.StringComparison]::OrdinalIgnoreCase) -or
+        -not $testHome.StartsWith($tempPrefix,[System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Install test fault injection requires a disposable HOME under system TEMP'
+    }
+    $marker = Join-Path $testHome '.wfa-install-transaction-test-home'
+    if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
+        throw "Install test fault injection requires test marker: $marker"
+    }
+    Assert-NotLinked $testHome
+    Assert-NotLinked $marker
+}
+$repo = Get-RepoRoot $RepositoryRoot
 $available = Get-AvailableSkills $repo
 if ($Profile) {
     if ($Scope -ne 'project') { throw 'Project profiles can only be installed with -Scope project' }
@@ -60,17 +94,20 @@ if ($planned.Count -eq 0) { Write-Output "No changes"; return }
 foreach ($plan in $planned) { Write-Output "INSTALL $($plan.Skill.Name) version $(Get-SkillVersion $plan.Hashes) -> $($plan.Target)" }
 if ($DryRun) { Write-Output "DRY RUN: no filesystem changes"; return }
 
+if ($Scope -eq 'user') {
+    $effectiveHome = if ($HomePath) { [System.IO.Path]::GetFullPath($HomePath) } else { [System.IO.Path]::GetFullPath($HOME) }
+    if ($effectiveHome.TrimEnd([char[]]@('\','/')).Equals(
+        [System.IO.Path]::GetFullPath($HOME).TrimEnd([char[]]@('\','/')),
+        [System.StringComparison]::OrdinalIgnoreCase) -and -not $BackupPath) {
+        throw 'Real user HOME install requires explicit -BackupPath outside HOME; dry-run first'
+    }
+}
+if ($BackupPath) {
+    New-InstallExternalBackup -BackupPath $BackupPath -Destination $destination -ManifestPath $manifestPath -Manifest $manifest
+}
 if (-not (Test-Path -LiteralPath $destination)) {
     New-Item -ItemType Directory -Path $destination -Force | Out-Null
 }
-foreach ($plan in $planned) {
-    if (Test-Path -LiteralPath $plan.Target) { throw "Destination appeared during install: $($plan.Target)" }
-    Copy-Item -LiteralPath $plan.Skill.Directory -Destination $plan.Target -Recurse -Force
-    $actual = Get-FileHashes $plan.Target
-    Assert-SameManagedFiles $plan.Hashes $actual $plan.Skill.Name -RejectExtra
-    $entry = New-ManifestEntry $plan.Skill $plan.Hashes
-    $manifest.installed = @($manifest.installed) + @($entry)
-}
-Write-Manifest $manifestPath $manifest
+Invoke-TransactionalInstall -Destination $destination -ManifestPath $manifestPath -Manifest $manifest -Plans $planned -TestFailurePoint $TestFailurePoint
 Write-Output "Installed $($planned.Count) skill(s); manifest: $manifestPath"
 

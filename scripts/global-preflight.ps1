@@ -90,9 +90,10 @@ function Get-PreflightRootsAndCandidates {
                 continue
             }
             $transaction = Get-SyncTransactionPath $root
-            if (Test-Path -LiteralPath $transaction) { $rootInfo.Pending = $true }
+            if ((Test-Path -LiteralPath $transaction) -or (Test-Path -LiteralPath (Get-InstallTransactionPath $root))) { $rootInfo.Pending = $true }
             foreach ($directory in @(Get-ChildItem -LiteralPath $root -Directory -Force)) {
-                if ($directory.Name -eq (Split-Path -Leaf $transaction)) { continue }
+                if ($directory.Name -eq (Split-Path -Leaf $transaction) -or
+                    $directory.Name -eq '.workflow-for-agents.install-transaction') { continue }
                 $unsafe = (($directory.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
                 $snapshot = if ($unsafe) {
                     [pscustomobject]@{ Exists = $true; Safe = $false; Error = "Reparse point: $($directory.FullName)"; AllFiles = @(); Files = @{}; MissingFiles = @(); SkillMdPresent = $false; SkillMdSha256 = $null; Version = $null }
@@ -433,7 +434,7 @@ $overlaps = @(Get-PreflightOverlapRecords $allSourceRecords $implementedNames)
 $blockers = New-Object System.Collections.Generic.List[string]
 foreach ($rootInfo in @($global.Roots)) {
     if (-not $rootInfo.Safe) { $blockers.Add("$($rootInfo.Label): $($rootInfo.Error)") }
-    if ($rootInfo.Pending) { $blockers.Add("$($rootInfo.Label): pending sync transaction; preflight does not recover or unlock it") }
+    if ($rootInfo.Pending) { $blockers.Add("$($rootInfo.Label): pending install or sync transaction; preflight does not recover or unlock it") }
 }
 if ($workflowManifest.State -in @('INVALID_MANIFEST','UNSAFE_PATH')) { $blockers.Add("workflow-for-agents manifest: $($workflowManifest.Error)") }
 if ($legacyManifest.State -in @('INVALID_MANIFEST','UNSAFE_PATH')) { $blockers.Add("legacy CEOS manifest: $($legacyManifest.Error)") }
