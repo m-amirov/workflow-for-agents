@@ -40,6 +40,7 @@
 | Domain | production-art | Source-bound art provenance, mapping and separate acceptance gates | implemented |
 | Operations | prod-check | Read-only production inspection | implemented |
 | Operations | incident-analysis | Incident timeline и causal evidence analysis | implemented |
+| Operations | logging-standard | Структурированные события, trace/request correlation, retries/fallback, privacy-safe диагностика | implemented |
 
 ## Критерии для нового Skill
 

@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "skill": "logging-standard",
+  "source_reference": "https://github.com/rustlung/codex-multi-agent-dev",
+  "source_sha": "3c2e31016b62a052a4c2231891264ec12cf10f3f",
+  "scenarios": [
+    {
+      "id": "LS-01",
+      "expected_activation": true,
+      "scenario": "Cross-stage trace",
+      "prompt": "Добавь логи для request → queue → worker без привязки к vendor.",
+      "expected_behavior": "Единый trace_id, значимые stages и тесты.",
+      "prohibited_behavior": [
+        "Не меняет root trace_id при handoff"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-02",
+      "expected_activation": true,
+      "scenario": "Retry/fallback",
+      "prompt": "После API timeout включается fallback; сделай диагностику этого пути.",
+      "expected_behavior": "attempt, provider, error_type, fallback и degraded outcome.",
+      "prohibited_behavior": [
+        "Не повторяет неизвестный неидемпотентный side effect"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-03",
+      "expected_activation": true,
+      "scenario": "Exception duplication",
+      "prompt": "В логах одно исключение записано как ERROR пять раз. Исправь.",
+      "expected_behavior": "Владелец terminal error, минимальный контекст, без дубликатов.",
+      "prohibited_behavior": [
+        "Не подавляет реальную ошибку"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-04",
+      "expected_activation": true,
+      "scenario": "Secret leak",
+      "prompt": "Аудит логов: DEBUG содержит cookies и request body. Исправь безопасно.",
+      "expected_behavior": "Удаляет опасные поля, добавляет негативную проверку privacy.",
+      "prohibited_behavior": [
+        "Не копирует secrets в отчёт"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-05",
+      "expected_activation": true,
+      "scenario": "Broken correlation",
+      "prompt": "Синтетический trace: started=A, retry=B, completed=A. Найди проблему.",
+      "expected_behavior": "Определяет разрыв корреляции без фиктивного runtime PASS.",
+      "prohibited_behavior": [
+        "Не заявляет production verification"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-06",
+      "expected_activation": true,
+      "scenario": "Insufficient diagnostics",
+      "prompt": "Фоновый job падает, в логах только error. Что улучшить?",
+      "expected_behavior": "Минимальные stages, safe error_type, trace/job id и outcome.",
+      "prohibited_behavior": [
+        "Не включает тотальный DEBUG"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-07",
+      "expected_activation": false,
+      "scenario": "Theory only",
+      "prompt": "Теоретически объясни различие stdout и stderr.",
+      "expected_behavior": "Отвечает на теорию без проектного workflow.",
+      "prohibited_behavior": [
+        "Не навязывает instrumentation"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-08",
+      "expected_activation": false,
+      "scenario": "CSS only",
+      "prompt": "Измени padding кнопки на статической странице.",
+      "expected_behavior": "Не активирует logging-standard.",
+      "prohibited_behavior": [
+        "Не добавляет events"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-09",
+      "expected_activation": false,
+      "scenario": "Writing only",
+      "prompt": "Перепиши описание игры более формально.",
+      "expected_behavior": "Не использует logging-standard.",
+      "prohibited_behavior": [
+        "Не создаёт logging plan"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "LS-10",
+      "expected_activation": false,
+      "scenario": "Algorithm theory",
+      "prompt": "Объясни бинарный поиск.",
+      "expected_behavior": "Не активирует logging-standard.",
+      "prohibited_behavior": [
+        "Не навязывает trace_id"
+      ],
+      "verification": "codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    }
+  ]
+}

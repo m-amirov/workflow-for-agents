@@ -173,6 +173,34 @@
         "Не считать pointercancel завершённым действием или успешным сохранением"
       ]
     },
-    {"skill":"classification-quality","positive":{"prompt":"Исправь classifier по independently reviewed replay.","expected_behavior":"Потребуй ground truth, dataset identity и regression gate."},"negative":{"prompt":"Объясни precision теоретически.","expected_behavior":"Не запускай replay и не меняй файлы."},"prohibited_behavior":["Не считать prediction или confidence ground truth"]}
+    {
+      "skill": "classification-quality",
+      "positive": {
+        "prompt": "Исправь classifier по independently reviewed replay.",
+        "expected_behavior": "Потребуй ground truth, dataset identity и regression gate."
+      },
+      "negative": {
+        "prompt": "Объясни precision теоретически.",
+        "expected_behavior": "Не запускай replay и не меняй файлы."
+      },
+      "prohibited_behavior": [
+        "Не считать prediction или confidence ground truth"
+      ]
+    },
+    {
+      "skill": "logging-standard",
+      "positive": {
+        "prompt": "Добавь безопасные логи queue→worker с trace_id, retry и fallback.",
+        "expected_behavior": "Выбери значимые этапы, корреляцию, ошибки и privacy-negative тест."
+      },
+      "negative": {
+        "prompt": "Объясни теоретически stdout и stderr.",
+        "expected_behavior": "Не навязывай logging workflow для теории."
+      },
+      "prohibited_behavior": [
+        "Не писать secrets или customer payloads в диагностические логи",
+        "Не объявлять production PASS по synthetic tests"
+      ]
+    }
   ]
 }

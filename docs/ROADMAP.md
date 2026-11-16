@@ -77,6 +77,19 @@ evidence.
 
 Подробная матрица и границы: [Stage 8 migration report](migrations/2026-11-16-stage-8-ceos-skills-migration.md).
 
+## Stage 9A: Logging Standard
+
+**Статус:** implemented (Skill, synthetic fixtures, structural positive/negative evals); real Codex activation NOT RUN.
+
+- [x] Автономный logging-standard: этапы, correlation IDs, retries/fallback, минимальный безопасный контекст.
+- [x] Подготовлены LS-01…LS-10 (6 positive, 4 negative), без фиктивного PASS.
+- [x] Схема evals проверяется валидатором; добавлены negative regression tests.
+- [ ] Реальный Codex CLI positive/negative activation: NOT RUN, требует доступного transport.
+- [ ] Реальная user-scope установка: NOT RUN, требует отдельно проверенного HOME и ownership.
+
+Идеи сопоставлены с [codex-multi-agent-dev](https://github.com/rustlung/codex-multi-agent-dev) на SHA 3c2e31016b62a052a4c2231891264ec12cf10f3f.
+Текст Skill создан самостоятельно, без копирования runtime или инструкций агента.
+
 ## Антицели
 
 Не запускать оркестрацию нескольких агентов, централизованную БД или сложный индексатор раньше, чем простая файловая библиотека покажет ограничения.

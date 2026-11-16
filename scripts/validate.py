@@ -42,6 +42,7 @@ DRAWING_EDITOR_EVAL_IDS = {f"DE-{number:02d}" for number in range(1, 11)}
 DRAWING_EDITOR_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 CLASSIFICATION_QUALITY_EVAL_IDS = {f"CQ-{number:02d}" for number in range(1, 13)}
 CLASSIFICATION_QUALITY_EVAL_RESULTS = {"PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT RUN"}
+LOGGING_STANDARD_EVAL_IDS = {f"LS-{n:02d}" for n in range(1, 11)}
 CEOS_MIGRATED_SKILLS = {
     "audit", "audit-repair-loop", "ceos-continue", "fix", "verification",
     "release", "visual-qa", "video-production", "romance-narrative",
@@ -246,6 +247,60 @@ def validate_classification_quality_evals(root: Path) -> tuple[list[str], int]:
     return errors, len(scenarios)
 
 
+def validate_logging_standard_evals(root: Path) -> tuple[list[str], int]:
+    """Validate LS-01..LS-10 without confusing prepared with executed."""
+    path = root / "evals/cases/logging-standard/scenarios.json"
+    if not path.is_file():
+        return ["Missing logging-standard eval suite"], 0
+    try:
+        suite = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"Invalid logging-standard eval suite: {error}"], 0
+    if not isinstance(suite, dict) or suite.get("schema") != 1 or suite.get("skill") != "logging-standard":
+        return ["Invalid logging-standard eval suite schema"], 0
+    scenarios = suite.get("scenarios")
+    if not isinstance(scenarios, list):
+        return ["Logging-standard eval suite must contain scenarios"], 0
+    errors: list[str] = []
+    seen: set[str] = set()
+    positives = negatives = 0
+    for index, case in enumerate(scenarios):
+        identifier = case.get("id") if isinstance(case, dict) else None
+        if identifier not in LOGGING_STANDARD_EVAL_IDS or identifier in seen:
+            errors.append(f"Logging-standard eval {index}: unknown or duplicate id {identifier!r}")
+            continue
+        seen.add(identifier)
+        for field in ("scenario", "prompt", "expected_behavior", "verification"):
+            if not isinstance(case.get(field), str) or not case[field].strip():
+                errors.append(f"Logging-standard eval {identifier}: missing {field}")
+        prohibited = case.get("prohibited_behavior")
+        if not isinstance(prohibited, list) or not prohibited or any(
+            not isinstance(item, str) or not item.strip() for item in prohibited
+        ):
+            errors.append(f"Logging-standard eval {identifier}: missing prohibited behavior")
+        activation = case.get("expected_activation")
+        if type(activation) is not bool:
+            errors.append(f"Logging-standard eval {identifier}: expected_activation must be boolean")
+        elif activation:
+            positives += 1
+        else:
+            negatives += 1
+        status, result = case.get("status"), case.get("result")
+        if status not in BROWSER_AUTOMATION_EVAL_STATUSES:
+            errors.append(f"Logging-standard eval {identifier}: invalid status {status!r}")
+        if result not in CLASSIFICATION_QUALITY_EVAL_RESULTS:
+            errors.append(f"Logging-standard eval {identifier}: invalid result {result!r}")
+        elif ((status == "executed" and result == "NOT RUN") or
+              (status in {"prepared", "not-run"} and result != "NOT RUN") or
+              (status == "blocked" and result != "BLOCKED")):
+            errors.append(f"Logging-standard eval {identifier}: inconsistent execution/result")
+    errors.extend(f"Logging-standard eval suite missing {identifier}"
+                  for identifier in sorted(LOGGING_STANDARD_EVAL_IDS - seen))
+    if positives != 6 or negatives != 4:
+        errors.append(f"Logging-standard eval expected 6 positive/4 negative, got {positives}/{negatives}")
+    return errors, len(scenarios)
+
+
 def validate_ceos_migrated_evals(root: Path) -> tuple[list[str], int]:
     """Validate the source-bound positive/negative activation contract for Stage 8."""
     fixture = root / "evals" / "cases" / "ceos-migrated.json"
@@ -396,6 +451,8 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     errors.extend(drawing_eval_errors)
     classification_errors, classification_evals = validate_classification_quality_evals(root)
     errors.extend(classification_errors)
+    logging_errors, logging_evals = validate_logging_standard_evals(root)
+    errors.extend(logging_errors)
     ceos_errors, ceos_evals = validate_ceos_migrated_evals(root)
     errors.extend(ceos_errors)
     profile_errors, profiles = validate_profiles(root)
@@ -403,7 +460,7 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     return errors, {
         "skills": len(skills), "links": links, "patterns": patterns,
         "browser_evals": browser_evals, "drawing_evals": drawing_evals, "classification_evals": classification_evals,
-        "ceos_migrated_evals": ceos_evals, "profiles": profiles,
+        "ceos_migrated_evals": ceos_evals, "logging_evals": logging_evals, "profiles": profiles,
     }
 
 
@@ -419,6 +476,7 @@ def main() -> int:
         f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s), "
         f"{summary['drawing_evals']} drawing editor eval(s); "
         f"{summary['classification_evals']} classification quality eval(s); {summary['profiles']} project profile(s); "
+        f"{summary['logging_evals']} logging-standard eval(s); "
         f"{summary['ceos_migrated_evals']} CEOS migrated eval(s); "
         f"{len(errors)} error(s)"
     )
