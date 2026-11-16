@@ -9,6 +9,11 @@ import re
 import sys
 from urllib.parse import unquote
 
+SCRIPT_ROOT = Path(__file__).resolve().parent
+if str(SCRIPT_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_ROOT))
+from project_profiles import validate_profiles
+
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 FRONTMATTER_RE = re.compile(r"\A---\s*\n(?P<meta>.*?)\n---\s*\n", re.DOTALL)
@@ -343,9 +348,12 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     errors.extend(drawing_eval_errors)
     classification_errors, classification_evals = validate_classification_quality_evals(root)
     errors.extend(classification_errors)
+    profile_errors, profiles = validate_profiles(root)
+    errors.extend(profile_errors)
     return errors, {
         "skills": len(skills), "links": links, "patterns": patterns,
         "browser_evals": browser_evals, "drawing_evals": drawing_evals, "classification_evals": classification_evals,
+        "profiles": profiles,
     }
 
 
@@ -360,7 +368,7 @@ def main() -> int:
         f"Validated {summary['skills']} skill(s), {summary['links']} internal link(s), "
         f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s), "
         f"{summary['drawing_evals']} drawing editor eval(s); "
-        f"{summary['classification_evals']} classification quality eval(s); "
+        f"{summary['classification_evals']} classification quality eval(s); {summary['profiles']} project profile(s); "
         f"{len(errors)} error(s)"
     )
     return 1 if errors else 0

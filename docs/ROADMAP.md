@@ -38,8 +38,9 @@
 - [x] Реализовать `classification-quality` на offline replay контрактах Twork: [source evidence](../knowledge/research/classification-quality-evidence.md), [eval evidence](../evals/results/2026-11-16-classification-quality-codex-cli.md). Это не измерение качества Twork или внешняя platform acceptance.
 - [ ] Заполнить `knowledge/incidents/` и `knowledge/decisions/` только после появления source-bound случаев; не создавать их ради полноты каталога.
 - [ ] Добавить специализированные Skills по нескольким наиболее повторяемым задачам.
-- [ ] Подготовить проектные профили подключения.
-- [ ] Протестировать отсутствие конфликтов правил между проектами.
+- [x] Подготовить [проектные профили подключения](../projects/) и минимальный выбор Skills через `install.ps1 -Profile`/`sync.ps1 -Profile`.
+- [x] Добавить ограниченную [диагностику совместимости](../scripts/project_profiles.py): декларативные profile/constraint checks, без ложного семантического анализа произвольного `AGENTS.md`.
+- [x] Проверить project-profile selection и конфликтные read-only сценарии реальным Codex CLI: [eval evidence](../evals/results/2026-11-16-project-profiles-codex-cli.md).
 
 **Gate:** у каждого утверждения о причинах, исправлениях и результатах есть проверяемый источник; ни один проектный индекс не заменяет актуальные факты в исходном репозитории.
 

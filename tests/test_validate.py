@@ -186,6 +186,11 @@ cross_project_verification: NOT_RUN
         suite.unlink()
         self.assertTrue(any("Missing classification quality eval suite" in issue for issue in self.failures()))
 
+    def test_detects_missing_required_project_profile(self) -> None:
+        profile = self.root / "projects" / "twork" / "profile.json"
+        profile.unlink()
+        self.assertTrue(any("missing project profile twork" in issue for issue in self.failures()))
+
     def test_detects_inconsistent_classification_execution_and_result(self) -> None:
         import json
         suite = self.root / "evals" / "cases" / "classification-quality" / "scenarios.json"

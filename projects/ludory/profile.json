@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "ludory",
+  "canonical_repository": "https://github.com/m-amirov/ludory",
+  "source_sha": "933c73b195eaf3bfffd12a31ab1cbadb27989eea",
+  "recommended_skills": ["codebase-exploration", "regression-testing", "release-verification", "git-workflow", "browser-qa"],
+  "activation_conditions": ["core-runtime-connect change", "release or browser verification task", "do not use central Skills to alter frozen games"],
+  "protected_local_skills": ["ludory-asset-rights", "ludory-engineering-quality", "ludory-production-art", "ludory-verification", "ludory-visual-qa"],
+  "compatibility_notes": ["central main-first is refined by frozen-game and owner-authorization rules", "central PASS is not asset-rights or platform acceptance"],
+  "git_workflow": "main-first-project-refined",
+  "release_authorization": "owner-required",
+  "stop_lines": ["frozen-games", "asset-rights", "platform-acceptance"],
+  "release_gates": ["npm-test", "npm-check", "core-session", "rights-review", "platform-review"],
+  "installation_limits": ["project-scope explicit profile only", "never overwrite ludory local Skills", "never edit AGENTS.md"],
+  "update_rule": "Refresh source_sha and re-review local instructions, skills and release gates when the repository HEAD or AGENTS.md changes."
+}

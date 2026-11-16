@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "eskizno",
+  "canonical_repository": "https://github.com/m-amirov/eskizno",
+  "source_sha": "7e10b7db7c5b37ab3ed1e004ebf85234bd9faf15",
+  "recommended_skills": ["drawing-editor", "visual-audit", "browser-qa", "regression-testing", "root-cause-debugging"],
+  "activation_conditions": ["Canvas document, layers, history or pointer lifecycle change", "visual or browser verification task", "do not infer device support from unit tests"],
+  "protected_local_skills": ["frontend-design", "curriculum-design-guide", "test-driven-development", "verification-before-completion"],
+  "compatibility_notes": ["central drawing-editor supplements local frontend and curriculum Skills", "model tests do not replace Canvas, IndexedDB or physical stylus evidence"],
+  "git_workflow": "main-first-project-refined",
+  "release_authorization": "owner-required",
+  "stop_lines": ["unverified-stylus", "unverified-canvas-rendering", "unimplemented-persistence"],
+  "release_gates": ["model-history-events-tests", "typecheck", "browser-device-evidence-if-claimed"],
+  "installation_limits": ["project-scope explicit profile only", "never overwrite local curriculum or frontend Skills", "never edit AGENTS.md"],
+  "update_rule": "Refresh source_sha and validate new Canvas, pointer, persistence and local Skill contracts after changes to AGENTS.md or apps/web."
+}

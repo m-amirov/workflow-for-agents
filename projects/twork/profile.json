@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "twork",
+  "canonical_repository": "https://github.com/m-amirov/task-playwright-desktop",
+  "source_sha": "00a54d4d1d532332aef085ef7868cc66d5695e87",
+  "source_evidence_sha": "196f99b4583555ee1b0b170115d6c613e77ce705",
+  "recommended_skills": ["browser-automation", "classification-quality", "root-cause-debugging", "regression-testing", "release-verification"],
+  "activation_conditions": ["offline handler, lease, fence or receipt change", "offline classification replay or regression task", "never use profile testing for real task or submission"],
+  "protected_local_skills": ["twork-log-audit", "twork-playwright-regression", "twork-safe-release"],
+  "compatibility_notes": ["project PR-only/exact-head gate refines central main-first", "central CI and local handler success do not prove platform acceptance"],
+  "git_workflow": "pr-only",
+  "release_authorization": "squash-merge-owner-required",
+  "stop_lines": ["no-real-tasks", "no-complete-click", "no-production-session", "unknown-submission-outcome"],
+  "release_gates": ["npm-test", "npm-check", "gate-source", "exact-pr-head-linux-gate", "post-merge-main-gate"],
+  "installation_limits": ["project-scope explicit profile only", "never overwrite twork local Skills", "never edit AGENTS.md or access production sessions"],
+  "update_rule": "Refresh source_sha and re-run source review when AGENTS.md, handlers, leases, fences, local Skills or release workflows change; historical evidence remains bound to source_evidence_sha."
+}

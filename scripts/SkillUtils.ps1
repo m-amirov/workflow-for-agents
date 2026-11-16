@@ -86,6 +86,40 @@ function Get-SelectedNames {
     return $unique
 }
 
+function Get-ProjectProfile {
+    param([string]$RepoRoot, [string]$Profile)
+    if ($Profile -notmatch '^[a-z0-9-]+$') { throw "Invalid project profile name: $Profile" }
+    $path = Join-Path $RepoRoot (Join-Path 'projects' (Join-Path $Profile 'profile.json'))
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Project profile not found: $Profile" }
+    Assert-NotLinked $path
+    try { $document = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json }
+    catch { throw "Invalid project profile JSON: $Profile" }
+    if ($null -eq $document -or $document.schema -ne 1 -or $document.id -ne $Profile -or
+        $null -eq $document.recommended_skills) { throw "Invalid or incompatible project profile: $Profile" }
+    $selected = @($document.recommended_skills | ForEach-Object { [string]$_ })
+    if ($selected.Count -eq 0 -or @($selected | Where-Object { -not $_ }).Count -gt 0) {
+        throw "Project profile has no valid recommended skills: $Profile"
+    }
+    $catalogPath = Join-Path $RepoRoot 'docs\SKILL_CATALOG.md'
+    if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf)) {
+        throw "Skill catalog is required for project profile installation: $catalogPath"
+    }
+    $catalogStates = @{}
+    foreach ($line in @(Get-Content -LiteralPath $catalogPath -Encoding UTF8)) {
+        $columns = @($line.Split('|'))
+        if ($columns.Count -ge 5) {
+            $name = $columns[2].Trim()
+            $state = $columns[4].Trim()
+            if ($name -match '^[a-z0-9-]+$' -and $state) { $catalogStates[$name] = $state }
+        }
+    }
+    foreach ($name in $selected) {
+        if (-not $catalogStates.ContainsKey($name)) { throw "Profile Skill is absent from catalog: $name" }
+        if ($catalogStates[$name] -ne 'implemented') { throw "Profile Skill is not implemented: $name" }
+    }
+    return [pscustomobject]@{ Document = $document; Skills = $selected }
+}
+
 function New-Manifest {
     return [pscustomobject]@{
         schema = 1

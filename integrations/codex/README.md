@@ -29,6 +29,27 @@
 .\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Skills browser-qa,visual-audit
 ```
 
+Для известных проектов можно выбрать только профильный набор. Это по-прежнему требует явного вызова и сначала поддерживает dry-run:
+
+```powershell
+python .\scripts\project_profiles.py check --profile eskizno --project-root 'C:\work\eskizno'
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno -DryRun
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno
+```
+
+Проверка профиля не читает приватный `~/.codex/AGENTS.md` по умолчанию. Его можно явно передать через `--global-agents <path>`; произвольный текст не считается семантически понятным. Checker интерпретирует только profile fields, JSON constraints и добровольный marker `workflow-for-agents: git=pr-only|direct-main`, поэтому неизвестные формулировки возвращаются как `UNKNOWN`.
+
+## Матрица совместимости
+
+| Проект | Central Skills | Project refinement / stop-line | Результат checker |
+| --- | --- | --- | --- |
+| [Ludory](../../projects/ludory/) | exploration, regression, release, git, browser QA | Frozen games, asset rights и platform acceptance остаются отдельными gates | `PROJECT_REFINEMENT` / `DUPLICATE` |
+| [Eskizno](../../projects/eskizno/) | drawing editor, visual audit, browser QA, regression, debugging | Локальные frontend/curriculum/TDD Skills; Canvas/stylus/IndexedDB требуют отдельных evidence | `PROJECT_REFINEMENT` |
+| [Dachametr](../../projects/dachametr/) | exploration, regression, release, visual audit | PR-only; Market Gate BLOCKED и prototype не авторизован | `PROJECT_REFINEMENT`, без authorisation — `REQUIRES_PROJECT_DECISION` |
+| [Twork](../../projects/twork/) | browser automation, classification quality, debugging, regression, release | PR-only/exact-head/squash authorization; no real task, Complete или production session | `PROJECT_REFINEMENT`; historical evidence — `STALE_EVIDENCE` |
+
+`HARD_CONFLICT` означает две явно заданные несовместимые команды (например, `direct_main_required` против PR-only). `REQUIRES_PROJECT_DECISION` означает коллизию local Skill, невалидный manifest или отсутствующую авторизацию. Central PASS никогда не закрывает project release gate.
+
 Для обновления из новой версии центрального репозитория:
 
 ```powershell

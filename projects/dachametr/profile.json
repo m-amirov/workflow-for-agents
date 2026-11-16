@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "dachametr",
+  "canonical_repository": "https://github.com/m-amirov/dachametr",
+  "source_sha": "c474c916095651aaa95079193a05af8f0d51558c",
+  "recommended_skills": ["codebase-exploration", "regression-testing", "release-verification", "visual-audit"],
+  "activation_conditions": ["authorized research, specification or review task", "implementation only after explicit prototype authorization", "do not use planned SEO calculator Skill"],
+  "protected_local_skills": ["market-validation", "calculator-engineering", "release-readiness", "research-data-integrity", "change-review"],
+  "compatibility_notes": ["project PR-only refines central main-first", "central CI does not authorize Market Gate, prototype, deployment or indexing"],
+  "git_workflow": "pr-only",
+  "release_authorization": "prototype-and-owner-required",
+  "stop_lines": ["market-gate-blocked", "prototype-not-authorized", "no-deploy-or-indexed-url"],
+  "release_gates": ["market-decision", "prototype-authorization", "branch-pr", "owner-authorization", "browser-evidence-if-app-exists"],
+  "installation_limits": ["project-scope explicit profile only", "never overwrite local market or release Skills", "never edit AGENTS.md"],
+  "update_rule": "Refresh source_sha and re-check Market Gate, prototype authorization and local quality gates before changing the recommended set."
+}

@@ -24,6 +24,16 @@
 .\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Skills browser-qa,visual-audit
 ```
 
+Либо явно выбрать минимальный набор из проверенного профиля (не устанавливает все Skills):
+
+```powershell
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno -DryRun
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno
+.\scripts\sync.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno -DryRun
+```
+
+`-Profile` доступен только в project scope и нельзя совмещать с `-Skills`/`-All`. Он выбирает только `recommended_skills` из `projects/<profile>/profile.json`; установщик по-прежнему не редактирует `AGENTS.md`, не заменяет локальные Skills и отказывается при коллизии или повреждённом manifest. Перед установкой выполните `python scripts/project_profiles.py check --profile <name> --project-root <path>`.
+
 `-All` устанавливает все реализованные Skills; по умолчанию нужно указать `-Skills` или `-All`, чтобы избежать случайной массовой установки.
 
 Установщик:

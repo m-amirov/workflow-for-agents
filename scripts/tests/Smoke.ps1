@@ -1,3 +1,5 @@
+param([switch]$SkipUserScope)
+
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
@@ -21,6 +23,8 @@ $manifest = Join-Path $project '.agents\skills\.workflow-for-agents.manifest.jso
 try {
     New-Item -ItemType Directory -Path $sourceCategory, $project -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $repo 'skills\core\task-planning') -Destination $sourceSkill -Recurse
+    New-Item -ItemType Directory -Path (Join-Path $source 'docs') -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repo 'docs\SKILL_CATALOG.md') -Destination (Join-Path $source 'docs\SKILL_CATALOG.md')
 
     & $install -Scope project -ProjectPath $project -RepositoryRoot $source -Skills task-planning -DryRun | Out-Null
     Assert (-not (Test-Path -LiteralPath $targetSkill)) 'dry-run created destination'
@@ -41,6 +45,36 @@ try {
     Assert ($installedManifest.installed[0].sourceVersion -match '^[a-f0-9]{64}$') 'source version fingerprint not recorded'
 
     & $install -Scope project -ProjectPath $project -RepositoryRoot $source -Skills task-planning | Out-Null
+
+    $profileRoot = Join-Path $source 'projects\fixture'
+    New-Item -ItemType Directory -Path $profileRoot -Force | Out-Null
+    [System.IO.File]::WriteAllText((Join-Path $profileRoot 'profile.json'), @'
+{
+  "schema": 1,
+  "id": "fixture",
+  "recommended_skills": ["task-planning"]
+}
+'@, (New-Object System.Text.UTF8Encoding($false)))
+    $profileProject = Join-Path $tmp 'profile-project'
+    New-Item -ItemType Directory -Path $profileProject -Force | Out-Null
+    & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null
+    Assert (-not (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills'))) 'profile dry-run created destination'
+    & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture | Out-Null
+    Assert (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills\task-planning\SKILL.md')) 'profile install did not copy selected skill'
+    & $sync -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture | Out-Null
+    $plannedRoot = Join-Path $source 'projects\planned'
+    New-Item -ItemType Directory -Path $plannedRoot -Force | Out-Null
+    [System.IO.File]::WriteAllText((Join-Path $plannedRoot 'profile.json'), @'
+{
+  "schema": 1,
+  "id": "planned",
+  "recommended_skills": ["seo-calculators"]
+}
+'@, (New-Object System.Text.UTF8Encoding($false)))
+    $failed = $false
+    try { & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile planned | Out-Null }
+    catch { $failed = $true }
+    Assert $failed 'profile install accepted a planned Skill'
 
     $manifestOriginal = Get-Content -LiteralPath $manifest -Raw -Encoding UTF8
     $tampered = $manifestOriginal | ConvertFrom-Json
@@ -111,6 +145,7 @@ try {
     Assert ((Get-Content -LiteralPath $unmanaged -Raw).Contains('user data')) 'collision overwrote local data'
 
     # The CI runner uses an ephemeral user profile; verify real user-scoped path without overwriting existing data.
+    if (-not $SkipUserScope) {
     $userRoot = Join-Path (Join-Path $HOME '.agents') 'skills'
     $userTarget = Join-Path $userRoot 'task-planning'
     $userManifest = Join-Path $userRoot '.workflow-for-agents.manifest.json'
@@ -134,8 +169,13 @@ try {
         if (Test-Path -LiteralPath $userManifest) { Remove-Item -LiteralPath $userManifest -Force }
         if (Test-Path -LiteralPath $userOwned) { Remove-Item -LiteralPath $userOwned -Recurse -Force }
     }
+    } else {
+        Write-Output 'SKIP: user-scope smoke requires an isolated HOME'
+    }
 
-    Write-Output 'PASS: user/project scope, dry-run, manifest schema/source/version/hash integrity, install, idempotency, local edit protection, update/add/remove sync, unmanaged and user-owned file protection, collision'
+    $scopeSummary = if ($SkipUserScope) { 'project scope (user scope skipped)' } else { 'user/project scope' }
+    $protectionSummary = if ($SkipUserScope) { 'unmanaged file protection' } else { 'unmanaged and user-owned file protection' }
+    Write-Output "PASS: $scopeSummary, profile selection, dry-run, manifest schema/source/version/hash integrity, install, idempotency, local edit protection, update/add/remove sync, $protectionSummary, collision"
 }
 finally {
     if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }

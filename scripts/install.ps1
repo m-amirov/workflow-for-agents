@@ -4,6 +4,7 @@ param(
     [string]$ProjectPath = '.',
     [string[]]$Skills = @(),
     [switch]$All,
+    [string]$Profile = '',
     [switch]$DryRun,
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
 )
@@ -15,7 +16,13 @@ $destination = Get-SkillsDestination $Scope $ProjectPath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
 if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
 $available = Get-AvailableSkills $repo
-$selected = @(Get-SelectedNames $available $Skills -All:$All)
+if ($Profile) {
+    if ($Scope -ne 'project') { throw 'Project profiles can only be installed with -Scope project' }
+    if ($All -or $Skills.Count -gt 0) { throw 'Use -Profile alone; do not combine it with -Skills or -All' }
+    $selected = @(Get-SelectedNames $available (Get-ProjectProfile $repo $Profile).Skills)
+} else {
+    $selected = @(Get-SelectedNames $available $Skills -All:$All)
+}
 $manifest = Read-Manifest $manifestPath
 $planned = @()
 

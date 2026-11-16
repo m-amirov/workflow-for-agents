@@ -3,6 +3,7 @@ param(
     [ValidateSet('user','project')][string]$Scope = 'user',
     [string]$ProjectPath = '.',
     [string[]]$Skills = @(),
+    [string]$Profile = '',
     [switch]$DryRun,
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
 )
@@ -16,7 +17,13 @@ if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
 $manifest = Read-Manifest $manifestPath -Require
 $available = Get-AvailableSkills $repo
 $installed = @($manifest.installed)
-$selected = if ($Skills.Count -gt 0) { @($Skills | Select-Object -Unique) } else { @($installed | ForEach-Object { $_.name }) }
+if ($Profile) {
+    if ($Scope -ne 'project') { throw 'Project profiles can only be synchronized with -Scope project' }
+    if ($Skills.Count -gt 0) { throw 'Use -Profile alone; do not combine it with -Skills' }
+    $selected = @((Get-ProjectProfile $repo $Profile).Skills | Select-Object -Unique)
+} else {
+    $selected = if ($Skills.Count -gt 0) { @($Skills | Select-Object -Unique) } else { @($installed | ForEach-Object { $_.name }) }
+}
 $plans = @()
 
 foreach ($name in $selected) {
