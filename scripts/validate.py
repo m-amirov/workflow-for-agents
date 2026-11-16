@@ -33,6 +33,8 @@ KNOWLEDGE_VERIFICATION_STATUSES = {
 }
 BROWSER_AUTOMATION_EVAL_IDS = {f"BA-{number:02d}" for number in range(1, 11)}
 BROWSER_AUTOMATION_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
+DRAWING_EDITOR_EVAL_IDS = {f"DE-{number:02d}" for number in range(1, 11)}
+DRAWING_EDITOR_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -168,6 +170,41 @@ def validate_browser_automation_evals(root: Path) -> tuple[list[str], int]:
     return errors, len(scenarios)
 
 
+def validate_drawing_editor_evals(root: Path) -> tuple[list[str], int]:
+    errors: list[str] = []
+    fixture = root / "evals" / "cases" / "drawing-editor" / "scenarios.json"
+    if not fixture.is_file():
+        return ["Missing drawing editor eval suite"], 0
+    try:
+        suite = json.loads(fixture.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"Invalid drawing editor eval suite: {error}"], 0
+    if not isinstance(suite, dict) or suite.get("schema") != 1 or suite.get("skill") != "drawing-editor":
+        return ["Invalid drawing editor eval suite schema"], 0
+    scenarios = suite.get("scenarios")
+    if not isinstance(scenarios, list):
+        return ["Drawing editor eval suite must contain scenarios"], 0
+    seen: set[str] = set()
+    for index, scenario in enumerate(scenarios):
+        if not isinstance(scenario, dict):
+            errors.append(f"Drawing editor eval {index}: expected object")
+            continue
+        identifier = scenario.get("id")
+        if not isinstance(identifier, str) or identifier not in DRAWING_EDITOR_EVAL_IDS or identifier in seen:
+            errors.append(f"Drawing editor eval {index}: unknown or duplicate id: {identifier!r}")
+            continue
+        seen.add(identifier)
+        for field in ("scenario", "prompt", "expected_behavior", "verification"):
+            if not isinstance(scenario.get(field), str) or not scenario[field].strip():
+                errors.append(f"Drawing editor eval {identifier}: missing {field}")
+        status = scenario.get("status")
+        if status not in DRAWING_EDITOR_EVAL_STATUSES:
+            errors.append(f"Drawing editor eval {identifier}: invalid status {status!r}")
+    for identifier in sorted(DRAWING_EDITOR_EVAL_IDS - seen):
+        errors.append(f"Drawing editor eval suite missing {identifier}")
+    return errors, len(scenarios)
+
+
 def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     root = root.resolve()
     errors: list[str] = []
@@ -272,7 +309,12 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     errors.extend(pattern_errors)
     browser_eval_errors, browser_evals = validate_browser_automation_evals(root)
     errors.extend(browser_eval_errors)
-    return errors, {"skills": len(skills), "links": links, "patterns": patterns, "browser_evals": browser_evals}
+    drawing_eval_errors, drawing_evals = validate_drawing_editor_evals(root)
+    errors.extend(drawing_eval_errors)
+    return errors, {
+        "skills": len(skills), "links": links, "patterns": patterns,
+        "browser_evals": browser_evals, "drawing_evals": drawing_evals,
+    }
 
 
 def main() -> int:
@@ -284,7 +326,8 @@ def main() -> int:
         print(f"ERROR: {issue}", file=sys.stderr)
     print(
         f"Validated {summary['skills']} skill(s), {summary['links']} internal link(s), "
-        f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s); "
+        f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s), "
+        f"{summary['drawing_evals']} drawing editor eval(s); "
         f"{len(errors)} error(s)"
     )
     return 1 if errors else 0

@@ -167,6 +167,20 @@ cross_project_verification: NOT_RUN
         suite.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
         self.assertTrue(any("missing BA-09" in issue for issue in self.failures()))
 
+    def test_detects_missing_drawing_editor_eval_suite(self) -> None:
+        suite = self.root / "evals" / "cases" / "drawing-editor" / "scenarios.json"
+        suite.unlink()
+        self.assertTrue(any("Missing drawing editor eval suite" in issue
+                            for issue in self.failures()))
+
+    def test_detects_missing_required_drawing_editor_case(self) -> None:
+        import json
+        suite = self.root / "evals" / "cases" / "drawing-editor" / "scenarios.json"
+        data = json.loads(suite.read_text(encoding="utf-8"))
+        data["scenarios"] = [case for case in data["scenarios"] if case["id"] != "DE-09"]
+        suite.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        self.assertTrue(any("missing DE-09" in issue for issue in self.failures()))
+
 
 if __name__ == "__main__":
     unittest.main()

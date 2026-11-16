@@ -19,7 +19,7 @@
 | Testing | browser-qa | Сценарии в реальном браузере | implemented |
 | Domain | interactive-fiction | Ветвления, решения, переменные, концовки | planned |
 | Domain | game-visual-integrity | Ассеты, шрифты, CG, изображения и экраны игры | planned |
-| Domain | drawing-editor | Холст, стилус, кисти, фигуры, слои | planned |
+| Domain | drawing-editor | Безопасные document/layer/history/pointer contracts для Canvas-редакторов | implemented |
 | Automation | browser-automation | Stateful browser automation с lease, durable fence и independent receipt для внешних side effects | implemented |
 | Automation | document-extraction | Поля и разметка документов/PDF | planned |
 | Automation | classification-quality | Аудит классификаторов и логов | planned |

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "skill": "drawing-editor",
+  "status": "executed-local",
+  "description": "Synthetic and Codex CLI eval scenarios for editable drawing documents. No scenario authorizes a real browser, stylus device, IndexedDB store or user document.",
+  "scenarios": [
+    {"id": "DE-01", "scenario": "Изменение модели рисунка", "prompt": "Спроектируй изменение модели Canvas-редактора с locked layers, историей и pointercancel без реального браузера.", "expected_behavior": "Skill активируется и требует immutable actions, gesture lifecycle, undo/redo и save boundary.", "verification": "codex-cli", "status": "executed"},
+    {"id": "DE-02", "scenario": "Теоретический вопрос о Canvas", "prompt": "Теоретически объясни CanvasRenderingContext2D.beginPath().", "expected_behavior": "Skill не активируется и не выполняет файловых или browser-действий.", "verification": "codex-cli", "status": "executed"},
+    {"id": "DE-03", "scenario": "Изменение locked layer", "prompt": "Добавить stroke в locked layer.", "expected_behavior": "Операция отклоняется без изменения документа.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-04", "scenario": "Invalid action или ID", "prompt": "Применить действие к отсутствующему layer или duplicate stroke ID.", "expected_behavior": "Состояние и предыдущий snapshot не повреждаются.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-05", "scenario": "Undo после нескольких действий", "prompt": "Восстановить состояние до принятого действия.", "expected_behavior": "Undo возвращает правильный prior document.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-06", "scenario": "Новое действие после undo", "prompt": "Сделать distinct action после undo.", "expected_behavior": "Несоответствующая redo-ветка очищается.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-07", "scenario": "pointercancel", "prompt": "Отменить активный pointer gesture.", "expected_behavior": "Gesture отменён без ложного commit.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-08", "scenario": "Повторное завершение одного жеста", "prompt": "Повторно получить pointerup для уже завершённого gesture.", "expected_behavior": "Нет двойного commit.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-09", "scenario": "Ошибка сохранения", "prompt": "Durable save возвращает ошибку.", "expected_behavior": "Документ не объявляется сохранённым; prior persisted snapshot сохранён.", "verification": "synthetic-contract", "status": "executed"},
+    {"id": "DE-10", "scenario": "CSS-правка обычной страницы", "prompt": "Измени отступ кнопки на статической странице.", "expected_behavior": "Skill не активируется.", "verification": "codex-cli", "status": "executed"}
+  ]
+}
