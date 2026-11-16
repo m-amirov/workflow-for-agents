@@ -29,9 +29,9 @@ function Get-Snapshot {
 function Assert-Snapshot {
     param([object]$Expected,[string]$Name)
     $snapshot = Get-Snapshot
-    Assert ($snapshot.manifest -eq $Expected.manifest) "$Name: manifest mismatch"
-    Assert ($snapshot.a -eq $Expected.a) "$Name: first Skill mismatch"
-    Assert ($snapshot.b -eq $Expected.b) "$Name: second Skill mismatch"
+    Assert ($snapshot.manifest -eq $Expected.manifest) "${Name}: manifest mismatch"
+    Assert ($snapshot.a -eq $Expected.a) "${Name}: first Skill mismatch"
+    Assert ($snapshot.b -eq $Expected.b) "${Name}: second Skill mismatch"
 }
 
 try {
@@ -57,10 +57,10 @@ try {
         $failed = $false
         try { & $sync -Scope user -RepositoryRoot $source -HomePath $home -Skills task-planning,audit -TestFailurePoint $point | Out-Null }
         catch { $failed = $true }
-        Assert $failed "$point: did not raise failure"
-        Assert-Snapshot $before "$point: rollback"
-        Assert (-not (Test-Path -LiteralPath $transaction)) "$point: transaction left behind"
-        Assert ((Get-Content -LiteralPath $unmanaged -Raw).Contains('local notes')) "$point: unmanaged file deleted"
+        Assert $failed "${point}: did not raise failure"
+        Assert-Snapshot $before "${point}: rollback"
+        Assert (-not (Test-Path -LiteralPath $transaction)) "${point}: transaction left behind"
+        Assert ((Get-Content -LiteralPath $unmanaged -Raw).Contains('local notes')) "${point}: unmanaged file deleted"
     }
 
     $interrupted = $false
