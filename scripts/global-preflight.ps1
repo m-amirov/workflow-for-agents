@@ -434,7 +434,7 @@ $overlaps = @(Get-PreflightOverlapRecords $allSourceRecords $implementedNames)
 $blockers = New-Object System.Collections.Generic.List[string]
 foreach ($rootInfo in @($global.Roots)) {
     if (-not $rootInfo.Safe) { $blockers.Add("$($rootInfo.Label): $($rootInfo.Error)") }
-    if ($rootInfo.Pending) { $blockers.Add("$($rootInfo.Label): pending install or sync transaction; preflight does not recover or unlock it") }
+    if ($rootInfo.Pending) { $blockers.Add("$($rootInfo.Label): pending sync transaction or install transaction; preflight does not recover or unlock it") }
 }
 if ($workflowManifest.State -in @('INVALID_MANIFEST','UNSAFE_PATH')) { $blockers.Add("workflow-for-agents manifest: $($workflowManifest.Error)") }
 if ($legacyManifest.State -in @('INVALID_MANIFEST','UNSAFE_PATH')) { $blockers.Add("legacy CEOS manifest: $($legacyManifest.Error)") }
