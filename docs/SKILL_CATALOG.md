@@ -22,7 +22,7 @@
 | Domain | drawing-editor | Безопасные document/layer/history/pointer contracts для Canvas-редакторов | implemented |
 | Automation | browser-automation | Stateful browser automation с lease, durable fence и independent receipt для внешних side effects | implemented |
 | Automation | document-extraction | Поля и разметка документов/PDF | planned |
-| Automation | classification-quality | Аудит классификаторов и логов | planned |
+| Automation | classification-quality | Независимые labels, offline replay, baseline и fail-closed quality gates | implemented |
 | Domain | seo-calculators | Полезные SEO-инструменты и калькуляторы | planned |
 | Content | content-pipeline | Конвейер подготовки и проверки публикаций | planned |
 

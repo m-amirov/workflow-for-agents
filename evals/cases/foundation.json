@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "partially-executed-real-codex",
-  "description": "Twelve positive/negative prompts are structurally validated; real Codex CLI activation evidence exists for git-workflow, root-cause-debugging, browser-automation and drawing-editor.",
+  "description": "Thirteen positive/negative prompts are structurally validated; real Codex CLI activation evidence includes classification-quality.",
   "execution_reference": "../results/2026-11-15-codex-cli-foundation.md",
   "drawing_editor_execution_reference": "../results/2026-11-16-drawing-editor-codex-cli.md",
   "cases": [
@@ -172,6 +172,7 @@
       "prohibited_behavior": [
         "Не считать pointercancel завершённым действием или успешным сохранением"
       ]
-    }
+    },
+    {"skill":"classification-quality","positive":{"prompt":"Исправь classifier по independently reviewed replay.","expected_behavior":"Потребуй ground truth, dataset identity и regression gate."},"negative":{"prompt":"Объясни precision теоретически.","expected_behavior":"Не запускай replay и не меняй файлы."},"prohibited_behavior":["Не считать prediction или confidence ground truth"]}
   ]
 }

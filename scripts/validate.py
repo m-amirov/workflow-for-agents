@@ -35,6 +35,7 @@ BROWSER_AUTOMATION_EVAL_IDS = {f"BA-{number:02d}" for number in range(1, 11)}
 BROWSER_AUTOMATION_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 DRAWING_EDITOR_EVAL_IDS = {f"DE-{number:02d}" for number in range(1, 11)}
 DRAWING_EDITOR_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
+CLASSIFICATION_QUALITY_EVAL_IDS = {f"CQ-{number:02d}" for number in range(1, 13)}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -204,6 +205,25 @@ def validate_drawing_editor_evals(root: Path) -> tuple[list[str], int]:
         errors.append(f"Drawing editor eval suite missing {identifier}")
     return errors, len(scenarios)
 
+def validate_classification_quality_evals(root: Path) -> tuple[list[str], int]:
+    fixture = root / "evals" / "cases" / "classification-quality" / "scenarios.json"
+    if not fixture.is_file(): return ["Missing classification quality eval suite"], 0
+    try: suite = json.loads(fixture.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error: return [f"Invalid classification quality eval suite: {error}"], 0
+    if not isinstance(suite, dict) or suite.get("schema") != 1 or suite.get("skill") != "classification-quality": return ["Invalid classification quality eval suite schema"], 0
+    scenarios, seen, errors = suite.get("scenarios"), set(), []
+    if not isinstance(scenarios, list): return ["Classification quality eval suite must contain scenarios"], 0
+    for index, scenario in enumerate(scenarios):
+        identifier = scenario.get("id") if isinstance(scenario, dict) else None
+        if not isinstance(identifier, str) or identifier not in CLASSIFICATION_QUALITY_EVAL_IDS or identifier in seen:
+            errors.append(f"Classification quality eval {index}: unknown or duplicate id: {identifier!r}"); continue
+        seen.add(identifier)
+        for field in ("scenario", "prompt", "expected_behavior", "verification"):
+            if not isinstance(scenario.get(field), str) or not scenario[field].strip(): errors.append(f"Classification quality eval {identifier}: missing {field}")
+        if scenario.get("status") not in BROWSER_AUTOMATION_EVAL_STATUSES: errors.append(f"Classification quality eval {identifier}: invalid status")
+    errors.extend(f"Classification quality eval suite missing {identifier}" for identifier in sorted(CLASSIFICATION_QUALITY_EVAL_IDS - seen))
+    return errors, len(scenarios)
+
 
 def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     root = root.resolve()
@@ -311,9 +331,11 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     errors.extend(browser_eval_errors)
     drawing_eval_errors, drawing_evals = validate_drawing_editor_evals(root)
     errors.extend(drawing_eval_errors)
+    classification_errors, classification_evals = validate_classification_quality_evals(root)
+    errors.extend(classification_errors)
     return errors, {
         "skills": len(skills), "links": links, "patterns": patterns,
-        "browser_evals": browser_evals, "drawing_evals": drawing_evals,
+        "browser_evals": browser_evals, "drawing_evals": drawing_evals, "classification_evals": classification_evals,
     }
 
 
@@ -328,6 +350,7 @@ def main() -> int:
         f"Validated {summary['skills']} skill(s), {summary['links']} internal link(s), "
         f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s), "
         f"{summary['drawing_evals']} drawing editor eval(s); "
+        f"{summary['classification_evals']} classification quality eval(s); "
         f"{len(errors)} error(s)"
     )
     return 1 if errors else 0

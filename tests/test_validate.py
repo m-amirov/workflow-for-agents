@@ -181,6 +181,11 @@ cross_project_verification: NOT_RUN
         suite.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
         self.assertTrue(any("missing DE-09" in issue for issue in self.failures()))
 
+    def test_detects_missing_classification_quality_eval_suite(self) -> None:
+        suite = self.root / "evals" / "cases" / "classification-quality" / "scenarios.json"
+        suite.unlink()
+        self.assertTrue(any("Missing classification quality eval suite" in issue for issue in self.failures()))
+
 
 if __name__ == "__main__":
     unittest.main()
