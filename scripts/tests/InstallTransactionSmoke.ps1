@@ -73,6 +73,7 @@ try {
 
     foreach ($point in @('AfterFirstMove','BeforeManifest','AfterManifest')) {
         $failed = $false
+        $failureDetail = ''
         try {
             if ($point -eq 'AfterFirstMove') {
                 & $install -Scope user -HomePath $fixtureHome -RepositoryRoot $source -All -BackupPath $backup -TestFailurePoint $point | Out-Null
@@ -80,8 +81,9 @@ try {
                 & $install -Scope user -HomePath $fixtureHome -RepositoryRoot $source -All -TestFailurePoint $point | Out-Null
             }
         }
-        catch { $failed = $true }
+        catch { $failed = $true; $failureDetail = $_.Exception.Message }
         Assert $failed "$point did not raise injected failure"
+        Assert ($failureDetail.Contains("TEST-INJECT: $point")) "$point failed for unexpected reason: $failureDetail"
         Assert-Baseline $baseline "$point rollback"
         Assert (-not (Test-Path -LiteralPath $transaction)) "$point left transaction"
     }
