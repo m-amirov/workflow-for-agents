@@ -41,6 +41,7 @@
 - [x] Подготовить [проектные профили подключения](../projects/) и минимальный выбор Skills через `install.ps1 -Profile`/`sync.ps1 -Profile`.
 - [x] Добавить ограниченную [диагностику совместимости](../scripts/project_profiles.py): декларативные profile/constraint checks, без ложного семантического анализа произвольного `AGENTS.md`.
 - [x] Проверить project-profile selection и конфликтные read-only сценарии реальным Codex CLI: [eval evidence](../evals/results/2026-11-16-project-profiles-codex-cli.md).
+- [x] Добавить обязательный operational preflight для profile install/sync: canonical remote, exact source SHA, manifest/local-Skill protection и stop-line boundary до записи файлов. Пилотный rollout и фактические ограничения фиксируются отдельным evidence report.
 
 **Gate:** у каждого утверждения о причинах, исправлениях и результатах есть проверяемый источник; ни один проектный индекс не заменяет актуальные факты в исходном репозитории.
 

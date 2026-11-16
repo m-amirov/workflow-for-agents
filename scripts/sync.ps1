@@ -20,7 +20,9 @@ $installed = @($manifest.installed)
 if ($Profile) {
     if ($Scope -ne 'project') { throw 'Project profiles can only be synchronized with -Scope project' }
     if ($Skills.Count -gt 0) { throw 'Use -Profile alone; do not combine it with -Skills' }
-    $selected = @((Get-ProjectProfile $repo $Profile).Skills | Select-Object -Unique)
+    $preflight = Invoke-ProjectProfilePreflight -RepoRoot $repo -ProjectPath $ProjectPath -Profile $Profile
+    Assert-ProjectProfilePreflight $preflight
+    $selected = @($preflight.Skills | Select-Object -Unique)
 } else {
     $selected = if ($Skills.Count -gt 0) { @($Skills | Select-Object -Unique) } else { @($installed | ForEach-Object { $_.name }) }
 }

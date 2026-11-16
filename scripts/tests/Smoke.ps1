@@ -46,35 +46,112 @@ try {
 
     & $install -Scope project -ProjectPath $project -RepositoryRoot $source -Skills task-planning | Out-Null
 
-    $profileRoot = Join-Path $source 'projects\fixture'
-    New-Item -ItemType Directory -Path $profileRoot -Force | Out-Null
-    [System.IO.File]::WriteAllText((Join-Path $profileRoot 'profile.json'), @'
-{
-  "schema": 1,
-  "id": "fixture",
-  "recommended_skills": ["task-planning"]
-}
-'@, (New-Object System.Text.UTF8Encoding($false)))
     $profileProject = Join-Path $tmp 'profile-project'
-    New-Item -ItemType Directory -Path $profileProject -Force | Out-Null
+    $profileRemote = Join-Path $tmp 'profile-remote.git'
+    & git init --bare --quiet $profileRemote
+    & git init --quiet $profileProject
+    & git -C $profileProject config user.email 'smoke@example.invalid'
+    & git -C $profileProject config user.name 'Workflow Smoke'
+    Set-Content -LiteralPath (Join-Path $profileProject 'README.md') -Value 'fixture' -Encoding UTF8
+    & git -C $profileProject add README.md
+    & git -C $profileProject commit --quiet -m 'fixture'
+    & git -C $profileProject remote add origin $profileRemote
+    $profileHead = (& git -C $profileProject rev-parse HEAD).Trim()
+    $profileRoot = Join-Path $source 'projects\fixture'
+    New-Item -ItemType Directory -Path $profileRoot, (Join-Path $profileProject '.agents\skills\fixture-local') -Force | Out-Null
+    $profileDocument = [pscustomobject]@{
+        schema = 1
+        id = 'fixture'
+        canonical_repository = $profileRemote
+        source_sha = $profileHead
+        recommended_skills = @('task-planning')
+        activation_conditions = @('fixture')
+        protected_local_skills = @('fixture-local')
+        compatibility_notes = @('fixture')
+        git_workflow = 'main-first-project-refined'
+        release_authorization = 'owner-required'
+        stop_lines = @('fixture-stop-line')
+        release_gates = @('fixture-gate')
+        installation_limits = @('project only')
+        update_rule = 'fixture'
+    }
+    [System.IO.File]::WriteAllText((Join-Path $profileRoot 'profile.json'), ($profileDocument | ConvertTo-Json -Depth 10), (New-Object System.Text.UTF8Encoding($false)))
     & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null
-    Assert (-not (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills'))) 'profile dry-run created destination'
+    Assert (-not (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills\task-planning'))) 'profile dry-run created destination'
     & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture | Out-Null
     Assert (Test-Path -LiteralPath (Join-Path $profileProject '.agents\skills\task-planning\SKILL.md')) 'profile install did not copy selected skill'
     & $sync -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture | Out-Null
+    $profileManifest = Join-Path $profileProject '.agents\skills\.workflow-for-agents.manifest.json'
+    $profileManifestOriginal = Get-Content -LiteralPath $profileManifest -Raw -Encoding UTF8
+    [System.IO.File]::WriteAllText($profileManifest, '{"schema":9}', (New-Object System.Text.UTF8Encoding($false)))
+    $failed = $false
+    try { & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null }
+    catch { $failed = $true }
+    Assert $failed 'profile install accepted a corrupt manifest'
+    [System.IO.File]::WriteAllText($profileManifest, $profileManifestOriginal, (New-Object System.Text.UTF8Encoding($false)))
+    $profileManifestHidden = "$profileManifest.hidden"
+    Move-Item -LiteralPath $profileManifest -Destination $profileManifestHidden
+    $failed = $false
+    try { & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null }
+    catch { $failed = $true }
+    Assert $failed 'profile install treated an unmanaged local Skill as managed'
+    Move-Item -LiteralPath $profileManifestHidden -Destination $profileManifest
     $plannedRoot = Join-Path $source 'projects\planned'
     New-Item -ItemType Directory -Path $plannedRoot -Force | Out-Null
-    [System.IO.File]::WriteAllText((Join-Path $plannedRoot 'profile.json'), @'
-{
-  "schema": 1,
-  "id": "planned",
-  "recommended_skills": ["seo-calculators"]
-}
-'@, (New-Object System.Text.UTF8Encoding($false)))
+    $plannedDocument = $profileDocument | Select-Object *
+    $plannedDocument.id = 'planned'
+    $plannedDocument.recommended_skills = @('seo-calculators')
+    [System.IO.File]::WriteAllText((Join-Path $plannedRoot 'profile.json'), ($plannedDocument | ConvertTo-Json -Depth 10), (New-Object System.Text.UTF8Encoding($false)))
     $failed = $false
     try { & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile planned | Out-Null }
     catch { $failed = $true }
     Assert $failed 'profile install accepted a planned Skill'
+
+    $wrongProject = Join-Path $tmp 'wrong-profile-project'
+    $wrongRemote = Join-Path $tmp 'wrong-profile-remote.git'
+    & git init --bare --quiet $wrongRemote
+    & git init --quiet $wrongProject
+    & git -C $wrongProject config user.email 'smoke@example.invalid'
+    & git -C $wrongProject config user.name 'Workflow Smoke'
+    Set-Content -LiteralPath (Join-Path $wrongProject 'README.md') -Value 'wrong' -Encoding UTF8
+    & git -C $wrongProject add README.md
+    & git -C $wrongProject commit --quiet -m 'wrong fixture'
+    & git -C $wrongProject remote add origin $wrongRemote
+    $failed = $false
+    try { & $install -Scope project -ProjectPath $wrongProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null }
+    catch { $failed = $true }
+    Assert $failed 'profile install accepted a wrong Git remote'
+    Assert (-not (Test-Path -LiteralPath (Join-Path $wrongProject '.agents\skills\task-planning'))) 'blocked preflight partially installed a Skill'
+
+    Set-Content -LiteralPath (Join-Path $profileProject 'STALE.md') -Value 'new head' -Encoding UTF8
+    & git -C $profileProject add STALE.md
+    & git -C $profileProject commit --quiet -m 'stale fixture'
+    $failed = $false
+    try { & $install -Scope project -ProjectPath $profileProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null }
+    catch { $failed = $true }
+    Assert $failed 'profile install accepted stale source SHA'
+    & git -C $profileProject reset --hard --quiet $profileHead
+
+    $noGitProject = Join-Path $tmp 'no-git-profile-project'
+    New-Item -ItemType Directory -Path $noGitProject -Force | Out-Null
+    $failed = $false
+    try { & $install -Scope project -ProjectPath $noGitProject -RepositoryRoot $source -Profile fixture -DryRun | Out-Null }
+    catch { $failed = $true }
+    Assert $failed 'profile install accepted a non-Git target'
+
+    $prProfileRoot = Join-Path $source 'projects\prfixture'
+    New-Item -ItemType Directory -Path $prProfileRoot -Force | Out-Null
+    $prDocument = $profileDocument | Select-Object *
+    $prDocument.id = 'prfixture'
+    $prDocument.git_workflow = 'pr-only'
+    [System.IO.File]::WriteAllText((Join-Path $prProfileRoot 'profile.json'), ($prDocument | ConvertTo-Json -Depth 10), (New-Object System.Text.UTF8Encoding($false)))
+    $normalPreflight = Invoke-ProjectProfilePreflight -RepoRoot $source -ProjectPath $profileProject -Profile prfixture
+    Assert ($normalPreflight.Decision -eq 'PASS') 'PR-only refinement was blocked without a direct-main request'
+    $directMainPreflight = Invoke-ProjectProfilePreflight -RepoRoot $source -ProjectPath $profileProject -Profile prfixture -DirectMainRequired
+    Assert ($directMainPreflight.Decision -eq 'BLOCKED') 'direct-main requirement was not blocked for PR-only profile'
+    Assert (@($directMainPreflight.Findings | Where-Object { $_.Class -eq 'HARD_CONFLICT' }).Count -eq 1) 'PR-only conflict was not classified as HARD_CONFLICT'
+    $prototypePreflight = Invoke-ProjectProfilePreflight -RepoRoot $source -ProjectPath $profileProject -Profile fixture -Operation prototype
+    Assert ($prototypePreflight.Decision -eq 'BLOCKED') 'prototype operation was authorized by profile installation'
 
     $manifestOriginal = Get-Content -LiteralPath $manifest -Raw -Encoding UTF8
     $tampered = $manifestOriginal | ConvertFrom-Json

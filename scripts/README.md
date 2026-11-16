@@ -32,7 +32,16 @@
 .\scripts\sync.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno -DryRun
 ```
 
-`-Profile` доступен только в project scope и нельзя совмещать с `-Skills`/`-All`. Он выбирает только `recommended_skills` из `projects/<profile>/profile.json`; установщик по-прежнему не редактирует `AGENTS.md`, не заменяет локальные Skills и отказывается при коллизии или повреждённом manifest. Перед установкой выполните `python scripts/project_profiles.py check --profile <name> --project-root <path>`.
+`-Profile` доступен только в project scope и нельзя совмещать с `-Skills`/`-All`. Перед **каждой** profile-install и profile-sync установщик выполняет read-only preflight: проверяет Git checkout и `origin`, exact `HEAD` против `source_sha`, целостность manifest, защищённые local Skills, коллизии имён и декларативное Git-policy уточнение. Несовпавший remote, stale SHA, отсутствующий Git checkout, повреждённый manifest или неменеджируемая коллизия дают `BLOCKED` **до записи файлов**. `-DryRun` выполняет тот же preflight, но не записывает Skills.
+
+Для отдельной диагностики и проверки operation boundary используйте PowerShell-обёртку; `skill-install` не авторизует prototype, merge или release:
+
+```powershell
+.\scripts\profile-preflight.ps1 -Profile eskizno -ProjectPath 'C:\work\eskizno'
+.\scripts\profile-preflight.ps1 -Profile dachametr -ProjectPath 'C:\work\dachametr' -Operation prototype
+```
+
+Python checker `scripts/project_profiles.py check` остаётся декларативной диагностикой для profile/AGENTS constraints; он не является заменой operational preflight установщика. Установщик по-прежнему не редактирует `AGENTS.md` и не заменяет local Skills.
 
 `-All` устанавливает все реализованные Skills; по умолчанию нужно указать `-Skills` или `-All`, чтобы избежать случайной массовой установки.
 

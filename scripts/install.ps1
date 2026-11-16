@@ -19,7 +19,9 @@ $available = Get-AvailableSkills $repo
 if ($Profile) {
     if ($Scope -ne 'project') { throw 'Project profiles can only be installed with -Scope project' }
     if ($All -or $Skills.Count -gt 0) { throw 'Use -Profile alone; do not combine it with -Skills or -All' }
-    $selected = @(Get-SelectedNames $available (Get-ProjectProfile $repo $Profile).Skills)
+    $preflight = Invoke-ProjectProfilePreflight -RepoRoot $repo -ProjectPath $ProjectPath -Profile $Profile
+    Assert-ProjectProfilePreflight $preflight
+    $selected = @(Get-SelectedNames $available $preflight.Skills)
 } else {
     $selected = @(Get-SelectedNames $available $Skills -All:$All)
 }

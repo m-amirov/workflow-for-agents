@@ -29,15 +29,15 @@
 .\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Skills browser-qa,visual-audit
 ```
 
-Для известных проектов можно выбрать только профильный набор. Это по-прежнему требует явного вызова и сначала поддерживает dry-run:
+Для известных проектов можно выбрать только профильный набор. Это по-прежнему требует явного вызова и сначала поддерживает dry-run. Profile install/sync обязательно выполняет operational preflight (canonical `origin`, exact `HEAD`/`source_sha`, manifest, local-Skill collision и policy); `BLOCKED` останавливает процесс до записи:
 
 ```powershell
-python .\scripts\project_profiles.py check --profile eskizno --project-root 'C:\work\eskizno'
+.\scripts\profile-preflight.ps1 -Profile eskizno -ProjectPath 'C:\work\eskizno'
 .\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno -DryRun
 .\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\eskizno' -Profile eskizno
 ```
 
-Проверка профиля не читает приватный `~/.codex/AGENTS.md` по умолчанию. Его можно явно передать через `--global-agents <path>`; произвольный текст не считается семантически понятным. Checker интерпретирует только profile fields, JSON constraints и добровольный marker `workflow-for-agents: git=pr-only|direct-main`, поэтому неизвестные формулировки возвращаются как `UNKNOWN`.
+Декларативный Python checker не читает приватный `~/.codex/AGENTS.md` по умолчанию. Его можно явно передать через `--global-agents <path>`; произвольный текст не считается семантически понятным. Он интерпретирует только profile fields, JSON constraints и добровольный marker `workflow-for-agents: git=pr-only|direct-main`, поэтому неизвестные формулировки возвращаются как `UNKNOWN`. Operational preflight не делает семантических выводов из произвольного `AGENTS.md`: он проверяет только безопасные install-boundary facts и не выдаёт Skills за разрешение prototype, merge или release.
 
 ## Матрица совместимости
 

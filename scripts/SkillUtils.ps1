@@ -95,7 +95,13 @@ function Get-ProjectProfile {
     try { $document = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json }
     catch { throw "Invalid project profile JSON: $Profile" }
     if ($null -eq $document -or $document.schema -ne 1 -or $document.id -ne $Profile -or
-        $null -eq $document.recommended_skills) { throw "Invalid or incompatible project profile: $Profile" }
+        -not $document.canonical_repository -or -not $document.source_sha -or
+        $null -eq $document.recommended_skills -or $null -eq $document.protected_local_skills -or
+        -not $document.git_workflow -or $null -eq $document.stop_lines -or
+        -not $document.release_authorization) { throw "Invalid or incompatible project profile: $Profile" }
+    if ([string]$document.source_sha -notmatch '^[a-f0-9]{40}$') {
+        throw "Project profile has invalid source_sha: $Profile"
+    }
     $selected = @($document.recommended_skills | ForEach-Object { [string]$_ })
     if ($selected.Count -eq 0 -or @($selected | Where-Object { -not $_ }).Count -gt 0) {
         throw "Project profile has no valid recommended skills: $Profile"
@@ -118,6 +124,146 @@ function Get-ProjectProfile {
         if ($catalogStates[$name] -ne 'implemented') { throw "Profile Skill is not implemented: $name" }
     }
     return [pscustomobject]@{ Document = $document; Skills = $selected }
+}
+
+function Normalize-GitRepository {
+    param([string]$Repository)
+    $value = ([string]$Repository).Trim()
+    if (-not $value) { throw 'Git repository URL is empty' }
+    if ($value -match '^git@([^:]+):(.+)$') {
+        $value = "https://$($Matches[1])/$($Matches[2])"
+    }
+    $value = $value.Replace('\\', '/')
+    if ($value.EndsWith('.git', [System.StringComparison]::OrdinalIgnoreCase)) {
+        $value = $value.Substring(0, $value.Length - 4)
+    }
+    return $value.TrimEnd('/').ToLowerInvariant()
+}
+
+function Invoke-GitText {
+    param([string]$ProjectPath, [string[]]$Arguments)
+    $output = @(& git -C $ProjectPath @Arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw (($output | ForEach-Object { [string]$_ }) -join [Environment]::NewLine)
+    }
+    return (($output | ForEach-Object { [string]$_ }) -join [Environment]::NewLine).Trim()
+}
+
+function New-PreflightFinding {
+    param([string]$Class, [string]$Code, [string]$Message)
+    return [pscustomobject]@{ Class = $Class; Code = $Code; Message = $Message }
+}
+
+function Invoke-ProjectProfilePreflight {
+    [OutputType([pscustomobject])]
+    param(
+        [string]$RepoRoot,
+        [string]$ProjectPath,
+        [string]$Profile,
+        [ValidateSet('skill-install', 'prototype', 'merge', 'release')][string]$Operation = 'skill-install',
+        [switch]$DirectMainRequired
+    )
+
+    $profileData = Get-ProjectProfile $RepoRoot $Profile
+    $document = $profileData.Document
+    $project = [System.IO.Path]::GetFullPath($ProjectPath)
+    $findings = @()
+    $blocked = $false
+
+    if (-not (Test-Path -LiteralPath $project -PathType Container)) {
+        $findings += New-PreflightFinding 'BLOCKED' 'project-root' "Target project directory does not exist: $project"
+        return [pscustomobject]@{ Profile = $Profile; Operation = $Operation; Decision = 'BLOCKED'; Skills = $profileData.Skills; Findings = $findings }
+    }
+
+    try {
+        $inside = Invoke-GitText $project @('rev-parse', '--is-inside-work-tree')
+        if ($inside -ne 'true') { throw 'not a work tree' }
+        $remote = Invoke-GitText $project @('remote', 'get-url', 'origin')
+        $head = Invoke-GitText $project @('rev-parse', 'HEAD')
+    }
+    catch {
+        $findings += New-PreflightFinding 'BLOCKED' 'git-identity' "Target is not a usable Git checkout with origin and HEAD: $($_.Exception.Message)"
+        return [pscustomobject]@{ Profile = $Profile; Operation = $Operation; Decision = 'BLOCKED'; Skills = $profileData.Skills; Findings = $findings }
+    }
+
+    if ((Normalize-GitRepository $remote) -ne (Normalize-GitRepository ([string]$document.canonical_repository))) {
+        $blocked = $true
+        $findings += New-PreflightFinding 'BLOCKED' 'canonical-repository' "origin '$remote' does not match profile canonical repository '$($document.canonical_repository)'"
+    }
+    if ($head -ne [string]$document.source_sha) {
+        $blocked = $true
+        $findings += New-PreflightFinding 'STALE_EVIDENCE' 'source-sha' "HEAD $head differs from profile source_sha $($document.source_sha); refresh the profile before rollout"
+    }
+
+    $destination = Get-SkillsDestination 'project' $project
+    $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
+    $manifest = $null
+    try {
+        if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
+        $manifest = Read-Manifest $manifestPath
+    }
+    catch {
+        $blocked = $true
+        $findings += New-PreflightFinding 'BLOCKED' 'manifest-integrity' "Existing manifest is invalid: $($_.Exception.Message)"
+    }
+
+    if ($null -ne $manifest) {
+        foreach ($name in $profileData.Skills) {
+            $target = Join-Path $destination $name
+            $managed = @($manifest.installed | Where-Object { $_.name -eq $name })
+            if ((Test-Path -LiteralPath $target) -and $managed.Count -eq 0) {
+                $blocked = $true
+                $findings += New-PreflightFinding 'BLOCKED' 'local-skill-collision' "Unmanaged local Skill would be overwritten: $name"
+            }
+        }
+    }
+
+    foreach ($name in @($document.protected_local_skills | ForEach-Object { [string]$_ })) {
+        $protectedPath = Join-Path $destination $name
+        if (-not (Test-Path -LiteralPath $protectedPath -PathType Container)) {
+            $blocked = $true
+            $findings += New-PreflightFinding 'BLOCKED' 'protected-local-skill' "Expected protected local Skill is missing: $name"
+        }
+    }
+
+    if ([string]$document.git_workflow -eq 'pr-only') {
+        if ($DirectMainRequired) {
+            $blocked = $true
+            $findings += New-PreflightFinding 'HARD_CONFLICT' 'git-workflow' 'Explicit direct-main operation conflicts with this project PR-only workflow'
+        }
+        else {
+            $findings += New-PreflightFinding 'PROJECT_REFINEMENT' 'git-workflow' 'Project PR-only workflow refines central main-first guidance'
+        }
+    }
+
+    if ($Operation -ne 'skill-install') {
+        $blocked = $true
+        $findings += New-PreflightFinding 'BLOCKED' 'operation-authorization' "Profile installation never authorizes '$Operation'; obtain and record the project-specific authorization separately"
+    }
+    elseif (@($document.stop_lines).Count -gt 0) {
+        $findings += New-PreflightFinding 'PROJECT_REFINEMENT' 'stop-lines' 'Skills installation does not lift project stop-lines or release authorization requirements'
+    }
+
+    if (-not $blocked) {
+        $findings += New-PreflightFinding 'PASS' 'profile-preflight' "Profile '$Profile' is safe for skill-install at verified source SHA $head"
+    }
+    return [pscustomobject]@{
+        Profile = $Profile
+        Operation = $Operation
+        Decision = if ($blocked) { 'BLOCKED' } else { 'PASS' }
+        Skills = $profileData.Skills
+        Findings = $findings
+    }
+}
+
+function Assert-ProjectProfilePreflight {
+    param([object]$Preflight)
+    foreach ($finding in @($Preflight.Findings)) {
+        Write-Output "PREFLIGHT $($finding.Class) $($finding.Code): $($finding.Message)"
+    }
+    if ($Preflight.Decision -ne 'PASS') {
+        throw "Profile preflight BLOCKED for '$($Preflight.Profile)'; no files were changed"
+    }
 }
 
 function New-Manifest {
