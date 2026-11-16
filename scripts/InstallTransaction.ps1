@@ -54,11 +54,9 @@ function New-InstallExternalBackup {
     if (Test-Path -LiteralPath $out) { throw "Backup destination already exists: $out" }
     $root = [System.IO.Path]::GetFullPath($Destination).TrimEnd([char[]]@('\','/'))
     $installHome = [System.IO.Path]::GetFullPath((Split-Path -Parent (Split-Path -Parent $root))).TrimEnd([char[]]@('\','/'))
-    $realHome = [System.IO.Path]::GetFullPath($HOME).TrimEnd([char[]]@('\','/'))
     $compare = [System.StringComparison]::OrdinalIgnoreCase
     $separator = [System.IO.Path]::DirectorySeparatorChar
     if ($out.Equals($root,$compare) -or $out.StartsWith($root + $separator,$compare) -or
-        $out.Equals($realHome,$compare) -or $out.StartsWith($realHome + $separator,$compare) -or
         $out.Equals($installHome,$compare) -or $out.StartsWith($installHome + $separator,$compare)) {
         throw 'External backup must be outside installed Skills and selected HOME'
     }
