@@ -4,7 +4,7 @@
 
 | Категория | Skill | Когда использовать | Статус |
 |---|---|---|---|
-| Core | task-planning | Разложить техническую задачу на проверяемые шаги | implemented |
+| Core | task-planning | План и adaptive routing по TYPE/SIZE/RISK, review gates, DOCS_IMPACT и anti-loop | implemented |
 | Development | codebase-exploration | Найти правильное место изменения по коду | implemented |
 | Development | root-cause-debugging | Ошибка, регрессия, нестабильное поведение | implemented |
 | Testing | regression-testing | Защитить исправление от повторного сбоя | implemented |

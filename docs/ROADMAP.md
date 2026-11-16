@@ -90,6 +90,26 @@ evidence.
 Идеи сопоставлены с [codex-multi-agent-dev](https://github.com/rustlung/codex-multi-agent-dev) на SHA 3c2e31016b62a052a4c2231891264ec12cf10f3f.
 Текст Skill создан самостоятельно, без копирования runtime или инструкций агента.
 
+## Stage 9B: Adaptive Task Routing
+
+**Статус:** implemented для автономной routing policy и offline tests;
+реальная Codex activation и subagent composition в хосте — NOT RUN.
+
+- [x] Расширен существующий \`task-planning\`, без новых обязательных Skills.
+- [x] Добавлена read-only policy CLI: TYPE/SIZE/RISK отдельно, evidence-backed
+  risk signals, optional user override as minimum, UNASSESSED fail-closed.
+- [x] Пропорциональные Architect/Reviewer gates, обязательная документационная
+  свежесть и optional specialist, раздельные анти-loop budgets.
+- [x] Выполнена проверка структурной схемы 12 TR-сценариев (9 routing + 3
+  no-activation), добавлены offline policy regression cases.
+- [ ] Host Codex positive/negative activation: NOT RUN. Маршрутизатор не
+  запускает агентов и не объявляет модель или релиз подтверждёнными.
+- [ ] Реальная установка в global HOME и существующие проекты: NOT RUN.
+
+Идеи сопоставлены с [codex-multi-agent-dev](https://github.com/rustlung/codex-multi-agent-dev)
+на SHA \`3c2e31016b62a052a4c2231891264ec12cf10f3f\`;
+policy и Python реализация написаны самостоятельно.
+
 ## Антицели
 
 Не запускать оркестрацию нескольких агентов, централизованную БД или сложный индексатор раньше, чем простая файловая библиотека покажет ограничения.

@@ -1,0 +1,277 @@
+{
+  "schema": 1,
+  "contract": "stage-9b-adaptive-task-routing",
+  "skill": "task-planning",
+  "description": "12 prepared scenarios: nine deterministic policy examples and three no-activation controls. No Codex activation claimed.",
+  "scenarios": [
+    {
+      "id": "TR-01",
+      "should_route": true,
+      "scenario": "Small low feature",
+      "input": {
+        "task_type": "FEATURE",
+        "size": "SMALL",
+        "risk": "LOW",
+        "docs_impact": "NONE"
+      },
+      "expected": {
+        "reviewer": "NOT_REQUIRED",
+        "architect": "NOT_REQUIRED",
+        "risk": "LOW"
+      },
+      "prompt": "Добавь небольшой низкорисковый экспорт CSV; опиши минимальные проверки.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-02",
+      "should_route": true,
+      "scenario": "Small high security fix",
+      "input": {
+        "task_type": "BUGFIX",
+        "size": "SMALL",
+        "risk": "LOW",
+        "signals": [
+          "authorization"
+        ],
+        "docs_impact": "LOCAL"
+      },
+      "expected": {
+        "reviewer": "REQUIRED",
+        "risk": "HIGH",
+        "risk_escalated": true,
+        "user_gate": false
+      },
+      "prompt": "Исправь локальную уязвимость авторизации: объём маленький, но риск высокий.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-03",
+      "should_route": true,
+      "scenario": "Medium feature",
+      "input": {
+        "task_type": "FEATURE",
+        "size": "MEDIUM",
+        "risk": "LOW",
+        "docs_impact": "LOCAL"
+      },
+      "expected": {
+        "reviewer": "REQUIRED",
+        "documentation_action": "UPDATE_IN_CHANGE"
+      },
+      "prompt": "Добавь функцию с изменениями в API и двух модулях, с актуализацией документации.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-04",
+      "should_route": true,
+      "scenario": "Large low risk change",
+      "input": {
+        "task_type": "CHANGE",
+        "size": "LARGE",
+        "risk": "LOW",
+        "docs_impact": "SIGNIFICANT"
+      },
+      "expected": {
+        "architect": "RECOMMENDED",
+        "risk": "LOW",
+        "documentation_action": "CONSOLIDATE"
+      },
+      "prompt": "Сделай крупное изменение во внутренней системе, без чувствительных данных.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-05",
+      "should_route": true,
+      "scenario": "New small project",
+      "input": {
+        "task_type": "NEW_PROJECT",
+        "size": "SMALL",
+        "risk": "LOW",
+        "docs_impact": "LOCAL"
+      },
+      "expected": {
+        "user_gate": true,
+        "reviewer": "REQUIRED",
+        "documentation_action": "FINAL_CONSOLIDATION"
+      },
+      "prompt": "Создай небольшой новый продукт с утверждением архитектурного направления.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-06",
+      "should_route": true,
+      "scenario": "Destructive operation",
+      "input": {
+        "task_type": "CHANGE",
+        "size": "SMALL",
+        "risk": "AUTO",
+        "signals": [
+          "destructive-operation"
+        ],
+        "docs_impact": "LOCAL"
+      },
+      "expected": {
+        "risk": "HIGH",
+        "user_gate": true,
+        "execution": "NOT_PERFORMED"
+      },
+      "prompt": "Внеси изменение, которое удаляет реальные production данные.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-07",
+      "should_route": true,
+      "scenario": "Unassessed risk",
+      "input": {
+        "task_type": "REFACTOR",
+        "size": "SMALL",
+        "risk": "AUTO",
+        "docs_impact": "UNKNOWN"
+      },
+      "expected": {
+        "status": "NEEDS_RISK_ASSESSMENT",
+        "risk": "UNASSESSED",
+        "reviewer": "REQUIRED"
+      },
+      "prompt": "Нужно выполнить рефакторинг, риск пока не оценён.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-08",
+      "should_route": true,
+      "scenario": "Bugfix without systemic cause",
+      "input": {
+        "task_type": "BUGFIX",
+        "size": "LARGE",
+        "risk": "LOW",
+        "docs_impact": "NONE"
+      },
+      "expected": {
+        "architect": "NOT_REQUIRED",
+        "reviewer": "REQUIRED"
+      },
+      "prompt": "Большой баг, но архитектурная причина не установлена.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-09",
+      "should_route": true,
+      "scenario": "Schema change",
+      "input": {
+        "task_type": "FEATURE",
+        "size": "MEDIUM",
+        "risk": "AUTO",
+        "signals": [
+          "persistent-schema"
+        ],
+        "docs_impact": "SIGNIFICANT"
+      },
+      "expected": {
+        "risk": "MEDIUM",
+        "reviewer": "REQUIRED",
+        "documentation_action": "CONSOLIDATE"
+      },
+      "prompt": "Нужно изменить постоянную схему хранения данных.",
+      "expected_behavior": "Рекомендуется пропорциональный task routing по metadata; нет выполнения model/agent/release.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-10",
+      "should_route": false,
+      "scenario": "Trivial typo",
+      "input": null,
+      "expected": null,
+      "prompt": "Исправь опечатку в README.",
+      "expected_behavior": "Не навязывать полный task-router workflow для тривиального или теоретического запроса.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-11",
+      "should_route": false,
+      "scenario": "Theoretical Git question",
+      "input": null,
+      "expected": null,
+      "prompt": "Объясни разницу git fetch и pull, никаких действий.",
+      "expected_behavior": "Не навязывать полный task-router workflow для тривиального или теоретического запроса.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    },
+    {
+      "id": "TR-12",
+      "should_route": false,
+      "scenario": "Standalone prose edit",
+      "input": null,
+      "expected": null,
+      "prompt": "Переформулируй заголовок статьи.",
+      "expected_behavior": "Не навязывать полный task-router workflow для тривиального или теоретического запроса.",
+      "prohibited_behavior": [
+        "Не запускать субагентов автоматически; не выдавать план за выполненные gates"
+      ],
+      "verification": "offline-policy-and-codex-cli",
+      "status": "prepared",
+      "result": "NOT RUN"
+    }
+  ]
+}

@@ -42,6 +42,7 @@ DRAWING_EDITOR_EVAL_IDS = {f"DE-{number:02d}" for number in range(1, 11)}
 DRAWING_EDITOR_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 CLASSIFICATION_QUALITY_EVAL_IDS = {f"CQ-{number:02d}" for number in range(1, 13)}
 CLASSIFICATION_QUALITY_EVAL_RESULTS = {"PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT RUN"}
+TASK_ROUTING_EVAL_IDS = {f"TR-{n:02d}" for n in range(1, 13)}
 LOGGING_STANDARD_EVAL_IDS = {f"LS-{n:02d}" for n in range(1, 11)}
 CEOS_MIGRATED_SKILLS = {
     "audit", "audit-repair-loop", "ceos-continue", "fix", "verification",
@@ -245,6 +246,70 @@ def validate_classification_quality_evals(root: Path) -> tuple[list[str], int]:
             errors.append(f"Classification quality eval {identifier}: inconsistent execution/result")
     errors.extend(f"Classification quality eval suite missing {identifier}" for identifier in sorted(CLASSIFICATION_QUALITY_EVAL_IDS - seen))
     return errors, len(scenarios)
+
+
+def validate_task_routing_evals(root: Path) -> tuple[list[str], int]:
+    """Structural validation for prepared 9B routing/negative activation matrix."""
+    path = root / "evals" / "cases" / "task-routing" / "scenarios.json"
+    if not path.is_file():
+        return ["Missing task-routing eval suite"], 0
+    try:
+        suite = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"Invalid task-routing eval suite: {error}"], 0
+    if (not isinstance(suite, dict) or suite.get("schema") != 1 or
+            suite.get("skill") != "task-planning" or
+            suite.get("contract") != "stage-9b-adaptive-task-routing"):
+        return ["Invalid task-routing eval suite schema"], 0
+    cases = suite.get("scenarios")
+    if not isinstance(cases, list):
+        return ["Task-routing eval suite must contain scenarios"], 0
+    seen: set[str] = set()
+    errors: list[str] = []
+    positive = negative = 0
+    for index, case in enumerate(cases):
+        identifier = case.get("id") if isinstance(case, dict) else None
+        if identifier not in TASK_ROUTING_EVAL_IDS or identifier in seen:
+            errors.append(f"Task-routing eval {index}: unknown or duplicate id {identifier!r}")
+            continue
+        seen.add(identifier)
+        for field in ("scenario", "prompt", "expected_behavior", "verification"):
+            if not isinstance(case.get(field), str) or not case[field].strip():
+                errors.append(f"Task-routing eval {identifier}: missing {field}")
+        prohibited = case.get("prohibited_behavior")
+        if not isinstance(prohibited, list) or not prohibited or any(
+                not isinstance(item, str) or not item.strip() for item in prohibited):
+            errors.append(f"Task-routing eval {identifier}: missing prohibited_behavior")
+        status, result = case.get("status"), case.get("result")
+        if status not in BROWSER_AUTOMATION_EVAL_STATUSES:
+            errors.append(f"Task-routing eval {identifier}: invalid status")
+        if result not in CLASSIFICATION_QUALITY_EVAL_RESULTS:
+            errors.append(f"Task-routing eval {identifier}: invalid result")
+        elif ((status == "executed" and result == "NOT RUN") or
+              (status in {"prepared", "not-run"} and result != "NOT RUN") or
+              (status == "blocked" and result != "BLOCKED")):
+            errors.append(f"Task-routing eval {identifier}: inconsistent execution/result")
+        should_route = case.get("should_route")
+        if type(should_route) is not bool:
+            errors.append(f"Task-routing eval {identifier}: should_route must be bool")
+        elif should_route:
+            positive += 1
+            inp, expect = case.get("input"), case.get("expected")
+            if not isinstance(inp, dict) or not isinstance(expect, dict) or not expect:
+                errors.append(f"Task-routing eval {identifier}: missing input/expected")
+            elif inp.get("task_type") not in {"NEW_PROJECT", "FEATURE", "CHANGE", "BUGFIX", "REFACTOR"}:
+                errors.append(f"Task-routing eval {identifier}: invalid task_type")
+            elif inp.get("size") not in {"SMALL", "MEDIUM", "LARGE"}:
+                errors.append(f"Task-routing eval {identifier}: invalid size")
+        else:
+            negative += 1
+            if case.get("input") is not None or case.get("expected") is not None:
+                errors.append(f"Task-routing eval {identifier}: negative case must not have route metadata")
+    errors.extend(f"Task-routing eval suite missing {item}"
+                  for item in sorted(TASK_ROUTING_EVAL_IDS - seen))
+    if positive != 9 or negative != 3:
+        errors.append(f"Task-routing eval coverage expected 9/3, got {positive}/{negative}")
+    return errors, len(cases)
 
 
 def validate_logging_standard_evals(root: Path) -> tuple[list[str], int]:
@@ -451,6 +516,8 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     errors.extend(drawing_eval_errors)
     classification_errors, classification_evals = validate_classification_quality_evals(root)
     errors.extend(classification_errors)
+    routing_errors, routing_evals = validate_task_routing_evals(root)
+    errors.extend(routing_errors)
     logging_errors, logging_evals = validate_logging_standard_evals(root)
     errors.extend(logging_errors)
     ceos_errors, ceos_evals = validate_ceos_migrated_evals(root)
@@ -460,7 +527,7 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     return errors, {
         "skills": len(skills), "links": links, "patterns": patterns,
         "browser_evals": browser_evals, "drawing_evals": drawing_evals, "classification_evals": classification_evals,
-        "ceos_migrated_evals": ceos_evals, "logging_evals": logging_evals, "profiles": profiles,
+        "ceos_migrated_evals": ceos_evals, "logging_evals": logging_evals, "routing_evals": routing_evals, "profiles": profiles,
     }
 
 
@@ -476,6 +543,7 @@ def main() -> int:
         f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s), "
         f"{summary['drawing_evals']} drawing editor eval(s); "
         f"{summary['classification_evals']} classification quality eval(s); {summary['profiles']} project profile(s); "
+        f"{summary['routing_evals']} task-routing eval(s); "
         f"{summary['logging_evals']} logging-standard eval(s); "
         f"{summary['ceos_migrated_evals']} CEOS migrated eval(s); "
         f"{len(errors)} error(s)"
