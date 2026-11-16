@@ -111,7 +111,7 @@ function Restore-SyncTransaction {
 
 function Invoke-TransactionalSync {
     param([string]$Destination,[string]$ManifestPath,[object]$Manifest,[array]$Plans,
-        [ValidateSet('None','AfterFirstSwap','BeforeManifest','AfterManifest','InterruptAfterFirstSwap')]
+        [ValidateSet('None','AfterFirstSwap','BeforeManifest','AfterManifest','InterruptAfterFirstSwap','InterruptAfterBackup')]
         [string]$TestFailurePoint = 'None')
     Assert-NoPendingSyncTransaction $Destination
     $transaction = Get-SyncTransactionPath $Destination
@@ -199,6 +199,9 @@ function Invoke-TransactionalSync {
             $name = [string]$e.name
             $target = Join-Path $Destination $name
             Move-Item -LiteralPath $target -Destination (Join-Path $backupRoot $name)
+            if ($swapped -eq 0 -and $TestFailurePoint -eq 'InterruptAfterBackup') {
+                throw 'TEST-INJECT: InterruptAfterBackup'
+            }
             Move-Item -LiteralPath (Join-Path $stageRoot $name) -Destination $target
             $swapped++
             if ($swapped -eq 1 -and $TestFailurePoint -in @('AfterFirstSwap','InterruptAfterFirstSwap')) {
@@ -220,8 +223,8 @@ function Invoke-TransactionalSync {
     }
     catch {
         $problem = $_.Exception.Message
-        if ($TestFailurePoint -eq 'InterruptAfterFirstSwap' -and
-            $problem -eq 'TEST-INJECT: InterruptAfterFirstSwap') {
+        if ($TestFailurePoint -in @('InterruptAfterFirstSwap','InterruptAfterBackup') -and
+            $problem -eq "TEST-INJECT: $TestFailurePoint") {
             throw 'TEST-INJECT simulated interruption; pending journal preserved for sync.ps1 -Recover'
         }
         try { Restore-SyncTransaction -Destination $Destination -ManifestPath $ManifestPath | Out-Null }

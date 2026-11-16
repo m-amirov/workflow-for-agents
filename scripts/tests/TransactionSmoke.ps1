@@ -46,6 +46,14 @@ try {
     Set-Content -LiteralPath $unmanaged -Value 'local notes' -Encoding UTF8
     $before = Get-Snapshot
 
+    # Fault injection requires an isolated TEMP home and an explicit marker.
+    $denied = $false
+    try { & $sync -Scope user -RepositoryRoot $source -HomePath $fixtureHome -Skills task-planning,audit -TestFailurePoint AfterFirstSwap | Out-Null }
+    catch { $denied = $_.Exception.Message.Contains('disposable test marker') }
+    Assert $denied 'TestFailurePoint accepted an unmarked HOME'
+    Assert-Snapshot $before 'unmarked-home rejection'
+    Set-Content -LiteralPath (Join-Path $fixtureHome '.wfa-sync-transaction-test-home') -Value 'disposable' -Encoding UTF8
+
     Add-Content -LiteralPath (Join-Path $srcA 'SKILL.md') -Value '# update A' -Encoding UTF8
     Add-Content -LiteralPath (Join-Path $srcB 'SKILL.md') -Value '# update B' -Encoding UTF8
     Set-Content -LiteralPath (Join-Path $srcB 'added.txt') -Value 'new managed file' -Encoding UTF8
@@ -63,22 +71,24 @@ try {
         Assert ((Get-Content -LiteralPath $unmanaged -Raw).Contains('local notes')) "${point}: unmanaged file deleted"
     }
 
-    $interrupted = $false
-    try { & $sync -Scope user -RepositoryRoot $source -HomePath $fixtureHome -Skills task-planning,audit -TestFailurePoint InterruptAfterFirstSwap | Out-Null }
-    catch { $interrupted = $_.Exception.Message.Contains('pending journal preserved') }
-    Assert $interrupted 'simulated interruption did not leave recoverable journal'
-    Assert (Test-Path -LiteralPath (Join-Path $transaction 'journal.json') -PathType Leaf) 'journal not retained'
-    $blocked = $false
-    try { & $sync -Scope user -RepositoryRoot $source -HomePath $fixtureHome -DryRun | Out-Null }
-    catch { $blocked = $_.Exception.Message.Contains('Pending sync transaction') }
-    Assert $blocked 'pending transaction did not block sync dry-run'
-    $blocked = $false
-    try { & $install -Scope user -RepositoryRoot $source -HomePath $fixtureHome -Skills task-planning | Out-Null }
-    catch { $blocked = $_.Exception.Message.Contains('Pending sync transaction') }
-    Assert $blocked 'pending transaction did not block install'
-    & $sync -Scope user -HomePath $fixtureHome -Recover | Out-Null
-    Assert-Snapshot $before 'explicit recovery'
-    Assert (-not (Test-Path -LiteralPath $transaction)) 'recovery did not clear journal'
+    foreach ($interruptPoint in @('InterruptAfterBackup','InterruptAfterFirstSwap')) {
+        $interrupted = $false
+        try { & $sync -Scope user -RepositoryRoot $source -HomePath $fixtureHome -Skills task-planning,audit -TestFailurePoint $interruptPoint | Out-Null }
+        catch { $interrupted = $_.Exception.Message.Contains('pending journal preserved') }
+        Assert $interrupted "$interruptPoint did not leave recoverable journal"
+        Assert (Test-Path -LiteralPath (Join-Path $transaction 'journal.json') -PathType Leaf) 'journal not retained'
+        $blocked = $false
+        try { & $sync -Scope user -RepositoryRoot $source -HomePath $fixtureHome -DryRun | Out-Null }
+        catch { $blocked = $_.Exception.Message.Contains('Pending sync transaction') }
+        Assert $blocked 'pending transaction did not block sync dry-run'
+        $blocked = $false
+        try { & $install -Scope user -RepositoryRoot $source -HomePath $fixtureHome -Skills task-planning | Out-Null }
+        catch { $blocked = $_.Exception.Message.Contains('Pending sync transaction') }
+        Assert $blocked 'pending transaction did not block install'
+        & $sync -Scope user -HomePath $fixtureHome -Recover | Out-Null
+        Assert-Snapshot $before "$interruptPoint recovery"
+        Assert (-not (Test-Path -LiteralPath $transaction)) 'recovery did not clear journal'
+    }
 
     & $sync -Scope user -RepositoryRoot $source -HomePath $fixtureHome -Skills task-planning,audit | Out-Null
     $after = Get-Snapshot

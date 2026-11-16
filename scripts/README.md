@@ -117,9 +117,10 @@ Recovery проверяет journal и backup, не затирает измен�
 обрабатываемых ошибках и восстанавливаемый journal после прерывания,
 а не мгновенная консистентность во время аварии.
 
-Test-only инъекции -TestFailurePoint работают **только** с явным
--Scope user -HomePath <disposable-test-home>. Их нельзя применить к
-реальному HOME без явной передачи HomePath; использовать исключительно
+Test-only инъекции -TestFailurePoint работают **только** в каталоге
+под системным TEMP, с явным -Scope user -HomePath и файлом-маркером
+.wfa-sync-transaction-test-home в корне disposable HOME. Обычный HOME
+и непомеченный каталог блокируются до записи. Использовать исключительно
 в изолированных тестах. -Recover нельзя сочетать с -DryRun и выбором Skills.
 
 Скрипт install.ps1 также блокирует запись при pending sync transaction,

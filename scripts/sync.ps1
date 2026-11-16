@@ -7,7 +7,7 @@ param(
     [string]$Profile = '',
     [switch]$DryRun,
     [switch]$Recover,
-    [ValidateSet('None','AfterFirstSwap','BeforeManifest','AfterManifest','InterruptAfterFirstSwap')]
+    [ValidateSet('None','AfterFirstSwap','BeforeManifest','AfterManifest','InterruptAfterFirstSwap','InterruptAfterBackup')]
     [string]$TestFailurePoint = 'None',
     [string]$HomePath = '',
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
@@ -27,8 +27,23 @@ if ($Recover) {
     return
 }
 Assert-NoPendingSyncTransaction $destination
-if ($TestFailurePoint -ne 'None' -and ($Scope -ne 'user' -or -not $HomePath)) {
-    throw 'TestFailurePoint is allowed only with explicit -Scope user -HomePath disposable fixture'
+if ($TestFailurePoint -ne 'None') {
+    if ($Scope -ne 'user' -or -not $HomePath) {
+        throw 'TestFailurePoint is allowed only with explicit -Scope user -HomePath disposable fixture'
+    }
+    $testHome = [System.IO.Path]::GetFullPath($HomePath).TrimEnd([char[]]@('\','/'))
+    $realHome = [System.IO.Path]::GetFullPath($HOME).TrimEnd([char[]]@('\','/'))
+    $tempPrefix = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([char[]]@('\','/')) + [System.IO.Path]::DirectorySeparatorChar
+    if ($testHome.Equals($realHome, [System.StringComparison]::OrdinalIgnoreCase) -or
+        -not $testHome.StartsWith($tempPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'TestFailurePoint requires a disposable HOME beneath system TEMP, never the real HOME'
+    }
+    $marker = Join-Path $testHome '.wfa-sync-transaction-test-home'
+    if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
+        throw "TestFailurePoint requires explicit disposable test marker: $marker"
+    }
+    Assert-NotLinked $testHome
+    Assert-NotLinked $marker
 }
 $repo = Get-RepoRoot $RepositoryRoot
 $legacy = Get-LegacyCeosOwnership $HomePath
