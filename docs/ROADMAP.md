@@ -155,6 +155,24 @@ regression fixtures; реальная миграция глобальных Skil
 
 Результат и ограничения: [Stage 10 global Skills preflight report](migrations/2026-11-16-stage-10-global-skills-preflight.md).
 
+## Stage 11: Transactional Global Skills Installation
+
+**Статус:** реализовано add-only transactional install и disposable regression
+suite; реальная пользовательская установка/activation — NOT RUN в рамках
+GitHub-исполнения и требует локального запуска на компьютере владельца.
+
+- [x] \`install.ps1\` использует staging, snapshots/manifest SHA и journal,
+  автоматический rollback для пойманных ошибок и explicit \`-Recover\`.
+- [x] В real user HOME перед записью обязателен новый внешний
+  \`-BackupPath\`; бэкап текущего manifest и managed Skills проверяется SHA-256.
+- [x] Существующие WFA-managed Skills не перезаписываются; legacy CEOS и
+  unmanaged files продолжают блокироваться до записи.
+- [x] Pending install блокирует install/sync и preflight READY.
+- [x] Добавлены fault-injection и реальный полный 29-Skill fixture на
+  disposable HOME; PS7 и PS5.1 CI — отдельные acceptance gates.
+- [ ] Реальный HOME backup, установка 27 Skills и повторный preflight — NOT RUN.
+- [ ] Skill activation в Codex на пользовательском ПК — NOT RUN.
+
 ## Порядок ближайшей работы
 
 1. Закрыть текущий CI на финальном SHA после публикации изменений в `main`.

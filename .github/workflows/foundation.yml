@@ -34,9 +34,11 @@ jobs:
           ./scripts/tests/Smoke.ps1
           ./scripts/tests/TransactionSmoke.ps1
           ./scripts/tests/GlobalPreflightSmoke.ps1
+          ./scripts/tests/InstallTransactionSmoke.ps1
       - name: Smoke test project-scoped install and sync (Windows PowerShell 5.1)
         shell: powershell
         run: |
           ./scripts/tests/Smoke.ps1
           ./scripts/tests/GlobalPreflightSmoke.ps1
+          ./scripts/tests/InstallTransactionSmoke.ps1
 

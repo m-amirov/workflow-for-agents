@@ -74,6 +74,57 @@ Python checker `scripts/project_profiles.py check` остаётся деклар
 - named set `ceos-migrated` выбирает ровно 15 Skills, перенесённых из CEOS на source SHA `c8cc13bd3852409be93097ee823e9cd35e512b73`;
 - legacy CEOS manifest проверяется read-only и не удаляет backup, hooks, CLI или старый ownership.
 
+## Stage 11: безопасная установка полного набора в глобальный HOME
+
+В Stage 10 (snapshot 2026-11-16) в \`~/.agents/skills/\` были CURRENT
+\`git-workflow\` и \`root-cause-debugging\`; ещё 27 из 29 целевых Skills
+отсутствовали. Этот snapshot не заменяет повторную проверку прямо перед записью.
+
+В **реальном** user HOME установка требует внешний backup-каталог,
+расположенный *за пределами HOME*; обязательный параметр \`-BackupPath\`
+указывает **новую несуществующую** папку в уже существующем родительском каталоге.
+Backup сохраняет копию действующего WFA manifest, все текущие WFA-managed
+каталоги и контрольные суммы. Он не копирует и не меняет посторонние
+\`~/.codex/skills/\`, hooks или \`AGENTS.md\`.
+
+Последовательность действий в **локальном Windows PowerShell** из свежего
+\`workflow-for-agents\` checkout, после подтверждения source SHA и CI:
+
+~~~powershell
+git pull --ff-only origin main
+$preflight = .\scripts\global-preflight.ps1 -All -OutputFormat Json | ConvertFrom-Json
+if (-not $preflight.Summary.Ready) { throw "Global preflight BLOCKED" }
+.\scripts\install.ps1 -Scope user -All -DryRun
+# Отдельный каталог D:\WFA-backups должен уже существовать.
+$backup = 'D:\WFA-backups\stage11-' + (Get-Date -Format 'yyyyMMdd-HHmmss')
+.\scripts\install.ps1 -Scope user -All -BackupPath $backup
+$after = .\scripts\global-preflight.ps1 -All -OutputFormat Json | ConvertFrom-Json
+if (-not $after.Summary.Ready -or
+    @($after.Targets | Where-Object { $_.Status -ne 'CURRENT' }).Count -gt 0) {
+    throw 'Post-install verification not CURRENT; preserve backup and inspect'
+}
+~~~
+
+Установка выполняется как **add-only recoverable transaction**: staged copies,
+per-file SHA-256, старый manifest, prepare/journal и rollback на обычной
+ошибке. При аварийном прерывании **не перезапускать install/sync поверх**
+pending transaction. Сначала проверить каталог и выполнить:
+
+~~~powershell
+.\scripts\install.ps1 -Scope user -Recover
+~~~
+
+Recovery откажется стирать изменённый после аварии файл; сохранить
+журнал и backup, если результат BLOCKED. Отдельный sync использует свой
+\`sync.ps1 -Recover\` и не смешивается с install recovery.
+
+Для проверки fault-injection нужен HOME внутри system TEMP и маркер
+\`.wfa-install-transaction-test-home\`; в реальном HOME это недоступно.
+Файловая система не даёт атомарной многокаталожной транзакции при power loss
+или одновременном вмешательстве другого процесса. Фактическое применение
+на компьютере пользователя и Codex Skill activation — отдельные gates,
+не подтверждённые Windows CI.
+
 **Версия** — детерминированный SHA-256 fingerprint списка путей/хешей Skill, а не commit SHA Git. Источник берётся из текущих локальных файлов.
 
 ## Синхронизация
@@ -175,6 +226,7 @@ python scripts/validate.py
 python -m unittest discover -s tests -v
 .\scripts\tests\Smoke.ps1
 .\scripts\tests\GlobalPreflightSmoke.ps1
+.\scripts\tests\InstallTransactionSmoke.ps1
 ```
 
 Проверяются имена, frontmatter, каталог, локальные ссылки и структура eval-кейсов. Тесты установки/sync используют временные проектные каталоги и проверяют конфликтные ситуации. `foundation.yml` запускает Python на Ubuntu и smoke-тесты на Windows PowerShell 7 и 5.1.
