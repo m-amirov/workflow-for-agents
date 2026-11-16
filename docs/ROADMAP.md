@@ -58,6 +58,25 @@
 
 **Gate:** несколько агентов используют общий источник, при этом порядок применения правил прозрачен, обновления воспроизводимы, а существующие сценарии не регрессируют.
 
+## Этап 8: Global Skills Migration from CEOS
+
+**Статус:** `implemented` для source-bound адаптации, локальной валидации и
+disposable install/sync regression; `PARTIAL` для реальной Codex activation и
+внешних capability gates, пока соответствующие окружения не дадут свежие
+evidence.
+
+- [x] Учтены все 15 Skills source SHA `c8cc13bd3852409be93097ee823e9cd35e512b73`.
+- [x] Убраны обязательные CEOS CLI/hooks, старые model routes и Web High из автономных путей.
+- [x] `ceos-continue` ограничен явным CEOS run/checkpoint запросом и fail-closed при отсутствии state.
+- [x] `audit-repair-loop` сохраняет bounded audit → repair → verify → fresh re-audit.
+- [x] `production-art` сохраняет source-bound briefs, provenance, bytes/SHA-256, mapping и отдельные acceptance gates.
+- [x] `install.ps1`/`sync.ps1` поддерживают `-Set ceos-migrated`, disposable `-HomePath`, legacy ownership collision plan и no-overwrite.
+- [x] Добавлены 15 positive/negative eval cases, static regression и PS7/5.1 smoke.
+- [ ] Реальная активация всех 15 Skills в Codex CLI — только после стабильного transport; WebSocket/HTTP 403 классифицируется `BLOCKED_EXTERNAL`.
+- [ ] Реальный user HOME rollout — не выполнен; требует отдельного разрешения на backup/ownership migration конфликтующих CEOS-файлов.
+
+Подробная матрица и границы: [Stage 8 migration report](migrations/2026-11-16-stage-8-ceos-skills-migration.md).
+
 ## Антицели
 
 Не запускать оркестрацию нескольких агентов, централизованную БД или сложный индексатор раньше, чем простая файловая библиотека покажет ограничения.

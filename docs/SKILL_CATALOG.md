@@ -1,6 +1,6 @@
 # Каталог Agent Skills
 
-**Статусы:** implemented = в репозитории есть рабочее описание SKILL.md; planned = запланировано, но пока не реализовано. **Implemented не означает validated:** фактическое выполнение сценариев и соответствие конкретному агенту необходимо проверять отдельно.
+**Статусы:** implemented = в репозитории есть рабочее описание SKILL.md; planned = запланировано, но пока не реализовано. **Implemented не означает validated:** фактическое выполнение сценариев и соответствие конкретному агенту необходимо проверять отдельно. Skills Stage 8 помечены `implemented` для адаптированного контракта; runtime activation и внешние platform gates остаются отдельными статусами в migration report.
 
 | Категория | Skill | Когда использовать | Статус |
 |---|---|---|---|
@@ -25,6 +25,21 @@
 | Automation | classification-quality | Независимые labels, offline replay, baseline и fail-closed quality gates | implemented |
 | Domain | seo-calculators | Полезные SEO-инструменты и калькуляторы | planned |
 | Content | content-pipeline | Конвейер подготовки и проверки публикаций | planned |
+| Development | audit | Read-only аудит с evidence и классификацией findings | implemented |
+| Development | audit-repair-loop | Ограниченный audit → repair → verification → fresh re-audit | implemented |
+| Development | ceos-continue | Только явно запрошенное продолжение CEOS run/checkpoint | implemented |
+| Development | fix | Reproduce → root cause → minimal fix → regression → verification | implemented |
+| Testing | verification | Независимая проверка acceptance claims | implemented |
+| Testing | release | Release candidate gates и exact artifact evidence | implemented |
+| Design | visual-qa | Runtime/browser visual evidence и viewport QA | implemented |
+| Content | video-production | Gameplay evidence и отдельный promo trailer pipeline | implemented |
+| Domain | romance-narrative | Romance-first concept и bounded editorial review | implemented |
+| Domain | narrative-dialogue-editor | Voice, subtext, localization и branch-safe line editing | implemented |
+| Domain | narrative-continuity-engine | Route-conditioned continuity и save/back evidence | implemented |
+| Domain | reader-experience-review | Bounded blind-reader comprehension and payoff review | implemented |
+| Domain | production-art | Source-bound art provenance, mapping and separate acceptance gates | implemented |
+| Operations | prod-check | Read-only production inspection | implemented |
+| Operations | incident-analysis | Incident timeline и causal evidence analysis | implemented |
 
 ## Критерии для нового Skill
 

@@ -18,6 +18,25 @@
 .\scripts\install.ps1 -Scope user -Skills git-workflow,root-cause-debugging
 ```
 
+Для Stage 8 можно явно выбрать весь source-bound набор из 15 адаптированных
+Skills. Сначала выполняйте dry-run:
+
+```powershell
+.\scripts\install.ps1 -Scope user -Set ceos-migrated -DryRun
+.\scripts\install.ps1 -Scope user -Set ceos-migrated
+.\scripts\sync.ps1 -Scope user -Set ceos-migrated -DryRun
+.\scripts\sync.ps1 -Scope user -Set ceos-migrated
+```
+
+`-Set ceos-migrated` не устанавливает CEOS CLI, hooks, agents или глобальный
+`AGENTS.md`. Если в `~/.codex/ceos/installation.json` обнаружен старый CEOS
+owner для выбранного имени, команда останавливается до записи и печатает путь,
+конфликт и migration plan. `-Force` отсутствует намеренно: unmanaged и
+CEOS-managed файлы не перезаписываются.
+
+Для disposable HOME в smoke/regression тестах используйте только явный
+`-HomePath <temp-directory>`; без него user scope остаётся обычным `~/.agents/skills/`.
+
 Проектная установка:
 
 ```powershell
@@ -52,6 +71,8 @@ Python checker `scripts/project_profiles.py check` остаётся деклар
 - при повторной установке идентичного Skill не изменяет его;
 - не перезаписывает существующий неменеджируемый каталог;
 - отказывается продолжать, если управляемый Skill изменён локально или требует синхронизации.
+- named set `ceos-migrated` выбирает ровно 15 Skills, перенесённых из CEOS на source SHA `c8cc13bd3852409be93097ee823e9cd35e512b73`;
+- legacy CEOS manifest проверяется read-only и не удаляет backup, hooks, CLI или старый ownership.
 
 **Версия** — детерминированный SHA-256 fingerprint списка путей/хешей Skill, а не commit SHA Git. Источник берётся из текущих локальных файлов.
 
@@ -84,6 +105,11 @@ python -m unittest discover -s tests -v
 ```
 
 Проверяются имена, frontmatter, каталог, локальные ссылки и структура eval-кейсов. Тесты установки/sync используют временные проектные каталоги и проверяют конфликтные ситуации. `foundation.yml` запускает Python на Ubuntu и smoke-тесты на Windows PowerShell 7 и 5.1.
+
+Smoke запускается в disposable HOME и проверяет user/project scope, 15-entry
+set, manifest SHA-256, idempotency, локальные изменения, безопасный sync и
+collision со старым CEOS-managed Skill. Реальные пользовательские настройки
+автоматическими тестами не изменяются.
 
 ## Ограничения интеграции
 

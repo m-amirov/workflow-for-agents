@@ -43,3 +43,22 @@
 **Foundation закрыт по доступным локальным release gates:** структура, install/sync, manifest integrity, реальная активация двух Skills и локальный main-first сценарий имеют наблюдаемое доказательство. Protected-main/PR/squash остаётся отдельным `NOT RUN`, а не выдуманным `PASS`.
 
 Run #43720151759 относится к exact code/evidence commit выше; последующий документационный commit не меняет проверенные Skills и установщик. Старые GitHub Actions runs не считаются доказательством нового кода.
+
+## Stage 8 — CEOS Skills migration (2026-11-16)
+
+Источник: `codex-engineering-system` SHA
+`c8cc13bd3852409be93097ee823e9cd35e512b73`; target baseline до изменений:
+`bc34773d6e2a504949b06918e5ae4168ccfffd13`.
+
+| Gate | Среда | Статус | Доказательство |
+| --- | --- | --- | --- |
+| 15 source-bound Skill files, trigger metadata and migration matrix | Python/static | PASS | `tests/test_stage8_migration.py`, migration report |
+| Validator including 15 positive/negative eval cases | Python 3.13 local | PASS | `python scripts/validate.py` |
+| Full Python unittest suite | Python 3.13 local | PASS (69/69) | `python -m unittest discover -s tests -v` |
+| User/project install, SHA manifest, idempotency, local-edit protection and legacy collision | PowerShell 7, disposable HOME | PASS | `scripts/tests/Smoke.ps1` |
+| То же | Windows PowerShell 5.1, disposable HOME | PASS | `scripts/tests/Smoke.ps1` |
+| Codex CLI activation matrix | `codex-cli 0.167.2` | `BLOCKED_EXTERNAL` | WebSocket/HTTP 403; bounded probe in [Stage 8 eval report](../evals/results/2026-11-16-stage-8-ceos-skills-codex-cli.md) |
+| Real user HOME migration / CEOS ownership replacement | User profile | `NOT RUN` | Requires separate explicit approval; no real settings changed |
+
+Stage 8 is therefore not a full end-to-end activation PASS until the external
+Codex transport and fresh isolated CLI evaluation are available.

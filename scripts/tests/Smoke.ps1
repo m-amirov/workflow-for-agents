@@ -245,25 +245,61 @@ try {
     Assert $failed 'sync failed to detect new source/local file collision'
     Assert ((Get-Content -LiteralPath $unmanaged -Raw).Contains('user data')) 'collision overwrote local data'
 
-    # The CI runner uses an ephemeral user profile; verify real user-scoped path without overwriting existing data.
+    # User-scope regression uses a disposable HOME override; the real HOME is never touched.
     if (-not $SkipUserScope) {
-    $userRoot = Join-Path (Join-Path $HOME '.agents') 'skills'
-    $userTarget = Join-Path $userRoot 'task-planning'
+    $userHome = Join-Path $tmp 'home'
+    New-Item -ItemType Directory -Path $userHome -Force | Out-Null
+    $userRoot = Join-Path (Join-Path $userHome '.agents') 'skills'
+    $userTarget = Join-Path $userRoot 'audit'
     $userManifest = Join-Path $userRoot '.workflow-for-agents.manifest.json'
     $userOwned = Join-Path $userRoot 'user-owned-skill'
-    if ((Test-Path -LiteralPath $userTarget) -or (Test-Path -LiteralPath $userManifest)) {
-        throw 'Unsafe user-scope test: existing managed skill or manifest in HOME'
-    }
     try {
         New-Item -ItemType Directory -Path $userOwned -Force | Out-Null
         Set-Content -LiteralPath (Join-Path $userOwned 'notes.txt') -Value 'user data' -Encoding UTF8
-        & $install -Scope user -RepositoryRoot $source -Skills task-planning -DryRun | Out-Null
+        & $install -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $userHome -DryRun | Out-Null
         Assert (-not (Test-Path -LiteralPath $userTarget)) 'user-scope dry-run changed HOME'
-        & $install -Scope user -RepositoryRoot $source -Skills task-planning | Out-Null
+        & $install -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $userHome | Out-Null
         Assert (Test-Path -LiteralPath (Join-Path $userTarget 'SKILL.md')) 'user-scope install failed'
         Assert ((Get-Content -LiteralPath (Join-Path $userOwned 'notes.txt') -Raw).Contains('user data')) 'user-owned file was overwritten'
-        & $sync -Scope user -RepositoryRoot $source | Out-Null
-        Assert (Test-Path -LiteralPath $userManifest) 'user-scope sync has no manifest'
+        $installedUserManifest = Get-Content -LiteralPath $userManifest -Raw -Encoding UTF8 | ConvertFrom-Json
+        Assert (@($installedUserManifest.installed).Count -eq 15) 'ceos-migrated set did not install exactly 15 Skills'
+        Assert (-not (Test-Path -LiteralPath (Join-Path $userHome '.codex\hooks.json'))) 'user-scope install changed hooks'
+        Assert (-not (Test-Path -LiteralPath (Join-Path $userHome '.codex\AGENTS.md'))) 'user-scope install changed AGENTS.md'
+        $manifestBeforeRepeat = Get-Content -LiteralPath $userManifest -Raw -Encoding UTF8
+        & $install -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $userHome | Out-Null
+        Assert ((Get-Content -LiteralPath $userManifest -Raw -Encoding UTF8) -eq $manifestBeforeRepeat) 'repeat install changed manifest'
+        $userTargetFile = Join-Path $userTarget 'SKILL.md'
+        Add-Content -LiteralPath $userTargetFile -Value "`nlocal user edit"
+        $syncFailed = $false
+        try { & $sync -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $userHome | Out-Null }
+        catch { $syncFailed = $true }
+        Assert $syncFailed 'user-scope sync overwrote a local edit'
+        Assert ((Get-Content -LiteralPath $userTargetFile -Raw).Contains('local user edit')) 'user-scope local edit was lost'
+        Copy-Item -LiteralPath (Join-Path $repo 'skills\development\audit\SKILL.md') -Destination $userTargetFile -Force
+        & $sync -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $userHome -DryRun | Out-Null
+        & $sync -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $userHome | Out-Null
+
+        $legacyHome = Join-Path $tmp 'legacy-home'
+        $legacySkills = Join-Path $legacyHome '.agents\skills\audit'
+        $legacyManifest = Join-Path $legacyHome '.codex\ceos'
+        New-Item -ItemType Directory -Path $legacySkills, $legacyManifest -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $legacySkills 'SKILL.md') -Value 'legacy user skill' -Encoding UTF8
+        Set-Content -LiteralPath (Join-Path $legacyManifest 'installation.json') -Value '{"version":"0.5.41","skills":{"audit":{"source":"legacy"}}}' -Encoding UTF8
+        $legacyFailed = $false
+        $legacyOutput = ''
+        try { $legacyOutput = (& $install -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $legacyHome 2>&1 | Out-String) }
+        catch { $legacyFailed = $true; $legacyOutput = $_.Exception.Message }
+        Assert $legacyFailed 'legacy CEOS-managed collision was not blocked'
+        Assert ($legacyOutput.Contains('Legacy CEOS-managed Skill collision')) 'legacy collision message is not specific'
+        Assert ($legacyOutput.Contains('Migration plan')) 'legacy collision omitted migration plan'
+        Assert (-not (Test-Path -LiteralPath (Join-Path $legacyHome '.agents\skills\.workflow-for-agents.manifest.json'))) 'legacy collision partially installed manifest'
+        Assert ((Get-Content -LiteralPath (Join-Path $legacySkills 'SKILL.md') -Raw).Contains('legacy user skill')) 'legacy Skill was overwritten'
+        $legacySyncFailed = $false
+        $legacySyncOutput = ''
+        try { $legacySyncOutput = (& $sync -Scope user -RepositoryRoot $repo -Set ceos-migrated -HomePath $legacyHome 2>&1 | Out-String) }
+        catch { $legacySyncFailed = $true; $legacySyncOutput = $_.Exception.Message }
+        Assert $legacySyncFailed 'legacy CEOS collision was not blocked before sync manifest lookup'
+        Assert ($legacySyncOutput.Contains('Legacy CEOS-managed Skill collision')) 'legacy sync collision message is not specific'
     }
     finally {
         if (Test-Path -LiteralPath $userTarget) { Remove-Item -LiteralPath $userTarget -Recurse -Force }
@@ -274,9 +310,9 @@ try {
         Write-Output 'SKIP: user-scope smoke requires an isolated HOME'
     }
 
-    $scopeSummary = if ($SkipUserScope) { 'project scope (user scope skipped)' } else { 'user/project scope' }
-    $protectionSummary = if ($SkipUserScope) { 'unmanaged file protection' } else { 'unmanaged and user-owned file protection' }
-    Write-Output "PASS: $scopeSummary, profile selection, dry-run, manifest schema/source/version/hash integrity, install, idempotency, local edit protection, update/add/remove sync, $protectionSummary, collision"
+    $scopeSummary = if ($SkipUserScope) { 'project scope (user scope skipped)' } else { 'user/project scope with disposable HOME' }
+    $protectionSummary = if ($SkipUserScope) { 'unmanaged file protection' } else { 'unmanaged, user-owned and legacy CEOS file protection' }
+    Write-Output "PASS: $scopeSummary, profile selection, named ceos-migrated set, dry-run, manifest schema/source/version/hash integrity, install, idempotency, local edit protection, update/add/remove sync, $protectionSummary, collision"
 }
 finally {
     if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }

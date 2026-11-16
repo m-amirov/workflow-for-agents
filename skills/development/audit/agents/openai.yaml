@@ -1,0 +1,6 @@
+interface:
+  display_name: "Audit"
+  short_description: "Evidence-based read-only project audit"
+  default_prompt: "Audit the locked target without changing product behavior and report findings with evidence."
+policy:
+  allow_implicit_invocation: true

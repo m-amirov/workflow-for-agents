@@ -39,6 +39,12 @@
 
 Для одного проекта используйте `-Scope project -ProjectPath 'C:\path\to\project'`. Установщик не перезаписывает существующие неменеджируемые каталоги, а синхронизатор останавливается при локальных изменениях и конфликтующих файлах. Полные инструкции и ограничения: [scripts/README.md](scripts/README.md).
 
+Stage 8 добавляет явный user-scope набор `ceos-migrated` для 15 адаптированных
+Skills из CEOS source SHA `c8cc13bd3852409be93097ee823e9cd35e512b73`. Dry-run
+обязателен перед записью; legacy CEOS ownership, unmanaged Skills и локальные
+изменения блокируют install/sync без удаления или перезаписи. Отчёт миграции:
+[Stage 8 CEOS Skills migration](docs/migrations/2026-11-16-stage-8-ceos-skills-migration.md).
+
 **Важно:** установка Skill сама по себе не делает Git-правило постоянно действующим. Для Codex настройте глобальный/проектный `AGENTS.md` согласно [инструкции](integrations/codex/README.md).
 
 ## Начать здесь

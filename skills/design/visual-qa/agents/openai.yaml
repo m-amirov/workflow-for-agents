@@ -1,0 +1,6 @@
+interface:
+  display_name: "Visual QA"
+  short_description: "Current runtime rendering and pixel evidence"
+  default_prompt: "Verify rendered UI or game presentation with current runtime pixels and truthful viewport evidence."
+policy:
+  allow_implicit_invocation: true

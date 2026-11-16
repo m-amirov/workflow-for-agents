@@ -23,3 +23,10 @@
 
 В `evals/cases/foundation.json` сохранены 10 пар positive/negative prompts. Валидатор CI проверяет только структуру; реальные Codex CLI activation-evals выполнены для `git-workflow` и `root-cause-debugging`. Команды, наблюдаемые tool events и ограничения сохранены в [результате](results/2026-11-15-codex-cli-foundation.md). Для остальных восьми Skills activation остаётся `NOT RUN`.
 
+Для Stage 8 добавлен `evals/cases/ceos-migrated.json` с positive/negative
+сценарием для каждого из 15 migrated Skills и exact source SHA. Static
+regression проверяет trigger descriptions, автономность, CEOS-only boundary и
+production-art fail-closed contract. Реальная Codex CLI активация Stage 8
+осталась `BLOCKED_EXTERNAL` после bounded HTTP/WebSocket 403 probe; подробности
+в [Stage 8 report](results/2026-11-16-stage-8-ceos-skills-codex-cli.md).
+

@@ -3,29 +3,36 @@ param(
     [ValidateSet('user','project')][string]$Scope = 'user',
     [string]$ProjectPath = '.',
     [string[]]$Skills = @(),
+    [ValidateSet('ceos-migrated')][string]$Set = '',
     [string]$Profile = '',
     [switch]$DryRun,
+    [string]$HomePath = '',
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'SkillUtils.ps1')
 
 $repo = Get-RepoRoot $RepositoryRoot
-$destination = Get-SkillsDestination $Scope $ProjectPath
+$destination = Get-SkillsDestination $Scope $ProjectPath $HomePath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
 if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
+$legacy = Get-LegacyCeosOwnership $HomePath
+if ($Set) { Assert-NoLegacyCeosCollision $legacy (Get-SkillSetNames $Set) }
 $manifest = Read-Manifest $manifestPath -Require
 $available = Get-AvailableSkills $repo
 $installed = @($manifest.installed)
 if ($Profile) {
     if ($Scope -ne 'project') { throw 'Project profiles can only be synchronized with -Scope project' }
-    if ($Skills.Count -gt 0) { throw 'Use -Profile alone; do not combine it with -Skills' }
+    if ($Skills.Count -gt 0 -or $Set) { throw 'Use -Profile alone; do not combine it with -Skills or -Set' }
     $preflight = Invoke-ProjectProfilePreflight -RepoRoot $repo -ProjectPath $ProjectPath -Profile $Profile
     Assert-ProjectProfilePreflight $preflight
     $selected = @($preflight.Skills | Select-Object -Unique)
 } else {
-    $selected = if ($Skills.Count -gt 0) { @($Skills | Select-Object -Unique) } else { @($installed | ForEach-Object { $_.name }) }
+    if ($Set) { $selected = @(Get-SkillSetNames $Set) }
+    elseif ($Skills.Count -gt 0) { $selected = @($Skills | Select-Object -Unique) }
+    else { $selected = @($installed | ForEach-Object { $_.name }) }
 }
+if (-not $Set) { Assert-NoLegacyCeosCollision $legacy $selected }
 $plans = @()
 
 foreach ($name in $selected) {

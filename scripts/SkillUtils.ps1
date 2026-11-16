@@ -10,15 +10,34 @@ function Get-RepoRoot {
 }
 
 function Get-SkillsDestination {
-    param([string]$Scope, [string]$ProjectPath)
+    param([string]$Scope, [string]$ProjectPath, [string]$HomePath = '')
     if ($Scope -eq 'user') {
-        return (Join-Path (Join-Path $HOME '.agents') 'skills')
+        $resolvedHome = if ($HomePath) { [System.IO.Path]::GetFullPath($HomePath) } else { [System.IO.Path]::GetFullPath($HOME) }
+        if (-not (Test-Path -LiteralPath $resolvedHome -PathType Container)) {
+            throw "User home directory not found: $resolvedHome"
+        }
+        return (Join-Path (Join-Path $resolvedHome '.agents') 'skills')
     }
     $project = [System.IO.Path]::GetFullPath($ProjectPath)
     if (-not (Test-Path -LiteralPath $project -PathType Container)) {
         throw "Project directory not found: $project"
     }
     return (Join-Path (Join-Path $project '.agents') 'skills')
+}
+
+function Get-SkillSetNames {
+    param([string]$Set)
+    switch ($Set) {
+        'ceos-migrated' {
+            return @(
+                'audit', 'audit-repair-loop', 'ceos-continue', 'fix', 'verification',
+                'release', 'visual-qa', 'video-production', 'romance-narrative',
+                'narrative-dialogue-editor', 'narrative-continuity-engine',
+                'reader-experience-review', 'production-art', 'prod-check', 'incident-analysis'
+            )
+        }
+        default { throw "Unknown Skill set: $Set. Available sets: ceos-migrated" }
+    }
 }
 
 function Get-RelativeFilePath {
@@ -73,10 +92,12 @@ function Get-AvailableSkills {
 }
 
 function Get-SelectedNames {
-    param([hashtable]$Available, [string[]]$Names, [switch]$All)
+    param([hashtable]$Available, [string[]]$Names, [switch]$All, [string]$Set = '')
+    if ($Set -and ($All -or $Names.Count -gt 0)) { throw "Use -Set alone; do not combine it with -Skills or -All" }
+    if ($Set) { $Names = @(Get-SkillSetNames $Set) }
     if ($All -and $Names.Count -gt 0) { throw "Use either -All or -Skills, not both" }
     if (-not $All -and $Names.Count -eq 0) {
-        throw "Select skills with -Skills skill-a,skill-b or -All"
+        throw "Select skills with -Skills skill-a,skill-b, -Set ceos-migrated or -All"
     }
     if ($All) { return @($Available.Keys | Sort-Object) }
     $unique = @($Names | Select-Object -Unique)
@@ -84,6 +105,55 @@ function Get-SelectedNames {
         if (-not $Available.ContainsKey($name)) { throw "Unknown skill: $name" }
     }
     return $unique
+}
+
+function Get-LegacyCeosOwnership {
+    param([string]$HomePath)
+    $resolvedHome = if ($HomePath) { [System.IO.Path]::GetFullPath($HomePath) } else { [System.IO.Path]::GetFullPath($HOME) }
+    $manifestPath = Join-Path (Join-Path $resolvedHome '.codex') 'ceos\installation.json'
+    if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+        return [pscustomobject]@{ Present = $false; ManifestPath = $manifestPath; SkillNames = @(); Error = $null }
+    }
+    Assert-NotLinked $manifestPath
+    try {
+        $document = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $names = @()
+        if ($document.PSObject.Properties.Name -contains 'skills') {
+            $names += @($document.skills.PSObject.Properties | ForEach-Object { $_.Name })
+        }
+        if ($document.PSObject.Properties.Name -contains 'installed') {
+            $names += @($document.installed | ForEach-Object { [string]$_.name })
+        }
+        return [pscustomobject]@{
+            Present = $true
+            ManifestPath = $manifestPath
+            SkillNames = @($names | Where-Object { $_ } | Select-Object -Unique)
+            Error = $null
+        }
+    }
+    catch {
+        return [pscustomobject]@{ Present = $true; ManifestPath = $manifestPath; SkillNames = @(); Error = $_.Exception.Message }
+    }
+}
+
+function Assert-NoLegacyCeosCollision {
+    param([object]$Ownership, [string[]]$Selected)
+    if (-not $Ownership.Present) { return }
+    if ($Ownership.Error) {
+        throw "Legacy CEOS ownership manifest cannot be read: $($Ownership.ManifestPath). Preserve it and resolve it explicitly before installing or syncing. Error: $($Ownership.Error)"
+    }
+    $conflicts = @($Selected | Where-Object { $Ownership.SkillNames -contains $_ } | Select-Object -Unique)
+    if ($conflicts.Count -eq 0) {
+        Write-Output "NOTICE legacy CEOS ownership manifest detected: $($Ownership.ManifestPath); selected Skills have no named collision"
+        return
+    }
+    $lines = @(
+        "Legacy CEOS-managed Skill collision: $($conflicts -join ', ')"
+        "Manifest: $($Ownership.ManifestPath)"
+        "Migration plan: preserve the CEOS manifest and Skill files; review the listed files and hashes; obtain explicit approval for a backup-backed ownership migration; only then remove the old owner and rerun this install/sync."
+        "No files were changed."
+    )
+    throw ($lines -join [Environment]::NewLine)
 }
 
 function Get-ProjectProfile {

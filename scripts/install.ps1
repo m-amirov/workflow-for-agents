@@ -4,27 +4,31 @@ param(
     [string]$ProjectPath = '.',
     [string[]]$Skills = @(),
     [switch]$All,
+    [ValidateSet('ceos-migrated')][string]$Set = '',
     [string]$Profile = '',
     [switch]$DryRun,
+    [string]$HomePath = '',
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'SkillUtils.ps1')
 
 $repo = Get-RepoRoot $RepositoryRoot
-$destination = Get-SkillsDestination $Scope $ProjectPath
+$destination = Get-SkillsDestination $Scope $ProjectPath $HomePath
 $manifestPath = Join-Path $destination '.workflow-for-agents.manifest.json'
 if (Test-Path -LiteralPath $destination) { Assert-NotLinked $destination }
 $available = Get-AvailableSkills $repo
 if ($Profile) {
     if ($Scope -ne 'project') { throw 'Project profiles can only be installed with -Scope project' }
-    if ($All -or $Skills.Count -gt 0) { throw 'Use -Profile alone; do not combine it with -Skills or -All' }
+    if ($All -or $Skills.Count -gt 0 -or $Set) { throw 'Use -Profile alone; do not combine it with -Skills, -Set or -All' }
     $preflight = Invoke-ProjectProfilePreflight -RepoRoot $repo -ProjectPath $ProjectPath -Profile $Profile
     Assert-ProjectProfilePreflight $preflight
     $selected = @(Get-SelectedNames $available $preflight.Skills)
 } else {
-    $selected = @(Get-SelectedNames $available $Skills -All:$All)
+    $selected = @(Get-SelectedNames $available $Skills -All:$All -Set $Set)
 }
+$legacy = Get-LegacyCeosOwnership $HomePath
+Assert-NoLegacyCeosCollision $legacy $selected
 $manifest = Read-Manifest $manifestPath
 $planned = @()
 

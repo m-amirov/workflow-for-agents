@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verification"
+  short_description: "Independent acceptance verification"
+  default_prompt: "Map acceptance criteria to fresh evidence and return PASS, FAIL or BLOCKED without overclaiming."
+policy:
+  allow_implicit_invocation: true

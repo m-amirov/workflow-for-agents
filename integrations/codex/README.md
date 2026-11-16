@@ -23,6 +23,19 @@
 .\scripts\install.ps1 -Scope user -Skills git-workflow,root-cause-debugging
 ```
 
+Для Stage 8 весь адаптированный набор выбирается явно:
+
+```powershell
+.\scripts\install.ps1 -Scope user -Set ceos-migrated -DryRun
+.\scripts\install.ps1 -Scope user -Set ceos-migrated
+```
+
+Набор содержит 15 Skills из CEOS source SHA
+`c8cc13bd3852409be93097ee823e9cd35e512b73`. Он не устанавливает CEOS CLI,
+hooks, agents, model routes или глобальные инструкции. При обнаружении старого
+CEOS ownership установка возвращает `BLOCKED` с конкретным migration plan и
+ничего не перезаписывает.
+
 Для проектной установки:
 
 ```powershell
@@ -69,10 +82,14 @@
 
 1. Убедиться, что нужные `SKILL.md` реально находятся в целевом каталоге.
 2. Запустить Codex и проверить обнаружение навыка.
-3. Пройти положительный и отрицательный кейс из `evals/cases/foundation.json`.
+3. Пройти положительный и отрицательный кейс из `evals/cases/ceos-migrated.json`.
 4. Записать версию клиента, точный SHA источника, результат и ограничения.
 
 До реальных проверок не объявлять интеграционную приёмку PASS.
+
+Проверки Stage 8 для CEOS-dependent `ceos-continue`, ImageGen/Web и внешнего
+transport остаются `BLOCKED`/`NOT RUN`, если соответствующая capability реально
+не доступна. Обычное «продолжи» не должно запускать CEOS recovery.
 
 ## Фактическая локальная приёмка 2026-11-15
 

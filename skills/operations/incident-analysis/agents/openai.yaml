@@ -1,0 +1,6 @@
+interface:
+  display_name: "Incident Analysis"
+  short_description: "Causal timeline from runtime incident evidence"
+  default_prompt: "Reconstruct the incident timeline, separate root cause from fallout and state evidence gaps."
+policy:
+  allow_implicit_invocation: true

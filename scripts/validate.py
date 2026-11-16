@@ -42,6 +42,12 @@ DRAWING_EDITOR_EVAL_IDS = {f"DE-{number:02d}" for number in range(1, 11)}
 DRAWING_EDITOR_EVAL_STATUSES = {"prepared", "executed", "blocked", "not-run"}
 CLASSIFICATION_QUALITY_EVAL_IDS = {f"CQ-{number:02d}" for number in range(1, 13)}
 CLASSIFICATION_QUALITY_EVAL_RESULTS = {"PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT RUN"}
+CEOS_MIGRATED_SKILLS = {
+    "audit", "audit-repair-loop", "ceos-continue", "fix", "verification",
+    "release", "visual-qa", "video-production", "romance-narrative",
+    "narrative-dialogue-editor", "narrative-continuity-engine",
+    "reader-experience-review", "production-art", "prod-check", "incident-analysis",
+}
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, str], list[str]]:
@@ -240,6 +246,48 @@ def validate_classification_quality_evals(root: Path) -> tuple[list[str], int]:
     return errors, len(scenarios)
 
 
+def validate_ceos_migrated_evals(root: Path) -> tuple[list[str], int]:
+    """Validate the source-bound positive/negative activation contract for Stage 8."""
+    fixture = root / "evals" / "cases" / "ceos-migrated.json"
+    if not fixture.is_file():
+        return ["Missing CEOS migrated eval suite"], 0
+    try:
+        suite = json.loads(fixture.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"Invalid CEOS migrated eval suite: {error}"], 0
+    if not isinstance(suite, dict) or suite.get("schema") != 1 or suite.get("source_sha") != "c8cc13bd3852409be93097ee823e9cd35e512b73":
+        return ["Invalid CEOS migrated eval suite schema or source SHA"], 0
+    scenarios = suite.get("scenarios")
+    if not isinstance(scenarios, list):
+        return ["CEOS migrated eval suite must contain scenarios"], 0
+    errors: list[str] = []
+    seen: set[str] = set()
+    for index, scenario in enumerate(scenarios):
+        skill = scenario.get("skill") if isinstance(scenario, dict) else None
+        if not isinstance(skill, str) or skill not in CEOS_MIGRATED_SKILLS or skill in seen:
+            errors.append(f"CEOS migrated eval {index}: unknown or duplicate skill: {skill!r}")
+            continue
+        seen.add(skill)
+        for variant in ("positive", "negative"):
+            value = scenario.get(variant)
+            if not isinstance(value, dict) or any(
+                not isinstance(value.get(field), str) or not value[field].strip()
+                for field in ("prompt", "expected_behavior")
+            ):
+                errors.append(f"CEOS migrated eval {skill}: missing {variant} prompt/expected_behavior")
+        prohibited = scenario.get("prohibited_behavior")
+        if not isinstance(prohibited, list) or not prohibited or any(
+            not isinstance(item, str) or not item.strip() for item in prohibited
+        ):
+            errors.append(f"CEOS migrated eval {skill}: missing prohibited behavior")
+        status = scenario.get("status")
+        if status not in {"prepared", "executed", "blocked", "not-run"}:
+            errors.append(f"CEOS migrated eval {skill}: invalid status {status!r}")
+    for skill in sorted(CEOS_MIGRATED_SKILLS - seen):
+        errors.append(f"CEOS migrated eval suite missing {skill}")
+    return errors, len(scenarios)
+
+
 def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     root = root.resolve()
     errors: list[str] = []
@@ -338,7 +386,7 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
                         not isinstance(item, str) or not item.strip() for item in prohibited
                     ):
                         errors.append(f"Eval case {index}: missing prohibited behavior")
-                for name in sorted(set(names) - covered):
+                for name in sorted((set(names) - CEOS_MIGRATED_SKILLS) - covered):
                     errors.append(f"No foundation eval case for {name}")
     pattern_errors, patterns = validate_knowledge_patterns(root)
     errors.extend(pattern_errors)
@@ -348,12 +396,14 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     errors.extend(drawing_eval_errors)
     classification_errors, classification_evals = validate_classification_quality_evals(root)
     errors.extend(classification_errors)
+    ceos_errors, ceos_evals = validate_ceos_migrated_evals(root)
+    errors.extend(ceos_errors)
     profile_errors, profiles = validate_profiles(root)
     errors.extend(profile_errors)
     return errors, {
         "skills": len(skills), "links": links, "patterns": patterns,
         "browser_evals": browser_evals, "drawing_evals": drawing_evals, "classification_evals": classification_evals,
-        "profiles": profiles,
+        "ceos_migrated_evals": ceos_evals, "profiles": profiles,
     }
 
 
@@ -369,6 +419,7 @@ def main() -> int:
         f"{summary['patterns']} knowledge pattern(s), {summary['browser_evals']} browser automation eval(s), "
         f"{summary['drawing_evals']} drawing editor eval(s); "
         f"{summary['classification_evals']} classification quality eval(s); {summary['profiles']} project profile(s); "
+        f"{summary['ceos_migrated_evals']} CEOS migrated eval(s); "
         f"{len(errors)} error(s)"
     )
     return 1 if errors else 0

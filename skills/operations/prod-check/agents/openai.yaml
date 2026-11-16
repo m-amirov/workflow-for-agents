@@ -1,0 +1,6 @@
+interface:
+  display_name: "Production Check"
+  short_description: "Read-only production inspection"
+  default_prompt: "Inspect only authorized production surfaces in read-only mode and report exact evidence."
+policy:
+  allow_implicit_invocation: false

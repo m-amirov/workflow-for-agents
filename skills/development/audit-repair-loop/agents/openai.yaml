@@ -1,0 +1,6 @@
+interface:
+  display_name: "Audit Repair Loop"
+  short_description: "Bounded audit, repair, verification and fresh re-audit"
+  default_prompt: "Run a locked-scope audit-repair loop with a cycle bound and a truthful final verdict."
+policy:
+  allow_implicit_invocation: true

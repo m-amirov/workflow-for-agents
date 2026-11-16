@@ -1,0 +1,6 @@
+interface:
+  display_name: "Production Art"
+  short_description: "Source-bound asset provenance and runtime acceptance"
+  default_prompt: "Lock scope, verify real assets and provenance, and keep mechanical, artistic and runtime gates separate."
+policy:
+  allow_implicit_invocation: true
