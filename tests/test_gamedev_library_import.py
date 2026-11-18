@@ -79,5 +79,28 @@ class GamedevImportTests(unittest.TestCase):
             self.assertFalse(destination.parent.exists())
 
 
+    def test_code_fences_do_not_create_false_file_links(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from validate import prose_for_link_validation, LINK_RE
+        markdown = (
+            "Docs: [real](guidance.md)\n"
+            "```python\n"
+            "data = MIGRATIONS[v](data)\n"
+            "fake = FLAGS[k](missing.md)\n"
+            "```\n"
+            "Inline `[not-link](missing-file.md)` and [real 2](ok.md).\n"
+        )
+        visible = prose_for_link_validation(markdown)
+        links = [m.group(1) for m in LINK_RE.finditer(visible)]
+        self.assertEqual(links, ["guidance.md", "ok.md"])
+
+    def test_template_exclusions_are_narrow(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from validate import GAMEDOC_TEMPLATE_PATHS
+        self.assertEqual(len(GAMEDOC_TEMPLATE_PATHS), 3)
+        self.assertTrue(all("/game-docs/references/" in path for path in GAMEDOC_TEMPLATE_PATHS))
+
+
+
 if __name__ == "__main__":
     unittest.main()
