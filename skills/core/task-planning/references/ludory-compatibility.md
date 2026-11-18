@@ -47,7 +47,7 @@ loaded runtime and project provenance. Use `UNKNOWN` when evidence is lacking.
   can use `phaser-core` when their loaded runtime is proven Phaser.
 - Never replace a native production-art packet, image-generator delegation,
   Web art review, source SHA/handoff or rights check with a global shortcut.
-- Never apply filesystem rename/backup recipes to a localStorage API, silently
+- Respect native persistence; never apply filesystem rename/backup recipes to a localStorage API, silently
   replace native save formats or promise save migrations without an actual
   compatible old-format fixture and owner decision.
 - Never promote generic CI PASS, foundation Skill validation or browser smoke
@@ -59,10 +59,10 @@ loaded runtime and project provenance. Use `UNKNOWN` when evidence is lacking.
 
 ## Verification
 
-The deterministic read-only [policy runner](../../../../../scripts/ludory_compatibility.py)
+The deterministic read-only [policy runner](../../../../scripts/ludory_compatibility.py)
 tests routing from **preverified asserted metadata**; it does NOT inspect
 source authenticity, read external repositories or prove actual Codex Skill
 activation. The offline fixture suite is
-[here](../../../../../evals/cases/ludory-compatibility/scenarios.json).
+[here](../../../../evals/cases/ludory-compatibility/scenarios.json).
 All Codex positive/negative tests must be run separately in a disposable
 workspace with real tool-read evidence; mark them `NOT RUN` otherwise.
