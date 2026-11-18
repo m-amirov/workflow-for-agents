@@ -1,0 +1,6 @@
+interface:
+  display_name: "Game Content QA"
+  short_description: "Committed content coverage and omissions by requirement ID"
+  default_prompt: "Bind the approved scope and exact HEAD, reconcile every required feature, route and asset to actual runtime/package evidence; report missing and unreachable items without silent scope cuts."
+policy:
+  allow_implicit_invocation: true

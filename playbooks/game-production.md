@@ -27,6 +27,9 @@ Read current game instructions and repo before choosing an engine. Use
 [task-planning](../skills/core/task-planning/SKILL.md) to classify task risk,
 scope and independent review. Select only relevant WFA Skills:
 [game-docs](../skills/gamedev/workflows/game-docs/SKILL.md),
+[gameplay-design](../skills/domain/gameplay-design/SKILL.md),
+[gameplay-playtesting](../skills/domain/gameplay-playtesting/SKILL.md),
+[game-content-qa](../skills/domain/game-content-qa/SKILL.md),
 [prototype-fast](../skills/gamedev/workflows/prototype-fast/SKILL.md),
 [production-art](../skills/domain/production-art/SKILL.md),
 [character-design](../skills/domain/character-design/SKILL.md),
@@ -36,7 +39,7 @@ scope and independent review. Select only relevant WFA Skills:
 [regression-testing](../skills/testing/regression-testing/SKILL.md),
 [release-verification](../skills/testing/release-verification/SKILL.md)
 plus confirmed engine/genre-specific Skills. A project-native Skill is
-authoritative within its eligible scope. Never preload all 109 Skills.
+authoritative within its eligible scope. Never preload all available Skills.
 
 ## Stage and evidence matrix
 
@@ -54,10 +57,12 @@ authoritative within its eligible scope. Never preload all 109 Skills.
 Production can iterate within stages and revisit prior stages after a scope
 change. A later PASS cannot bypass an earlier gate. Reusable records with
 source hashes are evidence **pointers**, not authenticated proof of human/host
-observation. Content-coverage requires a table of promised requirements →
+observation. Use [game-content-qa](../skills/domain/game-content-qa/SKILL.md) at G4/G6: its optional offline checker compares game-owned accepted baseline and coverage manifest, but only native runtime and package evidence may close actual content acceptance. Content-coverage requires a table of promised requirements →
 actual code/data/use sites → evidence → status, including unreachable routes
 and intentionally cut content. A missing promised feature is FAIL, not a
 "completed scope" silently shrunk to match the build.
+
+**G3/G5 player research:** use [gameplay-playtesting](../skills/domain/gameplay-playtesting/SKILL.md) for genuine observed participants. A written protocol is not a human playtest; record consent, source SHA and selection limits.
 
 **G5:** automated bots can check reachability or simulation but cannot prove
 players enjoyed a game; actual human feedback and observed play sessions must

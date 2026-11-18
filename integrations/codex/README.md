@@ -126,6 +126,21 @@ visual-qa для provenance и runtime QA. Установка Skill не зап�
 
 Для задачи от идеи до релизного кандидата применяйте [Game Production Pipeline](../../playbooks/game-production.md) вместе с [шаблоном самостоятельного задания Codex](../../prompts/codex/game-production.md). Это playbook, а не автоматически установленный Skill или фоновый исполнитель. Пример state record расположен в [templates](../../templates/game-production-state.example.json); read-only проверку структуры запускает scripts/game_production.py. Не объявляйте G7 PASS по локальному JSON.
 
+## Critical gameplay Skills for new games
+
+Install only when relevant to the target game's scope; run the project-scoped
+dry-run first, then perform the actual install if there are no conflicts:
+
+~~~powershell
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\new-game' -Skills gameplay-design,gameplay-playtesting,game-content-qa -DryRun
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\new-game' -Skills gameplay-design,gameplay-playtesting,game-content-qa
+~~~
+
+See [Game Production Pipeline](../../playbooks/game-production.md). WFA Skills
+do not override Ludory local Skills, project permissions, real human test
+evidence or platform/asset-rights gates. Installation does not prove Codex
+activation. The game-content-qa checker is read-only and structural.
+
 ## Проверка
 
 1. Убедиться, что нужные `SKILL.md` реально находятся в целевом каталоге.

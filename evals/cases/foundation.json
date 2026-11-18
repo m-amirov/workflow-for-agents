@@ -1399,6 +1399,51 @@
       "prohibited_behavior": [
         "Не объявлять identity PASS по similarity score, имени файла или отсутствующим изображениям"
       ]
+    },
+    {
+      "skill": "gameplay-design",
+      "positive": {
+        "prompt": "Спроектируй основной игровой цикл новой браузерной игры: что делает игрок, какие результаты и ошибки, как он узнает о последствиях, какие ID приёмки.",
+        "expected_behavior": "Активировать gameplay-design для наблюдаемого core loop, состояний и регламентированных acceptance IDs; реализацию поручить engine owner."
+      },
+      "negative": {
+        "prompt": "Отформатируй существующий GDD.md, не меняя игровых механик.",
+        "expected_behavior": "Использовать game-docs; не инициировать gameplay-design или перепроектирование."
+      },
+      "prohibited_behavior": [
+        "Не считать заполненный дизайн доказательством работающего игрового цикла.",
+        "Не дублировать engine/genre/level-design."
+      ]
+    },
+    {
+      "skill": "gameplay-playtesting",
+      "positive": {
+        "prompt": "Проведи playtest готовой игры на реальных участниках: пойми, почему люди не находят кнопку и не понимают проигрыш.",
+        "expected_behavior": "Определить гипотезы, согласие, зафиксировать build и реальные обезличенные наблюдения, разделить факты/интерпретации; без участников BLOCKED."
+      },
+      "negative": {
+        "prompt": "Прогоняй 100 автотестов в headless браузере и объяви, что игрокам понравилась игра.",
+        "expected_behavior": "Направить технический тест в browser-qa и отказать в claims о человеческом опыте без реальных playtest сессий."
+      },
+      "prohibited_behavior": [
+        "Не выдумывать участников, цитаты и выводы об удовольствии.",
+        "Не собирать неразрешённые персональные данные."
+      ]
+    },
+    {
+      "skill": "game-content-qa",
+      "positive": {
+        "prompt": "В GDD обещано 12 уровней и 4 концовки, а в билде видны только 10 уровней и 3 концовки. Аудит полноты.",
+        "expected_behavior": "Взять утверждённый baseline и исходники, сверить каждый MUST ID с реальным runtime/package, зафиксировать отсутствующее, не подменять G4 PASS."
+      },
+      "negative": {
+        "prompt": "Нарисуй новый CG-портрет для героя; исходных ассетов ещё нет.",
+        "expected_behavior": "Использовать character-design/production-art, не выполнять game-content-qa на несуществующих файлах."
+      },
+      "prohibited_behavior": [
+        "Не удалять требования из baseline, чтобы увеличить покрытие.",
+        "Не считать существование PNG или JSON доказательством фактического runtime."
+      ]
     }
   ],
   "gamedev_import_note": "78 prepared cases from source SHA c6ca6c41c839b68319ffc08430b99ab768debc32; NOT RUN in Codex."

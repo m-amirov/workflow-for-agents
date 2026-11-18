@@ -186,6 +186,18 @@ GitHub-исполнения и требует локального запуск�
 
 **Первый пилот:** отдельная новая Studio-игра, без мутации frozen проектов и без изменения фреймворка Ludory ради прохождения gate.
 
+## Game Production critical gameplay Skills (2026-11-18)
+
+**Статус:** added three specialized reusable Skills, references, positive/negative routing evals and a read-only source-bound content-coverage checker. Offline CI and actual Codex/runtime evidence are separate gates.
+
+- [x] gameplay-design: player action/response/feedback loop, state transitions, teaching, edge cases and stable acceptance IDs; game-docs and engine-specific owners remain authoritative.
+- [x] gameplay-playtesting: explicit human-session protocol, consent/privacy boundaries, observation versus hypothesis, evidence-backed retest; no fake player feedback.
+- [x] game-content-qa: approved baseline versus implementation/package completeness, MUST/OPTIONAL/CUT handling, stale source/evidence protection and external provenance caveats.
+- [x] Integration into G0/G1/G2, G3/G5 and G4/G6 of existing game-production pipeline.
+- [x] Prepared positive/negative eval matrix and offline structural/unit regression coverage.
+- [ ] Real positive/negative Codex activation of all three new Skills — NOT RUN.
+- [ ] Run first playable project with actual human playtests and native runtime/build content parity — NOT RUN.
+
 ## Порядок ближайшей работы
 
 1. Закрыть текущий CI на финальном SHA после публикации изменений в `main`.

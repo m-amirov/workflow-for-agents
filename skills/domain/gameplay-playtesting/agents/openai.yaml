@@ -1,0 +1,6 @@
+interface:
+  display_name: "Gameplay Playtesting"
+  short_description: "Observed human playtest sessions and retest findings"
+  default_prompt: "Pin a real build, define falsifiable tasks, observe real players with consent and report limitations; do not label bots or imagined reactions human feedback."
+policy:
+  allow_implicit_invocation: true

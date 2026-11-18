@@ -1,0 +1,51 @@
+{
+  "baseline": {
+    "schemaVersion": 1,
+    "gameId": "example-game",
+    "revision": "OWNER_NOT_APPROVED_EXAMPLE",
+    "sourceSha": "0000000000000000000000000000000000000000",
+    "requirements": [
+      {
+        "id": "GP-001",
+        "priority": "MUST",
+        "description": "EXAMPLE ONLY: primary loop is playable, not verified",
+        "requiredEvidenceKinds": [
+          "source",
+          "runtime"
+        ],
+        "cutDecision": null
+      },
+      {
+        "id": "LV-001",
+        "priority": "OPTIONAL",
+        "description": "EXAMPLE ONLY: optional stage",
+        "requiredEvidenceKinds": [
+          "source",
+          "runtime"
+        ],
+        "cutDecision": null
+      }
+    ]
+  },
+  "manifest": {
+    "schemaVersion": 1,
+    "gameId": "example-game",
+    "gameSourceSha": "0000000000000000000000000000000000000000",
+    "baselineSha256": null,
+    "rows": [
+      {
+        "id": "GP-001",
+        "status": "MISSING",
+        "sourceSha": "0000000000000000000000000000000000000000",
+        "evidence": []
+      },
+      {
+        "id": "LV-001",
+        "status": "OPTIONAL_MISSING",
+        "sourceSha": "0000000000000000000000000000000000000000",
+        "evidence": []
+      }
+    ]
+  },
+  "note": "Illustrative nested example, not two standalone project files; split and replace data in real game. No evidence claimed."
+}

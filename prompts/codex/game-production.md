@@ -24,6 +24,10 @@ rights issues, paid tools, destructive changes or external platform actions.
 2. Read WFA `playbooks/game-production.md` and its actual supporting files
    from a pinned WFA revision. Activate task-planning and minimal necessary
    game, narrative, visual, QA and release Skills. Do not load all WFA Skills.
+   Route core loops and acceptance IDs to gameplay-design, genuine participant
+   observations to gameplay-playtesting, and G4/G6 committed content coverage
+   to game-content-qa. Do not substitute bots for humans, source files for
+   runtime or a rewritten smaller matrix for the approved scope.
 3. Determine the actual engine and available creation/export APIs from source
    and current documentation. A Ludory game must use native Studio creation,
    trust, Runtime, image generation/import and Release contracts. Do not

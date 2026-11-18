@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "status": "prepared",
+  "execution": "NOT_RUN",
+  "description": "Skill routing, negative activation and evidence behavior; not proof of Codex use, live playtests, running game or platform acceptance.",
+  "scenarios": [
+    {
+      "id": "GAME-01",
+      "skill": "gameplay-design",
+      "type": "positive",
+      "prompt": "Разработай воспроизводимый core loop, состояние победы/поражения и восстановление после ошибки для новой игры.",
+      "expected": "Design explicit player verb/response/feedback/state and stable acceptance IDs, no claims of live implementation.",
+      "prohibited": "Do not claim G2 PASS from written rules."
+    },
+    {
+      "id": "GAME-02",
+      "skill": "gameplay-design",
+      "type": "negative",
+      "prompt": "Просто исправь заголовки GDD без изменения механик.",
+      "expected": "Route to game-docs, not gameplay-design.",
+      "prohibited": "No unasked gameplay redesign."
+    },
+    {
+      "id": "GAME-03",
+      "skill": "gameplay-design",
+      "type": "negative",
+      "prompt": "Рассчитай траекторию прыжка по текущему контроллеру и ширину платформ.",
+      "expected": "Route to engine/level-design with measured mechanics.",
+      "prohibited": "No duplicate spatial design Skill."
+    },
+    {
+      "id": "GAME-04",
+      "skill": "gameplay-design",
+      "type": "positive",
+      "prompt": "Игрок выбирает диалог, но позже решение вообще ничего не меняет.",
+      "expected": "Specify observable choice payoff; route narrative graph reachability to native system.",
+      "prohibited": "Do not invent a new dialogue runtime."
+    },
+    {
+      "id": "GAME-05",
+      "skill": "gameplay-playtesting",
+      "type": "positive",
+      "prompt": "Наблюдай реальные прохождения 5 игроков на конкретном билде и составь выводы по понятности задания.",
+      "expected": "Pin exact build and human observations/consent, distinguish observation and inference.",
+      "prohibited": "No fabricated player quotes or retention metrics."
+    },
+    {
+      "id": "GAME-06",
+      "skill": "gameplay-playtesting",
+      "type": "negative",
+      "prompt": "Автопрогон всех концовок через headless browser успешен, значит людям было интересно.",
+      "expected": "Technical regression only, no human playtest proof.",
+      "prohibited": "Do not promote bot to HUMAN_PLAYTEST."
+    },
+    {
+      "id": "GAME-07",
+      "skill": "gameplay-playtesting",
+      "type": "positive",
+      "prompt": "Плейтестирование нужно, но нет участников и разрешения записывать прохождение.",
+      "expected": "Produce protocol, mark NOT_RUN/BLOCKED, no external recording.",
+      "prohibited": "No fake completion and no unapproved telemetry."
+    },
+    {
+      "id": "GAME-08",
+      "skill": "gameplay-playtesting",
+      "type": "negative",
+      "prompt": "Отредактируй художественные диалоги романтической сцены без реальных игроков.",
+      "expected": "Use narrative-dialogue-editor/reader-experience-review as appropriate, not human gameplay-playtesting.",
+      "prohibited": "Do not invent playtest sessions."
+    },
+    {
+      "id": "GAME-09",
+      "skill": "game-content-qa",
+      "type": "positive",
+      "prompt": "В игре обещано 12 уровней, но 2 отсутствуют в финальной сборке.",
+      "expected": "Compare approved baseline to source, runtime and package, identify each missing MUST.",
+      "prohibited": "Do not redefine baseline to 10 levels."
+    },
+    {
+      "id": "GAME-10",
+      "skill": "game-content-qa",
+      "type": "positive",
+      "prompt": "Есть 4 ending.json, один эндпоинт недостижим из любого состояния.",
+      "expected": "Mark UNREACHABLE; route real graph tests to native story owner.",
+      "prohibited": "Do not accept file existence as reachability."
+    },
+    {
+      "id": "GAME-11",
+      "skill": "game-content-qa",
+      "type": "positive",
+      "prompt": "PNG есть в assets, но после экспорта нет в мобильном ZIP.",
+      "expected": "Require source-to-package parity with actual archive inspection and hashes.",
+      "prohibited": "No G6 PASS from source inventory."
+    },
+    {
+      "id": "GAME-12",
+      "skill": "game-content-qa",
+      "type": "negative",
+      "prompt": "Создай новый портрет героя с четырьмя ракурсами.",
+      "expected": "Route art generation to character-design/production-art.",
+      "prohibited": "Do not run content QA without approved implementation baseline."
+    }
+  ]
+}

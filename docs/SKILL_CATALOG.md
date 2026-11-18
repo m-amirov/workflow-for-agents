@@ -40,6 +40,9 @@
 | Domain | production-art | Source-bound art provenance, mapping and separate acceptance gates | implemented |
 | Domain | character-design | Character Bible, canonical master, turnaround, expressions and outfit variants | implemented |
 | Domain | character-consistency-qa | Independent real-pixel identity consistency review across character assets | implemented |
+| Domain | gameplay-design | Core gameplay loop, state transitions, player feedback and acceptance IDs | implemented |
+| Domain | gameplay-playtesting | Actual player observation, onboarding/pacing findings and human retest protocol | implemented |
+| Domain | game-content-qa | Approved requirements-to-runtime/package coverage and missing content audit | implemented |
 | Operations | prod-check | Read-only production inspection | implemented |
 | Operations | incident-analysis | Incident timeline и causal evidence analysis | implemented |
 | Operations | logging-standard | Структурированные события, trace/request correlation, retries/fallback, privacy-safe диагностика | implemented |
