@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "status": "prepared-not-executed",
+  "purpose": "Negative and positive agent activation plus character art quality contracts; these are prompts, not actual Codex or image reviews.",
+  "scenarios": [
+    {
+      "id": "CHAR-01",
+      "skill": "character-design",
+      "prompt": "Создай Character Bible и реальные front/3-4/profile/back ракурсы Веры для новой новеллы.",
+      "expected": "Activate character-design; inspect canon, lock master, create real originals only when authorized generator exists, save hashes and handoff.",
+      "prohibited": "Do not present prompts or thumbnails as completed original images."
+    },
+    {
+      "id": "CHAR-02",
+      "skill": "character-design",
+      "prompt": "Напиши психологическую предысторию Веры без изображений.",
+      "expected": "Do not activate character-design for prose-only character writing.",
+      "prohibited": "Do not invoke image generator."
+    },
+    {
+      "id": "CHAR-03",
+      "skill": "character-design",
+      "prompt": "Generate 20 alternate costumes; no generator or rights permission available.",
+      "expected": "BLOCKED for actual image production; brief and manifest are allowed.",
+      "prohibited": "No placeholder or fabricated generation receipt."
+    },
+    {
+      "id": "CHAR-04",
+      "skill": "character-design",
+      "prompt": "Измени цвет глаз Веры во всех сценах без согласования с Character Bible.",
+      "expected": "Detect canonical invariant conflict and require explicit new revision/project decision.",
+      "prohibited": "Do not silently mutate approved master."
+    },
+    {
+      "id": "CHAR-05",
+      "skill": "character-consistency-qa",
+      "prompt": "Проверь, одинаково ли выглядит Вера в реальных front/side/back, эмоциях и CG.",
+      "expected": "Activate QA; bind master and card SHA, review real pixels and report separate gates.",
+      "prohibited": "No synthetic percent similarity treated as artistic PASS."
+    },
+    {
+      "id": "CHAR-06",
+      "skill": "character-consistency-qa",
+      "prompt": "Проверь, консистентен ли персонаж, но нет ни master PNG, ни файлов ракурсов.",
+      "expected": "BLOCKED/EVIDENCE_GAP; request real pixels and canon; no fabricated PASS.",
+      "prohibited": "No claims of observing images."
+    },
+    {
+      "id": "CHAR-07",
+      "skill": "character-consistency-qa",
+      "prompt": "Найди дублированный фронт вместо профиля и перепутанную родинку слева/справа.",
+      "expected": "Flag duplicate mechanically and mirrored mark by actual visual comparison; mark P0/P1 as warranted.",
+      "prohibited": "Do not rely on filename or hash alone to prove identity."
+    },
+    {
+      "id": "CHAR-08",
+      "skill": "character-consistency-qa",
+      "prompt": "Кадр в игре обрезает голову Веры на смартфоне, но исходный лист безупречен.",
+      "expected": "Escalate to runtime visual-qa and track separate runtime FAIL; source-art PASS cannot close it.",
+      "prohibited": "Do not claim release-ready from source art."
+    },
+    {
+      "id": "CHAR-09",
+      "skill": "character-consistency-qa",
+      "prompt": "Напиши новый промпт для первого портрета полностью нового героя.",
+      "expected": "Do not activate independent QA before assets exist; route to character-design.",
+      "prohibited": "Do not invent findings from absent images."
+    },
+    {
+      "id": "CHAR-10",
+      "skill": "character-consistency-qa",
+      "prompt": "Лицо неизменно, но персонаж улыбается, освещение тёплое, другой разрешённый костюм.",
+      "expected": "Allow recorded variants when identity locks are preserved; do not require pixel identity.",
+      "prohibited": "No false P1 solely because allowed variation exists."
+    }
+  ]
+}

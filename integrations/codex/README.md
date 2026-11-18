@@ -105,6 +105,23 @@ preflight report](../../docs/migrations/2026-11-16-stage-10-global-skills-prefli
 
 В проекте с защитой `main` выполняйте обычный PR и обязательные проверки; удаление временной ветки — только после подтверждённого merge.
 
+## Подключение Character Design и Consistency QA к новой игре
+
+Skills живут в WFA, а не в runtime Ludory. Для нового игрового проекта
+выполните из checkout WFA сначала dry-run, затем установку:
+
+```powershell
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\new-game' -Skills character-design,character-consistency-qa -DryRun
+.\scripts\install.ps1 -Scope project -ProjectPath 'C:\work\new-game' -Skills character-design,character-consistency-qa
+```
+
+Codex должен прочитать проектный AGENTS.md и применимые Skills. В случае
+неизвестного/занятого пути Skill установка должна остановиться без
+перезаписи. Точные визуальные файлы, card revisions и hashes хранятся в
+репозитории игры, а WFA — общую методику. Используйте production-art и
+visual-qa для provenance и runtime QA. Установка Skill не запускает ImageGen,
+не добавляет возможности модели, не подтверждает авторские права или релиз.
+
 ## Проверка
 
 1. Убедиться, что нужные `SKILL.md` реально находятся в целевом каталоге.

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "status": "EXAMPLE_NOT_EXECUTED",
+  "source": {
+    "repository": "example/game",
+    "headSha": null,
+    "characterId": "example-vera",
+    "cardRevision": 1,
+    "cardSha256": null,
+    "masterPath": null,
+    "masterSha256": null
+  },
+  "candidates": [
+    {
+      "path": "assets/characters/vera/side.png",
+      "sha256": null,
+      "expectedView": "side",
+      "observedPixels": false
+    }
+  ],
+  "findings": [],
+  "reviewer": {
+    "method": "NOT_RUN",
+    "identity": null,
+    "observedOriginalPixels": false
+  },
+  "gates": {
+    "mechanical": "BLOCKED",
+    "artistic": "NOT_RUN",
+    "runtime": "NOT_RUN",
+    "rights": "NOT_RUN"
+  },
+  "overall": "BLOCKED",
+  "note": "All hashes/statuses must be based on real project files and observed review."
+}

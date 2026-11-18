@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "note": "EXAMPLE ONLY — not an approved game character or generated asset",
+  "characterId": "example-vera",
+  "revision": 1,
+  "status": "DRAFT_NO_ASSETS",
+  "narrative": {
+    "name": "Вера",
+    "role": "protagonist",
+    "personalityNotes": "Observant; reserved. Narrative traits are not pixel-verifiable."
+  },
+  "identityLocks": {
+    "approximateAge": "late 20s",
+    "silhouette": "medium height, narrow shoulders",
+    "face": "oval face, straight nose, small mole under the left eye",
+    "proportions": "realistic adult, approximately seven-and-a-half heads tall",
+    "eyes": "dark brown",
+    "hair": "shoulder-length dark chestnut, center part",
+    "marks": [
+      "small mole below left eye"
+    ],
+    "baseOutfit": "dark-green jacket, plain dark trousers",
+    "forbiddenDrift": [
+      "eye color change",
+      "mole switches sides",
+      "different facial structure",
+      "inconsistent body proportions"
+    ]
+  },
+  "allowedVariants": {
+    "expressions": [
+      "neutral",
+      "happy",
+      "sad",
+      "angry",
+      "afraid",
+      "surprised"
+    ],
+    "outfits": [
+      "base"
+    ],
+    "lighting": [
+      "neutral reference",
+      "story scene lighting"
+    ],
+    "poses": [
+      "neutral",
+      "narrative scene pose"
+    ]
+  },
+  "canonicalReference": {
+    "path": null,
+    "sha256": null,
+    "width": null,
+    "height": null,
+    "reviewStatus": "NOT_RUN"
+  },
+  "requiredViews": [
+    "front",
+    "three-quarter",
+    "side",
+    "back"
+  ],
+  "artifacts": [],
+  "provenance": {
+    "source": "not-generated",
+    "rightsStatus": "NOT_RUN"
+  },
+  "dependencies": [],
+  "changeHistory": []
+}

@@ -1371,6 +1371,34 @@
         "No claims of actual activation, code execution or game release from prepared cases",
         "Do not override project-owned rules, asset rights or platform gates"
       ]
+    },
+    {
+      "skill": "character-design",
+      "positive": {
+        "prompt": "Создай карточку персонажа и референсные front, side, back и expression изображения.",
+        "expected_behavior": "Активируй character-design, сохрани canon, реальные файлы, provenance, мастер-референс и передай на независимый QA."
+      },
+      "negative": {
+        "prompt": "Напиши только личную историю персонажа без иллюстраций.",
+        "expected_behavior": "Не активируй визуальную генерацию для prose-only задачи."
+      },
+      "prohibited_behavior": [
+        "Не выдумывать изображения и не подменять реальный ImageGen текстовым промптом"
+      ]
+    },
+    {
+      "skill": "character-consistency-qa",
+      "positive": {
+        "prompt": "Независимо проверь внешность персонажа по master, turnaround и эмоциям на реальных PNG.",
+        "expected_behavior": "Активируй независимую проверку реальных пикселей, привяжи хеши, выдели P0/P1 и раздельные mechanical/artistic/runtime gates."
+      },
+      "negative": {
+        "prompt": "Создай персонажа с нуля, исходных изображений нет.",
+        "expected_behavior": "Направь задачу в character-design; без пикселей верни BLOCKED, а не QA PASS."
+      },
+      "prohibited_behavior": [
+        "Не объявлять identity PASS по similarity score, имени файла или отсутствующим изображениям"
+      ]
     }
   ],
   "gamedev_import_note": "78 prepared cases from source SHA c6ca6c41c839b68319ffc08430b99ab768debc32; NOT RUN in Codex."

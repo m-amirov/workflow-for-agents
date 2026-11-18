@@ -1,0 +1,6 @@
+interface:
+  display_name: "Character Design"
+  short_description: "Canon-locked character sheets and reference packs"
+  default_prompt: "Inspect canon, lock identity, produce source-bound views and variants, record original bytes and hand off to independent consistency QA."
+policy:
+  allow_implicit_invocation: true
