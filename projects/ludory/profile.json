@@ -3,14 +3,67 @@
   "id": "ludory",
   "canonical_repository": "https://github.com/m-amirov/ludory",
   "source_sha": "933c73b195eaf3bfffd12a31ab1cbadb27989eea",
-  "recommended_skills": ["codebase-exploration", "regression-testing", "release-verification", "git-workflow", "browser-qa"],
-  "activation_conditions": ["core-runtime-connect change", "release or browser verification task", "do not use central Skills to alter frozen games"],
-  "protected_local_skills": ["ludory-asset-rights", "ludory-engineering-quality", "ludory-production-art", "ludory-verification", "ludory-visual-qa"],
-  "compatibility_notes": ["central main-first is refined by frozen-game and owner-authorization rules", "central PASS is not asset-rights or platform acceptance"],
+  "recommended_skills": [
+    "codebase-exploration",
+    "regression-testing",
+    "release-verification",
+    "git-workflow",
+    "browser-qa"
+  ],
+  "activation_conditions": [
+    "core-runtime-connect change",
+    "release or browser verification task",
+    "do not use central Skills to alter frozen games",
+    "engine repository vs verified new Studio-created game vs frozen legacy game must be distinguished before selecting local ludory-* skills"
+  ],
+  "protected_local_skills": [
+    "ludory-asset-rights",
+    "ludory-audit",
+    "ludory-engineering-quality",
+    "ludory-fix",
+    "ludory-incident-analysis",
+    "ludory-level-design",
+    "ludory-narrative-continuity",
+    "ludory-narrative-review",
+    "ludory-production-art",
+    "ludory-reader-experience",
+    "ludory-ui-design",
+    "ludory-verification",
+    "ludory-visual-qa"
+  ],
+  "compatibility_notes": [
+    "central main-first is refined by frozen-game and owner-authorization rules",
+    "central PASS is not asset-rights or platform acceptance",
+    "Ludory is a custom narrative framework; optional Phaser adapter or dependency is not sufficient to route ludory framework tasks to Phaser Skills",
+    "engine repository tasks use AGENTS.md and actual package owners; new Studio game-local ludory-* skills require their individual scope/authorization",
+    "global production-art is advisory only; ludory-production-art owns native image packet, separate image agent, import and art-review handoff",
+    "global save-systems and visual-novel cannot redefine native persistence, Back semantics or invent save migration",
+    "steam-publish and itch-publish do not substitute VK/Yandex SDK, asset-rights, owner approval, and native Release gates"
+  ],
   "git_workflow": "main-first-project-refined",
   "release_authorization": "owner-required",
-  "stop_lines": ["frozen-games", "asset-rights", "platform-acceptance"],
-  "release_gates": ["npm-test", "npm-check", "core-session", "rights-review", "platform-review"],
-  "installation_limits": ["project-scope explicit profile only", "never overwrite ludory local Skills", "never edit AGENTS.md"],
+  "stop_lines": [
+    "frozen-games",
+    "asset-rights",
+    "platform-acceptance",
+    "unknown-game-provenance",
+    "native-image-handoff",
+    "native-save-compatibility",
+    "owner-authorized-release",
+    "no-inferred-phaser-engine"
+  ],
+  "release_gates": [
+    "npm-test",
+    "npm-check",
+    "core-session",
+    "rights-review",
+    "platform-review"
+  ],
+  "installation_limits": [
+    "project-scope explicit profile only",
+    "never overwrite ludory local Skills",
+    "never edit AGENTS.md",
+    "all 78 imported gamedev Skills are not automatically installed into Ludory project scope"
+  ],
   "update_rule": "Refresh source_sha and re-review local instructions, skills and release gates when the repository HEAD or AGENTS.md changes."
 }

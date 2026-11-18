@@ -1,0 +1,342 @@
+{
+  "schema": 1,
+  "source": {
+    "wfa_head": "e6518146578b1c06310cde96aa305808a303121c",
+    "ludory_head": "933c73b195eaf3bfffd12a31ab1cbadb27989eea"
+  },
+  "description": "Prepared/source-derived deterministic routing assertions. NOT Codex activation tests; source_verified is asserted test-fixture metadata, not proof of genuine source inspection.",
+  "scenarios": [
+    {
+      "id": "LUD-01",
+      "title": "Framework contains optional Phaser adapter, must not become Phaser",
+      "input": {
+        "scope": "framework",
+        "task": "engine",
+        "source_verified": true,
+        "canonical_repository": "https://github.com/m-amirov/ludory",
+        "phaser_dependency": true
+      },
+      "expected": {
+        "status": "ROUTED",
+        "engine": "CUSTOM_LUDORY",
+        "native_owner": "AGENTS.md / actual Ludory package owner",
+        "advisory": [
+          "codebase-exploration",
+          "regression-testing"
+        ]
+      }
+    },
+    {
+      "id": "LUD-02",
+      "title": "New Studio graph, local native continuity owner",
+      "input": {
+        "scope": "new-studio",
+        "task": "narrative",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": false
+      },
+      "expected": {
+        "status": "ROUTED",
+        "engine": "CUSTOM_LUDORY",
+        "native_owner": "ludory-narrative-continuity",
+        "blocked": [
+          "native-narrative-and-review-precedence"
+        ]
+      }
+    },
+    {
+      "id": "LUD-03",
+      "title": "Studio prose review owner is not generic dialogue",
+      "input": {
+        "scope": "new-studio",
+        "task": "narrative-prose",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": false
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "ludory-narrative-review"
+      }
+    },
+    {
+      "id": "LUD-04",
+      "title": "Studio image uses native art handoff not WFA image shortcut",
+      "input": {
+        "scope": "new-studio",
+        "task": "art",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": true,
+        "owner_authorized": true
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "ludory-production-art",
+        "advisory": [
+          "production-art"
+        ],
+        "blocked": [
+          "no-auto-image-generation",
+          "native-image-handoff-and-rights-required"
+        ]
+      }
+    },
+    {
+      "id": "LUD-05",
+      "title": "Art without named mutation approval must stop",
+      "input": {
+        "scope": "new-studio",
+        "task": "art",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": true,
+        "owner_authorized": false
+      },
+      "expected": {
+        "status": "BLOCKED_AUTHORIZATION",
+        "native_owner": null
+      }
+    },
+    {
+      "id": "LUD-06",
+      "title": "Rights review is project local",
+      "input": {
+        "scope": "new-studio",
+        "task": "rights",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": false
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "ludory-asset-rights"
+      }
+    },
+    {
+      "id": "LUD-07",
+      "title": "Save uses native schema, global skill advisory only",
+      "input": {
+        "scope": "framework",
+        "task": "save",
+        "source_verified": true,
+        "canonical_repository": "https://github.com/m-amirov/ludory",
+        "phaser_dependency": true
+      },
+      "expected": {
+        "status": "ROUTED",
+        "engine": "CUSTOM_LUDORY",
+        "blocked": [
+          "native-persistence-contract",
+          "no-unapproved-save-migration"
+        ]
+      }
+    },
+    {
+      "id": "LUD-08",
+      "title": "Studio save without mutation approval blocks",
+      "input": {
+        "scope": "new-studio",
+        "task": "save",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": true,
+        "owner_authorized": false
+      },
+      "expected": {
+        "status": "BLOCKED_AUTHORIZATION"
+      }
+    },
+    {
+      "id": "LUD-09",
+      "title": "Native UI design owner for verified new Studio game",
+      "input": {
+        "scope": "new-studio",
+        "task": "ui",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": false
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "ludory-ui-design"
+      }
+    },
+    {
+      "id": "LUD-10",
+      "title": "VK/Yandex release retains native gates",
+      "input": {
+        "scope": "new-studio",
+        "task": "release-vk-yandex",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": true,
+        "owner_authorized": true
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "ludory-verification",
+        "advisory": [
+          "release-verification"
+        ],
+        "blocked": [
+          "no-steam-or-itch-substitution",
+          "owner-and-platform-release-gates"
+        ]
+      }
+    },
+    {
+      "id": "LUD-11",
+      "title": "No owner approval for release",
+      "input": {
+        "scope": "new-studio",
+        "task": "release-vk-yandex",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": true,
+        "owner_authorized": false
+      },
+      "expected": {
+        "status": "BLOCKED_AUTHORIZATION"
+      }
+    },
+    {
+      "id": "LUD-12",
+      "title": "Frozen CEOS game blocked even with approved mutation",
+      "input": {
+        "scope": "frozen",
+        "task": "art",
+        "source_verified": true,
+        "owner_authorized": true,
+        "mutation_requested": true
+      },
+      "expected": {
+        "status": "BLOCKED_FROZEN",
+        "native_owner": null,
+        "blocked": [
+          "read-only-frozen-game"
+        ]
+      }
+    },
+    {
+      "id": "LUD-13",
+      "title": "Copied Studio marker without proof not sufficient",
+      "input": {
+        "scope": "new-studio",
+        "task": "narrative",
+        "source_verified": true,
+        "studio_creation_verified": false,
+        "owner_authorized": true
+      },
+      "expected": {
+        "status": "EVIDENCE_GAP",
+        "blocked": [
+          "studio-creation-unverified"
+        ]
+      }
+    },
+    {
+      "id": "LUD-14",
+      "title": "Unverified Ludory target must not route",
+      "input": {
+        "scope": "framework",
+        "task": "engine",
+        "source_verified": false,
+        "canonical_repository": "https://github.com/m-amirov/ludory"
+      },
+      "expected": {
+        "status": "EVIDENCE_GAP",
+        "engine": "UNKNOWN"
+      }
+    },
+    {
+      "id": "LUD-15",
+      "title": "Unrelated Phaser project still allowed Phaser",
+      "input": {
+        "scope": "independent-phaser",
+        "task": "engine",
+        "actual_engine": "phaser",
+        "engine_source_verified": true
+      },
+      "expected": {
+        "status": "ROUTED",
+        "engine": "PHASER",
+        "native_owner": "phaser-core"
+      }
+    },
+    {
+      "id": "LUD-16",
+      "title": "Phaser dependency alone not trusted even in independent project",
+      "input": {
+        "scope": "independent-phaser",
+        "task": "engine",
+        "actual_engine": "phaser",
+        "engine_source_verified": false
+      },
+      "expected": {
+        "status": "EVIDENCE_GAP",
+        "engine": "UNKNOWN"
+      }
+    },
+    {
+      "id": "LUD-17",
+      "title": "Quoted Ludory in unrelated editorial request not activation",
+      "input": {
+        "scope": "unrelated",
+        "task": "engine",
+        "quoted_text": "Ludory"
+      },
+      "expected": {
+        "status": "NO_LUDORY_ACTIVATION",
+        "native_owner": null
+      }
+    },
+    {
+      "id": "LUD-18",
+      "title": "Unknown provenance fail closed",
+      "input": {
+        "scope": "unknown",
+        "task": "narrative",
+        "phaser_dependency": true
+      },
+      "expected": {
+        "status": "EVIDENCE_GAP",
+        "engine": "UNKNOWN"
+      }
+    },
+    {
+      "id": "LUD-19",
+      "title": "Native Studio visual QA dominates global general visual guidance",
+      "input": {
+        "scope": "new-studio",
+        "task": "visual-qa",
+        "source_verified": true,
+        "studio_creation_verified": true,
+        "mutation_requested": false
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "ludory-visual-qa"
+      }
+    },
+    {
+      "id": "LUD-20",
+      "title": "Ludory framework bugfix owner is actual module, not new-game local Skill",
+      "input": {
+        "scope": "framework",
+        "task": "fix",
+        "source_verified": true,
+        "canonical_repository": "https://github.com/m-amirov/ludory"
+      },
+      "expected": {
+        "status": "ROUTED",
+        "native_owner": "AGENTS.md / actual Ludory package owner",
+        "advisory": [
+          "root-cause-debugging",
+          "regression-testing"
+        ]
+      }
+    }
+  ]
+}
