@@ -1,0 +1,83 @@
+name: import pinned gamedev library
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/import-gamedev-library.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wfa-gamedev-import-main
+  cancel-in-progress: false
+
+jobs:
+  integrate:
+    name: Import 79 gamedev capabilities into WFA (deduplicated)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Checkout pinned public source as data only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none --no-checkout \
+            https://github.com/gamedev-skills/awesome-gamedev-agent-skills.git \
+            "$RUNNER_TEMP/gamedev-library"
+          git -C "$RUNNER_TEMP/gamedev-library" checkout --detach \
+            c6ca6c41c839b68319ffc08430b99ab768debc32
+          test "$(git -C "$RUNNER_TEMP/gamedev-library" rev-parse HEAD)" = \
+            "c6ca6c41c839b68319ffc08430b99ab768debc32"
+      - name: Import pinned source without executing its scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/import_gamedev_library.py \
+            --source "$RUNNER_TEMP/gamedev-library" --root . --apply
+          python scripts/import_gamedev_library.py \
+            --source "$RUNNER_TEMP/gamedev-library" --root . --check
+      - name: Gate — static validation, offline regressions, diff integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate.py
+          python -m unittest discover -s tests -v
+          git diff --check
+          git status --short
+      - name: Commit imported content directly to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- \
+            skills/gamedev \
+            skills/core/task-planning/SKILL.md \
+            skills/core/task-planning/references/gamedev-router \
+            skills/domain/production-art/SKILL.md \
+            skills/domain/production-art/references/gamedev-create-game-assets \
+            tools/gamedev-upstream \
+            evals/upstream-gamedev \
+            evals/cases/foundation.json \
+            docs/gamedev-upstream \
+            docs/SKILL_CATALOG.md \
+            docs/migrations/gamedev-library-import-manifest.json \
+            third_party/awesome-gamedev-agent-skills
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "PINNED_IMPORT_ALREADY_CURRENT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(gamedev): import 78 unique Skills and merge 1 into production-art"
+          git push origin HEAD:main
+          echo "IMPORTED_COMMIT=$(git rev-parse HEAD)"
