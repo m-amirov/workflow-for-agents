@@ -408,6 +408,34 @@ def validate_ceos_migrated_evals(root: Path) -> tuple[list[str], int]:
     return errors, len(scenarios)
 
 
+
+GAMEDOC_TEMPLATE_PATHS = {
+    "skills/gamedev/workflows/game-docs/references/architecture-template.md",
+    "skills/gamedev/workflows/game-docs/references/feature-templates.md",
+    "skills/gamedev/workflows/game-docs/references/gdd-template.md",
+}
+
+
+def prose_for_link_validation(markdown: str) -> str:
+    """Don't interpret literal code in Markdown fences or inline spans as links."""
+    output: list[str] = []
+    fence_char = None
+    fence_width = 0
+    for line in markdown.splitlines(keepends=True):
+        fence = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if fence:
+            token = fence.group(1)
+            if fence_char is None:
+                fence_char, fence_width = token[0], len(token)
+                continue
+            if token[0] == fence_char and len(token) >= fence_width:
+                fence_char, fence_width = None, 0
+                continue
+        if fence_char is None:
+            output.append(re.sub(r"(`+)(?!`)[^`\n]*\1(?!`)", "", line))
+    return "".join(output)
+
+
 def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
     root = root.resolve()
     errors: list[str] = []
@@ -446,7 +474,11 @@ def validate_repository(root: Path) -> tuple[list[str], dict[str, int]]:
         except (OSError, UnicodeDecodeError) as error:
             errors.append(f"{md.relative_to(root)}: cannot read: {error}")
             continue
-        for match in LINK_RE.finditer(content):
+        if md.relative_to(root).as_posix() in GAMEDOC_TEMPLATE_PATHS:
+            # Upstream's copyable GDD examples intentionally link to future
+            # project files, not existing WFA files. Check them after copying.
+            continue
+        for match in LINK_RE.finditer(prose_for_link_validation(content)):
             destination = match.group(1).strip().split(maxsplit=1)[0].strip("<>")
             if not destination or destination.startswith(("#", "/", "mailto:")):
                 continue
