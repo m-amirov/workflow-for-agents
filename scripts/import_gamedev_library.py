@@ -9,10 +9,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import posixpath
 import re
 import subprocess
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import unquote
 
 UPSTREAM = "https://github.com/gamedev-skills/awesome-gamedev-agent-skills"
 SOURCE_SHA = "c6ca6c41c839b68319ffc08430b99ab768debc32"
@@ -57,6 +59,45 @@ def resolved_target(root: Path, source_rel: Path) -> Path | None:
     if group in {".github", ".gitignore"}:
         return None
     raise ValueError(f"Unexpected upstream path: {source_rel}")
+
+
+
+MARKDOWN_LINK_RE = re.compile(r'(!?\[[^\]\n]*\]\()([^\)\n]+)(\))')
+
+
+def relocated_markdown(contents: bytes, input_rel: Path, target: Path, root: Path) -> bytes:
+    """Rewrite upstream relative Markdown links to destinations of relocated files.
+
+    External links are untouched. Non-mirrored repo infrastructure receives a
+    pinned upstream URL rather than a broken local link. This never rewrites
+    fenced code examples or instructs the agent to execute anything.
+    """
+    text = contents.decode("utf-8")
+    def rewrite(match: re.Match) -> str:
+        lead, href, close = match.groups()
+        if href.startswith(("#", "/", "mailto:", "http:", "https:", "data:")):
+            return match.group(0)
+        token = href.strip().split()[0].strip("<>")
+        if not token or ":" in token:
+            return match.group(0)
+        clean, anchor = (token.split("#", 1) + [""])[:2]
+        clean, query = (clean.split("?", 1) + [""])[:2]
+        if not clean:
+            return match.group(0)
+        original = posixpath.normpath(posixpath.join(input_rel.parent.as_posix(), unquote(clean)))
+        if original.startswith("../"):
+            return match.group(0)
+        new_target = resolved_target(root, Path(original))
+        if new_target is None:
+            destination = UPSTREAM + "/blob/" + SOURCE_SHA + "/" + original
+        else:
+            destination = Path(os.path.relpath(new_target, target.parent)).as_posix()
+        if anchor:
+            destination += "#" + anchor
+        if query:
+            destination += "?" + query
+        return lead + href.replace(token, destination, 1) + close
+    return MARKDOWN_LINK_RE.sub(rewrite, text).encode("utf-8")
 
 
 def upstream_skill_names(source: Path) -> dict[str, Path]:
@@ -142,7 +183,7 @@ def catalogue_section(names: dict[str, Path]) -> str:
     for name, skill in sorted(names.items()):
         if name in FOLD:
             continue
-        group = skill.relative_to(skill.parents[2]).parts[0] if False else skill.parent.parent.name
+        group = skill.parent.parent.name
         original = skill.read_text(encoding="utf-8")
         frontmatter = original.split("---", 2)[1]
         match = re.search(r"(?ms)^description:\s*[>|][-+]?\s*\n(.*?)(?=\n\S|\Z)", frontmatter)
@@ -241,12 +282,11 @@ def perform(root: Path, source: Path, *, apply: bool) -> dict:
             continue
         if not target.resolve().is_relative_to(root):
             raise ValueError(f"Target outside WFA root: {target}")
-        content = input_file.read_bytes()
-        # Converted relative docs links must remain valid; linkify non-local
-        # paths only in relocated upstream docs (not in Skill instructions).
+        original = input_file.read_bytes()
+        content = relocated_markdown(original, rel, target, root) if rel.suffix == ".md" else original
         ensure_exact(target, content, apply=apply)
         files.append({"source": rel.as_posix(), "target": target.relative_to(root).as_posix(),
-                      "sha256": fingerprint(content)})
+                      "source_sha256": fingerprint(original), "target_sha256": fingerprint(content)})
     patch_once(root, "skills/core/task-planning/SKILL.md", ROUTER_SUFFIX, apply=apply)
     patch_once(root, "skills/domain/production-art/SKILL.md", ART_SUFFIX, apply=apply)
     update_catalog(root, catalogue_section(names), apply=apply)
