@@ -46,6 +46,7 @@ jobs:
             --source "$RUNNER_TEMP/gamedev-library" --root . --apply
           python scripts/import_gamedev_library.py \
             --source "$RUNNER_TEMP/gamedev-library" --root . --check
+      # A new run is required after changes to Markdown-code link validation.
       - name: Gate — static validation, offline regressions, diff integrity
         shell: bash
         run: |
