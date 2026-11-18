@@ -84,7 +84,7 @@ try {
     $empty = New-FixtureHome
     $beforeEmpty = @(Get-ChildItem -LiteralPath $empty -Force)
     $emptyReport = (Invoke-FixturePreflight $empty -All).Json
-    $implementedCount = @(Get-PreflightImplementedSkillNames $repo).Count
+    $implementedCount = @(Get-ChildItem -LiteralPath (Join-Path $repo 'skills') -Filter SKILL.md -File -Recurse).Count
     Assert ($implementedCount -ge 29) 'implemented Skills unexpectedly missing from catalog'
     Assert ($emptyReport.Summary.CheckedSelectedSkills -eq $implementedCount) 'empty HOME did not audit all implemented Skills'
     Assert ($emptyReport.Summary.SafeToInstallWithoutOwnershipConflict -eq $implementedCount) 'empty HOME did not classify all Skills as installable'
