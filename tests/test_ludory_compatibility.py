@@ -70,7 +70,7 @@ class LudoryCompatibilityGate(unittest.TestCase):
         text = TASK.read_text(encoding="utf-8")
         self.assertIn("gamedev-router/WFA-ROUTING.md", text)
         self.assertIn("ludory-compatibility.md", text)
-        self.assertIn("not automatically", text.lower())
+        self.assertIn("does not authorize treating the framework as a phaser game", text.lower())
         self.assertIn("UPSTREAM.md", ROUTING.read_text(encoding="utf-8"))
 
     def test_native_process_and_release_gates_are_not_overridden(self):
