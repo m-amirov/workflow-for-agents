@@ -201,6 +201,1177 @@
         "Не писать secrets или customer payloads в диагностические логи",
         "Не объявлять production PASS по synthetic tests"
       ]
+    },
+    {
+      "skill": "ai-behavior-trees-utility-ai",
+      "positive": {
+        "prompt": "I want to write my own behavior tree runtime in TypeScript for my game, no engine BT. need a Blackboard, Sequence/Selector/Parallel and decorators like Cooldown and Inverter, tick returns Running/Success/Failure. where do i even start",
+        "expected_behavior": "Route to the matching ai-behavior-trees-utility-ai Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "ue5 enemy BT_Grunt never leaves the MoveTo task. blackboard key TargetActor is set in my AIController, theres an 'Is Set' decorator on the sequence. what am i missing",
+        "expected_behavior": "Do not activate ai-behavior-trees-utility-ai; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "audio-design",
+      "positive": {
+        "prompt": "how should i structure audio buses for a game? master / music / sfx / ui / voice, plus ducking the music when dialogue plays. engine agnostic answer pls, we havent picked an engine yet",
+        "expected_behavior": "Route to the matching audio-design Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "AudioStreamPlayer2D in my godot 4.7 scene doesnt play when i call play() in _ready(), bus is set to \"SFX\", no errors in output",
+        "expected_behavior": "Do not activate audio-design; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "bevy-ecs",
+      "positive": {
+        "prompt": "bevy 0.17: system doesnt seem to run. added with add_systems(Update, move_player) but Query<&mut Transform, With<Player>> finds nothing",
+        "expected_behavior": "Route to the matching bevy-ecs Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "writing an ECS from scratch in C for my own engine, archetype storage vs sparse sets",
+        "expected_behavior": "Do not activate bevy-ecs; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "camera-systems",
+      "positive": {
+        "prompt": "camera in my 2d game is jittery when following the player, im just lerping position in update. want a deadzone + some look-ahead in the direction the player moves. not engine specific, ill port it to my own framework",
+        "expected_behavior": "Route to the matching camera-systems Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "godot 4.7 3d scene, the Camera3D view looks washed out and grey, i think its the sky / fog / tonemap settings on the environment",
+        "expected_behavior": "Do not activate camera-systems; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "card-game",
+      "positive": {
+        "prompt": "making a slay the spire style deckbuilder. need draw pile, hand, discard, reshuffle when draw is empty, energy costs, and card effects that can trigger other effects. how do i structure effect resolution so it doesnt turn into spaghetti",
+        "expected_behavior": "Route to the matching card-game Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "whats the probability of drawing two aces in a 5 card poker hand from a standard 52 deck",
+        "expected_behavior": "Do not activate card-game; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "defold-core",
+      "positive": {
+        "prompt": "defold: msg.post to another game object's script never arrives, url is \"enemy#script\" and on_message is never called",
+        "expected_behavior": "Route to the matching defold-core Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "pico-8 game: how do i read input with btn() and spawn bullets into a table",
+        "expected_behavior": "Do not activate defold-core; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "dialogue-systems",
+      "positive": {
+        "prompt": "building npc dialogue for my game, need branching choices with conditions (if player has key, if quest done) and variables. should i use ink, yarn spinner or roll my own json? unity project but i want the dialogue logic portable",
+        "expected_behavior": "Route to the matching dialogue-systems Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "write me the actual dialogue for the blacksmith npc, gruff dwarf, 3 short lines about the broken sword quest",
+        "expected_behavior": "Do not activate dialogue-systems; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "ebitengine-game",
+      "positive": {
+        "prompt": "make a small snake game in go with ebitengine v2: keyboard + gamepad, score text, restart on death",
+        "expected_behavior": "Route to the matching ebitengine-game Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "help me write a REST leaderboard service in Go (gin + postgres) that my game posts scores to",
+        "expected_behavior": "Do not activate ebitengine-game; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "fps-shooter",
+      "positive": {
+        "prompt": "tuning ttk and recoil in my fps. AR does 25 dmg at 600rpm and players say its a laser. how do people design recoil patterns vs random spread",
+        "expected_behavior": "Route to the matching fps-shooter Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "add first-person head bob and an fov kick when sprinting",
+        "expected_behavior": "Do not activate fps-shooter; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "game-ai",
+      "positive": {
+        "prompt": "enemy ai for my top down shooter: patrol between points, chase when it sees you, search last known position, give up after 5s. should this be an FSM or a behavior tree? pseudocode is fine, i havent decided on engine yet (prob godot or unity)",
+        "expected_behavior": "Route to the matching game-ai Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "the NavMeshAgent in unity 6 slides past the waypoint and spins around it forever, stoppingDistance is 0",
+        "expected_behavior": "Do not activate game-ai; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "game-docs",
+      "positive": {
+        "prompt": "write a GDD for my roguelite deckbuilder that links to an ARCHITECTURE.md and per-feature folders",
+        "expected_behavior": "Route to the matching game-docs Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "implement the dash feature in my godot 4.7 platformer, CharacterBody2D",
+        "expected_behavior": "Do not activate game-docs; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "game-feel",
+      "positive": {
+        "prompt": "combat in my beat em up feels weak. hits connect but nothing happens. what are the standard juice tricks and timings, like how many ms of hitstop, how much shake, flash frames, knockback",
+        "expected_behavior": "Route to the matching game-feel Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "whats the formula for easeOutBack? need it in plain lua for a ui tweening lib im writing for a desktop app (not a game)",
+        "expected_behavior": "Do not activate game-feel; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "game-jam",
+      "positive": {
+        "prompt": "gmtk jam starts in 2 hours, theme drops then. solo, godot 4.7, last jam i overscoped and submitted a broken build 3 minutes before deadline lol. help me plan the 48h and how big i should scope this time",
+        "expected_behavior": "Route to the matching game-jam Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "planning a 6 month dev schedule for my indie game with milestones and a demo for steam next fest",
+        "expected_behavior": "Do not activate game-jam; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "game-ui-ux",
+      "positive": {
+        "prompt": "my HUD breaks on ultrawide and on steam deck, health bar ends up half off screen. how should i anchor things and handle aspect ratios / safe area? unity ugui",
+        "expected_behavior": "Route to the matching game-ui-ux Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "settings page on my company's react admin dashboard doesnt work with keyboard tab navigation, focus jumps around",
+        "expected_behavior": "Do not activate game-ui-ux; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-2d-movement",
+      "positive": {
+        "prompt": "is_on_floor() flickers true/false on slopes with my CharacterBody2D so jumping randomly fails, godot 4.7. floor_snap_length is default, i tried floor_max_angle too, didnt help",
+        "expected_behavior": "Route to the matching godot-2d-movement Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "the RigidBody2D ball in my godot pinball game passes straight through the flippers at high speed",
+        "expected_behavior": "Do not activate godot-2d-movement; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-3d-essentials",
+      "positive": {
+        "prompt": "godot 4.7 3d scene looks flat and grey. want a sky, directional light shadows, agx tonemap, some glow",
+        "expected_behavior": "Route to the matching godot-3d-essentials Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "i need a 3d sword model for my godot game, write the brief for the artist: poly budget, texture size, material notes",
+        "expected_behavior": "Do not activate godot-3d-essentials; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-animation",
+      "positive": {
+        "prompt": "AnimationTree state machine in godot 4.7: idle/run/jump, travel() doesnt transition and the blend position isnt updating",
+        "expected_behavior": "Route to the matching godot-animation Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity animator blend tree for 8 direction movement, SetFloat doesnt seem to change anything",
+        "expected_behavior": "Do not activate godot-animation; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-audio",
+      "positive": {
+        "prompt": "godot 4.7: music volume from a settings HSlider (0-100), i set AudioServer.set_bus_volume_db(idx, value) and it goes silent way too early. db vs linear?",
+        "expected_behavior": "Route to the matching godot-audio Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "plan the soundtrack layering for my boss fight phases, which instruments come in at which phase",
+        "expected_behavior": "Do not activate godot-audio; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-csharp",
+      "positive": {
+        "prompt": "godot 4.7 C#: my [Signal] delegate EventHandler doesnt show up in the editor and i get a 'partial class' error",
+        "expected_behavior": "Route to the matching godot-csharp Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity c# GetComponent returns null in Start, script is on the same object",
+        "expected_behavior": "Do not activate godot-csharp; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-export",
+      "positive": {
+        "prompt": "exported my godot 4.7 game to web and host it on my own nginx box, browser says SharedArrayBuffer / cross-origin isolation error",
+        "expected_behavior": "Route to the matching godot-export Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "godot --headless runs my test script but the exit code is always 0 even when asserts fail",
+        "expected_behavior": "Do not activate godot-export; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-gdscript",
+      "positive": {
+        "prompt": "port this godot 3 gdscript to 4.7: yield(get_tree().create_timer(1), 'timeout'), export var speed = 200, onready var sprite = $Sprite",
+        "expected_behavior": "Route to the matching godot-gdscript Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "gdscript syntax highlighting isnt working in neovim with treesitter",
+        "expected_behavior": "Do not activate godot-gdscript; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-gdscript-headless-testing",
+      "positive": {
+        "prompt": "want unit tests for my inventory.gd without installing GUT, just run them from the cli in CI and fail the build",
+        "expected_behavior": "Route to the matching godot-gdscript-headless-testing Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "set up a headless dedicated server build for my godot multiplayer game",
+        "expected_behavior": "Do not activate godot-gdscript-headless-testing; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-multiplayer",
+      "positive": {
+        "prompt": "add 2 player online coop to my godot 4.7 game, ENet host/join and spawn a player for each peer",
+        "expected_behavior": "Route to the matching godot-multiplayer Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my roblox multiplayer game: how do i sync the round timer to all clients without spamming remotes",
+        "expected_behavior": "Do not activate godot-multiplayer; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-nodes-scenes",
+      "positive": {
+        "prompt": "how should i split my godot project into scenes? player, weapons, enemies, level. when do i instance vs use inherited scenes",
+        "expected_behavior": "Route to the matching godot-nodes-scenes Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "three.js: added a child mesh to a Group and its world position is all wrong",
+        "expected_behavior": "Do not activate godot-nodes-scenes; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-physics",
+      "positive": {
+        "prompt": "collision layers vs masks in godot 4.7, i still dont get it after reading teh docs twice. enemies should hit the player but not eachother",
+        "expected_behavior": "Route to the matching godot-physics Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "physics objects jitter at high refresh rates in my monogame engine, fixed timestep + interpolation question",
+        "expected_behavior": "Do not activate godot-physics; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-resources",
+      "positive": {
+        "prompt": "make items data driven in godot 4.7: an Item resource with class_name and @export icon/name/stats, one .tres per item",
+        "expected_behavior": "Route to the matching godot-resources Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity ScriptableObject event channels for decoupling systems",
+        "expected_behavior": "Do not activate godot-resources; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-shaders",
+      "positive": {
+        "prompt": "write a .gdshader canvas_item shader for water distortion using hint_screen_texture, godot 4.7",
+        "expected_behavior": "Route to the matching godot-shaders Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "im learning opengl for my game engine, explain conceptually what the vertex shader vs fragment shader does",
+        "expected_behavior": "Do not activate godot-shaders; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-signals-groups",
+      "positive": {
+        "prompt": "replace get_parent().get_parent().score += 1 with signals in godot 4.7. how do i connect from code with a Callable",
+        "expected_behavior": "Route to the matching godot-signals-groups Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity: UnityEvent vs ScriptableObject event channels for decoupling ui from the player",
+        "expected_behavior": "Do not activate godot-signals-groups; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-tilemap",
+      "positive": {
+        "prompt": "godot 4.7 says TileMap is deprecated, how do i migrate to TileMapLayer with my 3 layers",
+        "expected_behavior": "Route to the matching godot-tilemap Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "design a 16x16 tileset art style with grass/dirt/water transitions for my godot game",
+        "expected_behavior": "Do not activate godot-tilemap; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "godot-ui-control",
+      "positive": {
+        "prompt": "godot 4.7 hud: VBoxContainer children ignore my custom size and the full rect anchor preset messes everything up",
+        "expected_behavior": "Route to the matching godot-ui-control Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "roblox ScreenGui inventory resets every time the player respawns",
+        "expected_behavior": "Do not activate godot-ui-control; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "input-systems",
+      "positive": {
+        "prompt": "add key rebinding to my game's options: detect conflicts (two actions on one key) and save to a file. custom engine on SDL2",
+        "expected_behavior": "Route to the matching input-systems Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity 6 new input system: how do i read the Move vector from my .inputactions asset through the PlayerInput component",
+        "expected_behavior": "Do not activate input-systems; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "itch-publish",
+      "positive": {
+        "prompt": "butler push my windows and html5 builds to itch, what should the channel names be",
+        "expected_behavior": "Route to the matching itch-publish Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "publish my game on google play, aab signing and the store listing",
+        "expected_behavior": "Do not activate itch-publish; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "level-design",
+      "positive": {
+        "prompt": "blocking out the first mission of my 3d stealth game. how do i plan sightlines, cover, multiple routes, crouch heights etc? i want a process from whitebox to playable",
+        "expected_behavior": "Route to the matching level-design Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity 6 tile palette: painting ground tiles, my rule tile picks the wrong corner sprite on inner corners",
+        "expected_behavior": "Do not activate level-design; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "love2d-core",
+      "positive": {
+        "prompt": "love2d game, movement speed is different on 60hz vs 144hz monitors. am i supposed to multiply by dt in love.update?",
+        "expected_behavior": "Route to the matching love2d-core Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "roblox luau script to move a part up and down smoothly",
+        "expected_behavior": "Do not activate love2d-core; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "performance-optimization",
+      "positive": {
+        "prompt": "ok so ive been working on this bullet hell in monogame for like 8 months and its finally fun, but the moment boss phase 3 starts and theres ~2000 bullets the game goes from 144 to 40 fps. im doing new Bullet() every shot and bullets.Remove(b) when they leave the screen. my friend says 'just use a pool' but i dont even know if thats the problem. how do i find whats actually slow before i rewrite stuff",
+        "expected_behavior": "Route to the matching performance-optimization Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my unity webgl build is 480mb and the jam page caps uploads at 200mb, how do i optimize the build size",
+        "expected_behavior": "Do not activate performance-optimization; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "phaser-arcade-physics",
+      "positive": {
+        "prompt": "phaser 4 player falls through the platforms, i added a collider and setCollideWorldBounds",
+        "expected_behavior": "Route to the matching phaser-arcade-physics Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "phaser scene transition from menu to game, passing the selected level as data",
+        "expected_behavior": "Do not activate phaser-arcade-physics; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "phaser-core",
+      "positive": {
+        "prompt": "phaser 4: this.load.image in preload but the texture shows as a green box",
+        "expected_behavior": "Route to the matching phaser-core Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "pixi v8: added a sprite to app.stage but nothing shows",
+        "expected_behavior": "Do not activate phaser-core; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "physics-tuning",
+      "positive": {
+        "prompt": "fast projectiles go through thin walls sometimes. is this tunneling? do i need CCD? physics runs at a fixed 60hz step in my own engine",
+        "expected_behavior": "Route to the matching physics-tuning Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "Area2D body_entered never fires in godot 4.7 when the player walks in. both on collision layer 1 mask 1",
+        "expected_behavior": "Do not activate physics-tuning; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "pixijs-rendering",
+      "positive": {
+        "prompt": "pixijs v8 migration: new Application() then await app.init(), my v7 code breaks everywhere",
+        "expected_behavior": "Route to the matching pixijs-rendering Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "rendering 10k points on canvas for my analytics dashboard is slow, someone suggested pixi",
+        "expected_behavior": "Do not activate pixijs-rendering; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "platformer",
+      "positive": {
+        "prompt": "jump feels bad in my platformer. want coyote time, a jump buffer, variable jump height (let go early = short hop), faster fall. celeste-ish",
+        "expected_behavior": "Route to the matching platformer Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "top-down 8 direction movement for my godot 4.7 zelda-like, diagonal is faster than straight",
+        "expected_behavior": "Do not activate platformer; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "procedural-gen",
+      "positive": {
+        "prompt": "generate a terrain heightmap with perlin/simplex noise, octaves, lacunarity etc. has to be deterministic from a seed so all multiplayer clients get the same map",
+        "expected_behavior": "Route to the matching procedural-gen Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "random.seed() in my python notebook gives the same sample every run, how do i get fresh randomness for my data science bootstrap",
+        "expected_behavior": "Do not activate procedural-gen; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "prototype-fast",
+      "positive": {
+        "prompt": "i have an idea: grappling hook + slow-mo. want to find out if its fun in like an hour with greybox before i commit to it. unity",
+        "expected_behavior": "Route to the matching prototype-fast Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "prototype pattern in javascript, Object.create vs class",
+        "expected_behavior": "Do not activate prototype-fast; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "puzzle",
+      "positive": {
+        "prompt": "match3 in plain js (canvas, no engine): find matches, clear, drop gems with gravity, refill, cascade until stable, and dont start with a board that already has matches. my cascade loop currently runs forever sometimes",
+        "expected_behavior": "Route to the matching puzzle Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "write a sudoku solver with backtracking for my algorithms class",
+        "expected_behavior": "Do not activate puzzle; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "pygame-core",
+      "positive": {
+        "prompt": "pygame-ce 2.5: sprites flicker, i think im calling display.flip() twice? also clock.tick(60) vs using dt for movement, whats the right way",
+        "expected_behavior": "Route to the matching pygame-core Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "matplotlib FuncAnimation is slow redrawing every frame, someone said use blit=True",
+        "expected_behavior": "Do not activate pygame-core; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-characters",
+      "positive": {
+        "prompt": "roblox: my sprint script breaks after the player dies and respawns, it still holds the old Humanoid",
+        "expected_behavior": "Route to the matching roblox-characters Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my roblox shop gui disappears every time the character respawns",
+        "expected_behavior": "Do not activate roblox-characters; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-datastores",
+      "positive": {
+        "prompt": "roblox: save player coins and level on leave, load on join, with pcall and BindToClose",
+        "expected_behavior": "Route to the matching roblox-datastores Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "persistence for my godot game: save player progress to user:// as json",
+        "expected_behavior": "Do not activate roblox-datastores; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-luau",
+      "positive": {
+        "prompt": "roblox beginner here: make a part that gives 10 coins when touched, server script, leaderstats",
+        "expected_behavior": "Route to the matching roblox-luau Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "exploiters are firing my roblox remotes 1000 times a second",
+        "expected_behavior": "Do not activate roblox-luau; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-networking",
+      "positive": {
+        "prompt": "exploiters keep fireing my DamageEvent RemoteEvent with giant numbers (like 9e9 dmg) and one shotting bosses. client sends (target, damage). how do i validate this on the server properly",
+        "expected_behavior": "Route to the matching roblox-networking Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my roblox game lags hard on mobile with ~500 moving parts",
+        "expected_behavior": "Do not activate roblox-networking; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-physics",
+      "positive": {
+        "prompt": "raycast for my roblox gun with RaycastParams so it ignores the shooter's character and accessories",
+        "expected_behavior": "Route to the matching roblox-physics Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my roblox walkspeed boost doesnt apply after the character respawns",
+        "expected_behavior": "Do not activate roblox-physics; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-simulator-economy",
+      "positive": {
+        "prompt": "roblox clicker sim: upgrade cost is baseCost * 1.15^n. how do i compute buy max without looping",
+        "expected_behavior": "Route to the matching roblox-simulator-economy Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "balancing gold income across waves in my godot tower defense",
+        "expected_behavior": "Do not activate roblox-simulator-economy; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-studio-workflow",
+      "positive": {
+        "prompt": "in roblox studio, where should this script go? ServerScriptService, StarterPlayerScripts, or a ModuleScript in ReplicatedStorage",
+        "expected_behavior": "Route to the matching roblox-studio-workflow Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity: where do editor scripts go vs runtime scripts, the Editor folder thing",
+        "expected_behavior": "Do not activate roblox-studio-workflow; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roblox-ui",
+      "positive": {
+        "prompt": "roblox inventory ScrollingFrame with UIGridLayout, AutomaticSize canvas wont grow with items",
+        "expected_behavior": "Route to the matching roblox-ui Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "hud for my unity mobile game, handle notch safe area on iphone",
+        "expected_behavior": "Do not activate roblox-ui; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "roguelike",
+      "positive": {
+        "prompt": "turn based roguelike in python with tcod: grid movement, enemies act after the player, field of view with shadowcasting",
+        "expected_behavior": "Route to the matching roguelike Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "roguelike deckbuilder like slay the spire, card rewards after each fight and a branching map",
+        "expected_behavior": "Do not activate roguelike; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "rpg",
+      "positive": {
+        "prompt": "designing stats for my jrpg: str/def/agi/luck, level curve to 50. right now i use atk*atk/def and by lvl 30 everything one shots everything lol. want a damage formula that doesnt explode at high levels",
+        "expected_behavior": "Route to the matching rpg Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "inventory for my survival game: stack sizes, and crafting recipes that eat wood + stone",
+        "expected_behavior": "Do not activate rpg; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "save-systems",
+      "positive": {
+        "prompt": "how should i structure save files for my game? json vs binary, what to save (player, world state, quest flags), 3 save slots, and versioning so updates dont nuke old saves. engine is godot but i want the design first",
+        "expected_behavior": "Route to the matching save-systems Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "roblox DataStore SetAsync keeps throwing 'request was throttled' when lots of players leave at once",
+        "expected_behavior": "Do not activate save-systems; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "shader-programming",
+      "positive": {
+        "prompt": "explain how a dissolve shader works with a noise texture and a glowing edge, give me glsl and hlsl versions",
+        "expected_behavior": "Route to the matching shader-programming Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "convert this shader from godot 3 to 4, it uses SCREEN_TEXTURE and hint_color",
+        "expected_behavior": "Do not activate shader-programming; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "steam-publish",
+      "positive": {
+        "prompt": "first time on steam, just paid the $100 fee and got my app id. need app_build.vdf and depot vdf for a windows build and the steamcmd upload command, the docs are confusing af",
+        "expected_behavior": "Route to the matching steam-publish Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "add steam achievements via Steamworks.NET in my unity game",
+        "expected_behavior": "Do not activate steam-publish; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "survival-crafting",
+      "positive": {
+        "prompt": "survival game: hunger, thirst and temperature drain over time and hurt you at 0. how do i balance the drain rates",
+        "expected_behavior": "Route to the matching survival-crafting Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "spigot plugin (java) for my minecraft server that adds a custom crafting recipe",
+        "expected_behavior": "Do not activate survival-crafting; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "threejs-gltf-loading",
+      "positive": {
+        "prompt": "load a .glb character in three.js and play its 'Run' clip with AnimationMixer",
+        "expected_behavior": "Route to the matching threejs-gltf-loading Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my model loads fine but looks completely black in three.js",
+        "expected_behavior": "Do not activate threejs-gltf-loading; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "threejs-materials-lighting",
+      "positive": {
+        "prompt": "shadows not showing in three.js, i set castShadow on the light and the mesh",
+        "expected_behavior": "Route to the matching threejs-materials-lighting Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "custom glsl ShaderMaterial for a hologram effect in three.js",
+        "expected_behavior": "Do not activate threejs-materials-lighting; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "threejs-scene-setup",
+      "positive": {
+        "prompt": "threejs canvas is stretched after i resize the window, everything looks squished. how do i update the camera aspect and renderer size",
+        "expected_behavior": "Route to the matching threejs-scene-setup Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "babylon.js scene setup with an ArcRotateCamera",
+        "expected_behavior": "Do not activate threejs-scene-setup; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "tower-defense",
+      "positive": {
+        "prompt": "tower defense: enemies follow a path, towers can target first/last/strongest, waves come from a json list",
+        "expected_behavior": "Route to the matching tower-defense Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my enemies all bunch up into one blob while walking down the lane, i want them to keep some space between each other",
+        "expected_behavior": "Do not activate tower-defense; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-animation",
+      "positive": {
+        "prompt": "unity 6 animator: transition from Attack back to Idle has a delay, is it has exit time?",
+        "expected_behavior": "Route to the matching unity-animation Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "animate my aseprite sprite frames in pixijs with AnimatedSprite",
+        "expected_behavior": "Do not activate unity-animation; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-build-pipeline",
+      "positive": {
+        "prompt": "script a unity 6 build with BuildPipeline.BuildPlayer for windows + mac from the command line in CI (-batchmode -executeMethod)",
+        "expected_behavior": "Route to the matching unity-build-pipeline Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity build is 1.2gb and sharedassets0.resS alone is 900mb, why",
+        "expected_behavior": "Do not activate unity-build-pipeline; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-build-size",
+      "positive": {
+        "prompt": "unity 6000.3 webgl build for the jam has to be under 200mb and mine is 480mb zipped. i only have like 6 small levels?? how do i find whats eating the space",
+        "expected_behavior": "Route to the matching unity-build-size Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "unity build takes 40 minutes every time, how do i speed up build times",
+        "expected_behavior": "Do not activate unity-build-size; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-csharp-scripting",
+      "positive": {
+        "prompt": "unity 6: GetComponent<Health>() returns null in Awake, the component is on a child object",
+        "expected_behavior": "Route to the matching unity-csharp-scripting Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "c# async/await in my asp.net core api deadlocks on .Result",
+        "expected_behavior": "Do not activate unity-csharp-scripting; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-input-system",
+      "positive": {
+        "prompt": "unity 6 new input system, PlayerInput set to Send Messages, OnMove never gets called",
+        "expected_behavior": "Route to the matching unity-input-system Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "ue5 jump input action never fires even though i added the mapping context",
+        "expected_behavior": "Do not activate unity-input-system; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-navmesh",
+      "positive": {
+        "prompt": "unity 6: bake the navmesh at runtime for procedurally placed rooms with NavMeshSurface",
+        "expected_behavior": "Route to the matching unity-navmesh Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "A* on a hex grid for my turn-based strategy game, its in unity but i want my own pathfinding not navmesh",
+        "expected_behavior": "Do not activate unity-navmesh; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-physics",
+      "positive": {
+        "prompt": "OnTriggerEnter isnt firing between my player and the coin, both have colliders",
+        "expected_behavior": "Route to the matching unity-physics Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "my 2d unity character with a Rigidbody2D falls through the TilemapCollider2D",
+        "expected_behavior": "Do not activate unity-physics; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-scriptableobjects",
+      "positive": {
+        "prompt": "my unity 6 project has a GameManager singleton that like 40 scripts reference and its a nightmare. want to replace it with ScriptableObject event channels and runtime sets, where do i start without breaking everything",
+        "expected_behavior": "Route to the matching unity-scriptableobjects Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "godot custom resources for weapon data",
+        "expected_behavior": "Do not activate unity-scriptableobjects; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unity-tilemap-2d",
+      "positive": {
+        "prompt": "rule tile setup in unity 6 for walls with inner and outer corners",
+        "expected_behavior": "Route to the matching unity-tilemap-2d Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "design a fun layout for level 1 of my 2d unity platformer, where to teach jump vs dash",
+        "expected_behavior": "Do not activate unity-tilemap-2d; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unreal-behavior-trees",
+      "positive": {
+        "prompt": "ue5.8 enemy behaviour tree: patrol, then chase when it sees the player. blackboard key should get set from AIPerception sight sense but it never changes",
+        "expected_behavior": "Route to the matching unreal-behavior-trees Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "whats better for my enemies, an FSM or a behavior tree? small 2d game",
+        "expected_behavior": "Do not activate unreal-behavior-trees; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unreal-blueprints",
+      "positive": {
+        "prompt": "ue5 blueprint: door opens when the player overlaps a trigger box, how do i wire the event graph",
+        "expected_behavior": "Route to the matching unreal-blueprints Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "UFUNCTION(BlueprintCallable) in my c++ class doesnt show up in blueprints",
+        "expected_behavior": "Do not activate unreal-blueprints; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unreal-cpp-gameplay",
+      "positive": {
+        "prompt": "ue 5.8 c++: GENERATED_BODY error and my UPROPERTY(EditAnywhere) doesnt show in details",
+        "expected_behavior": "Route to the matching unreal-cpp-gameplay Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "compiling unreal engine itself from the github source fails in visual studio 2022",
+        "expected_behavior": "Do not activate unreal-cpp-gameplay; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unreal-enhanced-input",
+      "positive": {
+        "prompt": "ue5 enhanced input: IA_Move axis2d with swizzle for WASD, IMC added in BeginPlay but nothing moves",
+        "expected_behavior": "Route to the matching unreal-enhanced-input Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "design accessible control remapping that works on every platform, conflicts and ui, engine agnostic",
+        "expected_behavior": "Do not activate unreal-enhanced-input; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unreal-niagara",
+      "positive": {
+        "prompt": "niagara explosion system with sparks and smoke, spawn it at the hit location from blueprint",
+        "expected_behavior": "Route to the matching unreal-niagara Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "particle effect for snow in my unity game with VFX Graph",
+        "expected_behavior": "Do not activate unreal-niagara; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "unreal-packaging",
+      "positive": {
+        "prompt": "package my ue5 game as a shipping build for windows. works perfect in PIE but the packaged exe loads into a black screen and log says it cant find /Game/Maps/Level_02",
+        "expected_behavior": "Route to the matching unreal-packaging Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "upload my unreal build to steam with steamcmd and set it live on a beta branch",
+        "expected_behavior": "Do not activate unreal-packaging; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
+    },
+    {
+      "skill": "visual-novel",
+      "positive": {
+        "prompt": "making a visual novel: character sprites with expressions, backgrounds, a text box with typewriter effect, choices, backlog, skip/auto",
+        "expected_behavior": "Route to the matching visual-novel Skill; confirm actual project and engine before using any implementation or commands."
+      },
+      "negative": {
+        "prompt": "barks and branching npc dialogue for my stealth game using yarn spinner",
+        "expected_behavior": "Do not activate visual-novel; select the suitable alternative only if verified by context."
+      },
+      "prohibited_behavior": [
+        "No claims of actual activation, code execution or game release from prepared cases",
+        "Do not override project-owned rules, asset rights or platform gates"
+      ]
     }
-  ]
+  ],
+  "gamedev_import_note": "78 prepared cases from source SHA c6ca6c41c839b68319ffc08430b99ab768debc32; NOT RUN in Codex."
 }

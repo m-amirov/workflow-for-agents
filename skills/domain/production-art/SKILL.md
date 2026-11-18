@@ -60,3 +60,7 @@ distinct real portrait and desktop files with current dimensions/hashes and
 separate runtime checks; do not stretch or crop one file into proof of both.
 Use `visual-qa` after integration. No external upload, publication or paid
 generation is authorized by this Skill.
+
+## Game development library integration
+
+For game-art families, sprite sheets, alpha/crop validation and asset QA, use the complementary [game-asset production reference](references/gamedev-create-game-assets/UPSTREAM.md) and its preserved scripts/templates. Keep source provenance, independent artistic review, asset-rights and runtime pixel gates separate; the reference does not authorize generation or publication.

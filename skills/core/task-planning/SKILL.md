@@ -53,3 +53,7 @@ without pretending it executed.
 
 **Output:** concise scope, TYPE/SIZE/RISK with evidence, review and approval
 gates, DOCS_IMPACT, focused steps, actual checks and remaining unknowns.
+
+## Game development library integration
+
+For game-engine-specific work, identify the engine from actual project code and consult [game-development routing](references/gamedev-router/UPSTREAM.md). Pick the smallest applicable set of specialized Skills. Ludory is a custom narrative runtime, not automatically a Phaser project. Project-owned rules and release gates take precedence.
