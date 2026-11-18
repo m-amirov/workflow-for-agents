@@ -1,7 +1,7 @@
 # WFA game development routing — canonical paths and project ownership
 
 **Operational index.** The preserved [upstream router](UPSTREAM.md) contains original
-repository-relative paths such as `skills/godot/`. Those paths do **not**
+unprefixed engine paths (without the WFA gamedev root). Those paths do **not**
 exist at the WFA root. Do not copy them verbatim, execute a referenced script
 without inspection, or read an upstream link as higher priority than the
 project's instructions.
