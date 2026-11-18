@@ -173,6 +173,19 @@ GitHub-исполнения и требует локального запуск�
 - [ ] Реальный HOME backup, установка 27 Skills и повторный preflight — NOT RUN.
 - [ ] Skill activation в Codex на пользовательском ПК — NOT RUN.
 
+## Game Production Pipeline G0–G7 (2026-11-18)
+
+**Статус:** implemented as reusable playbook, Codex prompt, example state contract, read-only offline record checker and offline tests. Actual independent Codex end-to-end game creation / platform acceptance: **NOT RUN**. Current game projects are unchanged.
+
+- [x] Описан полный цикл G0–G7, single-brief вход и risk/authority boundaries.
+- [x] Привязаны existing Skills и нативные Ludory runtime/art/rights/release stop-lines.
+- [x] Добавлены evidence-kind матрица, source/candidate SHA reconciliation, safe file hash checks, stage-order validation и безусловный отказ выдавать platform/publication authority локальному отчёту.
+- [x] Добавлены positive/negative offline contract tests и prepared Codex evaluation scenarios.
+- [ ] Выполнить реальную автономную Codex активацию и сквозное создание новой игры с browser/runtime/art playtesting и platform-specific release candidate evidence.
+- [ ] Пройти внешние реальные платформенные проверки G7 только с отдельным разрешением владельца; локальные симуляции не являются подтверждением.
+
+**Первый пилот:** отдельная новая Studio-игра, без мутации frozen проектов и без изменения фреймворка Ludory ради прохождения gate.
+
 ## Порядок ближайшей работы
 
 1. Закрыть текущий CI на финальном SHA после публикации изменений в `main`.

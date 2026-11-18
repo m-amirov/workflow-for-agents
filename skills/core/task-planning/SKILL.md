@@ -54,6 +54,14 @@ without pretending it executed.
 **Output:** concise scope, TYPE/SIZE/RISK with evidence, review and approval
 gates, DOCS_IMPACT, focused steps, actual checks and remaining unknowns.
 
+## Full new-game production routing
+
+When the user requests an entire new game from concept to release candidate,
+route into the [G0–G7 Game Production Pipeline](../../../playbooks/game-production.md)
+rather than treating a prototype or GDD as a finished game. Preserve the
+project's actual engine and native source/rights/release gates; this
+routing does not itself run agents, produce assets or grant publication.
+
 ## Game development library integration
 
 For game-engine-specific work, identify the real runtime owner from the loaded entrypoint and project instructions. Use the **WFA-adapted [game-development routing index](references/gamedev-router/WFA-ROUTING.md)** rather than the preserved upstream `UPSTREAM.md` paths. Pick the minimal Skills; 79 upstream capabilities were integrated as 78 new Skills plus an art reference, not permission to load all of them.

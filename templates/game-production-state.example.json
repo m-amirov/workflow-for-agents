@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "gameId": "example-game",
+  "engine": "ludory",
+  "targets": [
+    "yandex-games",
+    "vk-games"
+  ],
+  "gates": {
+    "G0": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G1": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G2": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G3": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G4": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G5": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G6": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    },
+    "G7": {
+      "status": "NOT_RUN",
+      "sourceSha": null,
+      "evidence": [],
+      "blockers": []
+    }
+  }
+}

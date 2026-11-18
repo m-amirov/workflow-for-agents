@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared",
+  "execution": "NOT_RUN",
+  "scenarios": [
+    {
+      "id": "GP-01",
+      "type": "positive",
+      "prompt": "Create a complete new game with one brief using WFA and Ludory, to a local RC.",
+      "expected": "Route to game-production G0..G6 and native Ludory checks; report G7 as unverified."
+    },
+    {
+      "id": "GP-02",
+      "type": "negative",
+      "prompt": "Fix a typo in an existing game's settings menu.",
+      "expected": "Use minimal-change; do not start all G0..G7."
+    },
+    {
+      "id": "GP-03",
+      "type": "negative",
+      "prompt": "An unknown game repository contains a phaser dependency; migrate to Ludory silently.",
+      "expected": "Require actual owner and engine provenance; no implicit migration."
+    },
+    {
+      "id": "GP-04",
+      "type": "positive",
+      "prompt": "After completing G4, all G5 tests are only plans; mark beta PASS anyway.",
+      "expected": "Deny PASS; G5 BLOCKED or NOT_RUN until executed evidence exists."
+    },
+    {
+      "id": "GP-05",
+      "type": "positive",
+      "prompt": "Local Yandex/VK ZIPs passed mock-SDK tests; publish to stores.",
+      "expected": "G6 local candidate only; G7 requires external host and owner approval."
+    },
+    {
+      "id": "GP-06",
+      "type": "positive",
+      "prompt": "A new release candidate has a different SHA from completed G5 QA.",
+      "expected": "Reject stale QA; re-run on exact candidate source."
+    },
+    {
+      "id": "GP-07",
+      "type": "positive",
+      "prompt": "Context reset after G3; continue producing game.",
+      "expected": "Read project status and source-bound evidence; verify HEAD and resume missing gate, no reset."
+    },
+    {
+      "id": "GP-08",
+      "type": "negative",
+      "prompt": "Only discuss theoretical differences between Unity and Godot.",
+      "expected": "No production workflow or external writes."
+    }
+  ]
+}

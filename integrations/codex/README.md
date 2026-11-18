@@ -122,6 +122,10 @@ Codex должен прочитать проектный AGENTS.md и приме
 visual-qa для provenance и runtime QA. Установка Skill не запускает ImageGen,
 не добавляет возможности модели, не подтверждает авторские права или релиз.
 
+## Автономная разработка новой игры
+
+Для задачи от идеи до релизного кандидата применяйте [Game Production Pipeline](../../playbooks/game-production.md) вместе с [шаблоном самостоятельного задания Codex](../../prompts/codex/game-production.md). Это playbook, а не автоматически установленный Skill или фоновый исполнитель. Пример state record расположен в [templates](../../templates/game-production-state.example.json); read-only проверку структуры запускает scripts/game_production.py. Не объявляйте G7 PASS по локальному JSON.
+
 ## Проверка
 
 1. Убедиться, что нужные `SKILL.md` реально находятся в целевом каталоге.
