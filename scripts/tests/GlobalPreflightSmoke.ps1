@@ -84,8 +84,10 @@ try {
     $empty = New-FixtureHome
     $beforeEmpty = @(Get-ChildItem -LiteralPath $empty -Force)
     $emptyReport = (Invoke-FixturePreflight $empty -All).Json
-    Assert ($emptyReport.Summary.CheckedSelectedSkills -eq 29) 'empty HOME did not audit all implemented Skills'
-    Assert ($emptyReport.Summary.SafeToInstallWithoutOwnershipConflict -eq 29) 'empty HOME did not classify all Skills as installable'
+    $implementedCount = @(Get-PreflightImplementedSkillNames $repo).Count
+    Assert ($implementedCount -ge 29) 'implemented Skills unexpectedly missing from catalog'
+    Assert ($emptyReport.Summary.CheckedSelectedSkills -eq $implementedCount) 'empty HOME did not audit all implemented Skills'
+    Assert ($emptyReport.Summary.SafeToInstallWithoutOwnershipConflict -eq $implementedCount) 'empty HOME did not classify all Skills as installable'
     Assert ($emptyReport.Summary.Ready -eq $true) 'empty HOME was not ready'
     Assert (-not (Test-Path -LiteralPath (Join-Path $empty '.agents'))) 'preflight created .agents in empty HOME'
     Assert (@(Get-ChildItem -LiteralPath $empty -Force).Count -eq $beforeEmpty.Count) 'empty HOME changed during preflight'
