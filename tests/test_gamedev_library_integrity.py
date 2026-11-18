@@ -41,9 +41,11 @@ class ImportedGamedevIntegrity(unittest.TestCase):
             targets.append(item["target"])
         self.assertEqual(len(targets), len(set(targets)), "two source files mapped to one destination")
 
-    def test_107_unique_skill_names_and_one_art_owner(self):
+    def test_unique_skill_names_and_one_art_owner(self):
         names = [path.parent.name for path in (ROOT / "skills").rglob("SKILL.md")]
-        self.assertEqual(len(names), 107)
+        # This imported-library test must not freeze the total number of first-party Skills.
+        # Verify the pinned imported set instead; new WFA Skills can be added independently.
+        self.assertTrue(set(self.manifest["new_skills"]).issubset(set(names)))
         self.assertEqual(len(names), len(set(names)))
         self.assertNotIn("create-game-assets", names)
         self.assertNotIn("router", names)
