@@ -47,6 +47,10 @@ Skills из CEOS source SHA `c8cc13bd3852409be93097ee823e9cd35e512b73`. Dry-run
 
 **Важно:** установка Skill сама по себе не делает Git-правило постоянно действующим. Для Codex настройте глобальный/проектный `AGENTS.md` согласно [инструкции](integrations/codex/README.md).
 
+## Дизайн интерфейсов
+
+Общие [правила дизайна](rules/design.md) и [процесс Interface Design](playbooks/interface-design.md) описывают работу с проверенными референсами, компонентами, одним выразительным приёмом (если нужен), выбором вариантов и единой дизайн-системой. Пять Skills находятся в `skills/design/`; `visual-audit`, `visual-qa` и `browser-qa` остаются отдельными проверками. Никакие проектные Skills или release gates автоматически не заменяются.
+
 ## Game Production Pipeline
 
 Для создания новой игры из одного brief используйте [Game Production Pipeline G0–G7](playbooks/game-production.md) и [самодостаточное задание Codex](prompts/codex/game-production.md). Опциональный [read-only gate checker](scripts/game_production.py) проверяет структуру локального evidence record, но **не запускает разработку, не проверяет игровой опыт и не разрешает публикацию**. Универсальный pipeline не подменяет проектные правила и Ludory Release.

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "partially-executed-real-codex",
-  "description": "Thirteen positive/negative prompts are structurally validated; real Codex CLI activation evidence includes classification-quality.",
+  "description": "Prepared positive/negative skill-routing cases with some historical real Codex activation evidence in separate reports; newly added interface-design cases have not been executed in Codex.",
   "execution_reference": "../results/2026-11-15-codex-cli-foundation.md",
   "drawing_editor_execution_reference": "../results/2026-11-16-drawing-editor-codex-cli.md",
   "cases": [
@@ -1443,6 +1443,76 @@
       "prohibited_behavior": [
         "Не удалять требования из baseline, чтобы увеличить покрытие.",
         "Не считать существование PNG или JSON доказательством фактического runtime."
+      ]
+    },
+    {
+      "skill": "design-reference-research",
+      "positive": {
+        "prompt": "Найди референсы для редактора зон участка и раздели донора структуры от оформления.",
+        "expected_behavior": "Проверит живые ссылки и мобильную версию, пометит непроверенные измерения."
+      },
+      "negative": {
+        "prompt": "Поправь грамматику одной подписи.",
+        "expected_behavior": "Не активирует массовый обзор референсов."
+      },
+      "prohibited_behavior": [
+        "Не выдавать непроверенный референс за увиденный."
+      ]
+    },
+    {
+      "skill": "ui-component-reuse",
+      "positive": {
+        "prompt": "Подбери UI-компонент для карточки SEO-калькулятора, учитывая существующий код.",
+        "expected_behavior": "Проверит локальное переиспользование, лицензию, a11y и зависимости."
+      },
+      "negative": {
+        "prompt": "Объясни асимптотическую сложность сортировки.",
+        "expected_behavior": "Не подключает UI-библиотеки."
+      },
+      "prohibited_behavior": [
+        "Не импортировать чужой компонент без проверки лицензии."
+      ]
+    },
+    {
+      "skill": "signature-visual-treatment",
+      "positive": {
+        "prompt": "Добавь один уместный эффект в hero и fallback без WebGPU.",
+        "expected_behavior": "Проверит статическую версию, reduced motion, сбой и телефоны."
+      },
+      "negative": {
+        "prompt": "Внеси исправление в backend SQL.",
+        "expected_behavior": "Не навязывает анимацию."
+      },
+      "prohibited_behavior": [
+        "Не делать эффект критическим для основного контента."
+      ]
+    },
+    {
+      "skill": "design-variant-selector",
+      "positive": {
+        "prompt": "Сделай визуальный выбор трёх вариантов через ?select для страницы.",
+        "expected_behavior": "Сохранит URL-параметры, canonical и approval gate."
+      },
+      "negative": {
+        "prompt": "Сверь прибыль настоящего маркетингового A/B-теста.",
+        "expected_behavior": "Не подменяет аналитическое A/B сравнение селектором."
+      },
+      "prohibited_behavior": [
+        "Не публиковать selector URL в sitemap."
+      ]
+    },
+    {
+      "skill": "design-system-governance",
+      "positive": {
+        "prompt": "Останови дрейф типографики через общие токены и spec-тесты.",
+        "expected_behavior": "Сверит действующий DESIGN.md, реальные токены, снимки и отдельные проверки."
+      },
+      "negative": {
+        "prompt": "Дай оценку эффективности SEO-ключей, не трогая UI.",
+        "expected_behavior": "Не запускает дизайн-систему для нерелевантной работы."
+      },
+      "prohibited_behavior": [
+        "Не объявлять visual PASS только по spec-тестам."
       ]
     }
   ],

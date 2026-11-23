@@ -13,6 +13,11 @@
 | Development | git-workflow | Main-first: работа в main, merge проверенного результата и очистка своих временных веток | implemented |
 | Testing | release-verification | Проверить сборку и release gates | implemented |
 | Design | visual-audit | Независимая оценка UI и визуальной целостности | implemented |
+| Design | design-reference-research | Проверенные UI-референсы, доноры структуры и оформления | implemented |
+| Design | ui-component-reuse | Повторное использование UI-компонентов с проверкой лицензии и зависимостей | implemented |
+| Design | signature-visual-treatment | Один осмысленный эффект со статическим fallback и reduced motion | implemented |
+| Design | design-variant-selector | Визуальная примерка 3–5 вариантов и безопасные preview URL | implemented |
+| Design | design-system-governance | Единая дизайн-спека, токены, spec-тесты и реальные UI-образцы | implemented |
 | Frontend | responsive-design | Адаптивность и геометрия экрана | planned |
 | Design | interaction-design | Жесты, состояния и взаимодействия | planned |
 | Frontend | accessibility-audit | Доступность UI | planned |

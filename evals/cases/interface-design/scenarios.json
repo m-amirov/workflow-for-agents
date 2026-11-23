@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "status": "prepared",
+  "description": "Positive/negative scenario expectations for design workflow Skills; prepared prompts are not real Codex activation evidence.",
+  "scenarios": [
+    {
+      "id": "UI-01",
+      "skill": "design-reference-research",
+      "kind": "positive",
+      "prompt": "Выбери живые референсы для нового web-калькулятора, проверь mobile и desktop.",
+      "expected_behavior": "Раздельные доноры структуры/оформления, фактическая проверка и NOT VERIFIED при недоступности."
+    },
+    {
+      "id": "UI-02",
+      "skill": "design-reference-research",
+      "kind": "negative",
+      "prompt": "Исправь одну опечатку CSS без изменения макета.",
+      "expected_behavior": "Не запускать исследование 5 сайтов и не навязывать редизайн."
+    },
+    {
+      "id": "UI-03",
+      "skill": "ui-component-reuse",
+      "kind": "positive",
+      "prompt": "Выбери компонент карточки из существующего UI или React Bits для нового блока.",
+      "expected_behavior": "Сначала локальный компонент; затем лицензия, dependencies, accessibility и runtime checks."
+    },
+    {
+      "id": "UI-04",
+      "skill": "ui-component-reuse",
+      "kind": "negative",
+      "prompt": "Добавь поле в backend API.",
+      "expected_behavior": "Не предлагать установку UI-библиотек."
+    },
+    {
+      "id": "UI-05",
+      "skill": "signature-visual-treatment",
+      "kind": "positive",
+      "prompt": "Добавь один выразительный эффект к hero с fallback для старого браузера.",
+      "expected_behavior": "Статический контент, reduced motion, unsupported API, failure, performance and mobile testing."
+    },
+    {
+      "id": "UI-06",
+      "skill": "signature-visual-treatment",
+      "kind": "negative",
+      "prompt": "Нужно безанимационное чтение длинной инструкции.",
+      "expected_behavior": "Не добавлять WebGPU, фоновые эффекты и анимации по умолчанию."
+    },
+    {
+      "id": "UI-07",
+      "skill": "design-variant-selector",
+      "kind": "positive",
+      "prompt": "Сделай три визуально разных варианта заголовка через ?select без дублей в индексе.",
+      "expected_behavior": "Варианты, shareable URLs, preservation, canonical, sitemap exclusions, approval before default."
+    },
+    {
+      "id": "UI-08",
+      "skill": "design-variant-selector",
+      "kind": "negative",
+      "prompt": "Проведи настоящее A/B тестирование на продакшене с анализом конверсии.",
+      "expected_behavior": "Не подменять аналитический эксперимент локальным селектором."
+    },
+    {
+      "id": "UI-09",
+      "skill": "design-system-governance",
+      "kind": "positive",
+      "prompt": "После нескольких экранов поплыли размеры типографики; восстанови единый источник и защити его тестами.",
+      "expected_behavior": "Existing DESIGN authority, token alignment, focused tests, real browser QA separated."
+    },
+    {
+      "id": "UI-10",
+      "skill": "design-system-governance",
+      "kind": "negative",
+      "prompt": "Сделай визуальный PASS по исходникам без браузера и скриншотов.",
+      "expected_behavior": "Не объявлять visual PASS по spec tests и не обходить project gates."
+    },
+    {
+      "id": "UI-11",
+      "skill": "design-variant-selector",
+      "kind": "negative",
+      "prompt": "Внеси ?select прямо в UI замороженной игры Ludory без разрешения.",
+      "expected_behavior": "Stop: local ludory-* runtime ownership and explicit authorization required."
+    },
+    {
+      "id": "UI-12",
+      "skill": "design-system-governance",
+      "kind": "negative",
+      "prompt": "Создай второй DESIGN.md и новую палитру несмотря на утверждённые проектные токены.",
+      "expected_behavior": "Preserve existing authoritative design spec and approved values."
+    }
+  ]
+}

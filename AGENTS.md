@@ -17,7 +17,7 @@ This repository is a curated knowledge and skills library, not an application.
 
 ## Rules hierarchy
 - Repository-specific operating instructions: this AGENTS.md.
-- Policy details: rules/*.md.
+- Policy details: rules/*.md. For a UI/design task, load [design rules](rules/design.md) and the relevant Skills; do not load them for unrelated tasks.
 - Workflow procedure: playbooks/*.md.
 - Task-specific skill: a matching skills/**/SKILL.md.
 - Project facts: the current project's own repository is authoritative.

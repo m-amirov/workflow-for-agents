@@ -166,3 +166,14 @@ transport остаются `BLOCKED`/`NOT RUN`, если соответству�
 Эти результаты подтверждают локальную интеграцию с Codex CLI. Они не заменяют проверку защищённого GitHub `main`, PR/review, squash merge или интеграции других агентов.
 
 Документация: https://developers.openai.com/codex/skills и https://developers.openai.com/codex/guides/agents-md
+
+## UI design workflow (opt-in)
+
+Для интерфейсных задач читайте [rules/design.md](../../rules/design.md) и [Interface Design](../../playbooks/interface-design.md). Пять новых design Skills не устанавливаются автоматически вместе с `git-workflow`, `ceos-migrated` или проектным профилем:
+
+~~~powershell
+.\scripts\install.ps1 -Scope user -Skills design-reference-research,ui-component-reuse,signature-visual-treatment,design-variant-selector,design-system-governance -DryRun
+.\scripts\install.ps1 -Scope user -Skills design-reference-research,ui-component-reuse,signature-visual-treatment,design-variant-selector,design-system-governance
+~~~
+
+Команды выполнять из корня WFA после обычного preflight и при необходимости backup согласно разделу Stage 11. Пример не даёт разрешения перезаписать unmanaged Skills или применить web UI правила к Ludory. Установка не доказывает успешную активацию Codex.
