@@ -74,8 +74,12 @@ identical attempt without new evidence is not allowed, even before the limit.
 An external transport failure/403, credentials blocker, or missing capability
 does not consume an implementation failure slot.
 
-No automatic model escalation, new subagents, broad refactors or changes to
-accepted scope. A user-approved extra attempt must have a materially distinct
+No automatic model escalation, uncontrolled new subagents, broad refactors or changes to
+accepted scope. Exception: explicitly enabled WFA token-saving mode may
+delegate the initial bounded LOW-risk subtask to a Luna profile and use
+the independent Sol reviewer when required. No retry or model escalation
+is authorized by that mode. The optional probe `--token-work` recommends
+a route from explicitly assessed metadata; it does not enable or execute it. A user-approved extra attempt must have a materially distinct
 plan and bounded scope; the CLI does not issue user authorization. Stop when
 no evidence of progress remains.
 

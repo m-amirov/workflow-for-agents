@@ -27,6 +27,13 @@ Do not ingest the entire library into context by default. Discover by catalog an
 ## Branch completion gate
 For every change, verify it exists in `origin/main`. If the required integration is blocked by branch protection, conflicts, missing permissions or checks, preserve the branch and report `BLOCKED`; do not claim completion or force-delete. Report the final main SHA and status of task-owned temporary branches.
 
+## Token-saving delegation
+
+For work in WFA, the checked-in [Codex agents](.codex/agents/) are opt-in:
+use the [token-saving policy](integrations/codex/AGENTS.token-saving.md)
+only when the user explicitly enables it. Keep direct work as the default;
+do not skip required independent review or project-native checks.
+
 ## Quality gates
 When changing a skill: check metadata, trigger quality, relative paths, linked scripts and test cases. When changing an integration: state which platforms/environments were actually tested. A successful commit is not proof that functionality was verified.
 

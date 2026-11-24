@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only, deterministic engineering task-routing policy for explicit metadata.
 
-No natural-language inference, model selection, agent spawning or project writes.
+No natural-language inference, effective model selection, agent spawning or project writes.
 """
 from __future__ import annotations
 
@@ -170,6 +170,38 @@ def attempt_gate(
     return {"status": status, "used_failures": consumed, "limit": limit}
 
 
+TOKEN_WORK = ("COMMAND", "TINY", "BOUNDED_READ", "BOUNDED_WRITE", "COMPLEX")
+
+def token_plan(route: dict[str, object], work: str) -> dict[str, object]:
+    """Opt-in advisory profile selection; no actual model or agent execution."""
+    _required_enum("token_work", work, TOKEN_WORK)
+    eligible = (
+        route["status"] == "ROUTED" and route["risk"] == "LOW"
+        and route["size"] == "SMALL" and not route["user_gate"]
+        and route["architect"] == "NOT_REQUIRED"
+        and route["reviewer"] == "NOT_REQUIRED"
+    )
+    profile = "ROOT"
+    if eligible:
+        if work == "BOUNDED_READ":
+            profile = "wfa_explorer"
+        elif work == "BOUNDED_WRITE":
+            profile = "wfa_worker"
+        elif work == "COMMAND":
+            profile = "DIRECT_TOOL"
+    return {
+        "work": work,
+        "recommended_profile": profile,
+        "independent_review_profile": (
+            "wfa_reviewer" if route["reviewer"] == "REQUIRED" else "NOT_REQUIRED"
+        ),
+        "requires_context_savings": profile in {"wfa_explorer", "wfa_worker"},
+        "execution": "NOT_PERFORMED",
+        "effective_model": "UNKNOWN",
+        "token_savings": "NOT_MEASURED",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--type", dest="task_type", required=True, choices=TYPES)
@@ -177,9 +209,14 @@ def main() -> int:
     parser.add_argument("--risk", default="AUTO", choices=RISKS)
     parser.add_argument("--signal", action="append", default=[], choices=sorted(SIGNAL_RISK))
     parser.add_argument("--docs-impact", default="UNKNOWN", choices=DOC_IMPACTS)
+    parser.add_argument("--token-work", choices=TOKEN_WORK,
+                        help="Opt-in advisory profile; bounded work must actually save root context")
     args = parser.parse_args()
-    print(json.dumps(route_task(args.task_type, args.size, args.risk, args.signal,
-                                args.docs_impact), ensure_ascii=False, indent=2))
+    result = route_task(args.task_type, args.size, args.risk, args.signal,
+                        args.docs_impact)
+    if args.token_work:
+        result["token_plan"] = token_plan(result, args.token_work)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
 

@@ -47,8 +47,10 @@ python scripts/task_routing.py --type BUGFIX --size SMALL --risk HIGH --signal a
 ~~~
 
 The CLI returns an advisory JSON plan; it cannot inspect arbitrary prose,
-launch agents, select models, run tests, authorize external writes or certify
-a release. If the CLI is unavailable, follow the reference policy manually
+launch agents, change models, run tests, authorize external writes or certify
+a release. In explicitly enabled token-saving mode, use `--token-work`
+to recommend a native execution profile for assessed work; the legacy
+output is unchanged without this option. If the CLI is unavailable, follow the reference policy manually
 without pretending it executed.
 
 **Output:** concise scope, TYPE/SIZE/RISK with evidence, review and approval

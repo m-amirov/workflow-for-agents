@@ -9,6 +9,13 @@
 5. **Interface:** `integrations/`, `prompts/`, `agents/` — связь с конкретными средами.
 6. **Registry:** `docs/SKILL_CATALOG.md` и `projects/` — обнаружение и навигация.
 
+## Token-saving execution profiles
+
+The opt-in Codex adapter uses three native agents in `.codex/agents/`.
+Stage 9B remains the source of task/risk/review gates; the optional execution
+plan only recommends an eligible route and never spawns an agent.
+The parent owns verification and all decisions. See [activation and evidence](../integrations/codex/token-saving.md).
+
 ## Что куда записывать
 
 | Ситуация | Место |
