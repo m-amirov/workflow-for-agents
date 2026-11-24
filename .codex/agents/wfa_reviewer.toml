@@ -1,6 +1,6 @@
 name = "wfa_reviewer"
 description = "Independent read-only correctness, regression and risk review."
-model = "gpt-6.2-sol"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
 model_verbosity = "low"
 developer_instructions = """

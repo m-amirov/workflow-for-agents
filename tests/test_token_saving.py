@@ -45,7 +45,7 @@ class TokenSavingTests(unittest.TestCase):
     def test_native_profiles(self):
         expected = {"wfa_explorer": ("gpt-5.6-luna", "low"),
                     "wfa_worker": ("gpt-5.6-luna", "low"),
-                    "wfa_reviewer": ("gpt-6.2-sol", "medium")}
+                    "wfa_reviewer": ("gpt-5.6-sol", "medium")}
         for name, (model, effort) in expected.items():
             with self.subTest(name=name):
                 with (ROOT / ".codex/agents" / (name + ".toml")).open("rb") as file:

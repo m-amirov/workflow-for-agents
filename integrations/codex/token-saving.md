@@ -6,10 +6,10 @@ recommendation; existing root configuration is not changed.
 
 | Profile | Model | Effort | Use |
 | --- | --- | --- | --- |
-| Root | gpt-6.2-sol | medium | Planning, complex work, integration |
+| Root | gpt-5.6-sol | medium | Planning, complex work, integration |
 | wfa_explorer | gpt-5.6-luna | low | Bounded read with context savings |
 | wfa_worker | gpt-5.6-luna | low | SMALL/LOW-risk scoped change |
-| wfa_reviewer | gpt-6.2-sol | medium | Independent review when required |
+| wfa_reviewer | gpt-5.6-sol | medium | Independent review when required |
 
 Definitions are in the repository's `.codex/agents/`. The model IDs and
 native format follow https://developers.openai.com/codex/subagents and
@@ -22,9 +22,30 @@ lightweight and reviewer routes with the actual account before delegation;
 do not treat a static test or a picker entry as a successful invocation. Lower model price is not lower token count:
 subagents repeat context and have their own tool/LLM work. Avoid fan-out.
 
+## Native versus Web routes
+
+For the owner's Codex model catalog (2026-11-24), select native GPT-5.6 Sol
+(without the "(Web)" suffix) for the root and reviewer. The native
+GPT-5.6 Luna profiles remain unchanged. The GPT-6.2 Sol (Web) and GPT-6
+Sol (Web) entries belong to the separate, unofficial
+[Codex ChatGPT Web adapter](https://github.com/miuuyy/codex-chatgpt-web);
+their display names do not establish native model availability.
+
+Only Instant Web entries may be considered under the owner's constraint.
+They are optional, manually selected routes for bounded, non-sensitive
+standalone text work, not mandatory engineering agents or automatic
+fallbacks. Do not enable the adapter, alter its settings, or route private
+project context through it as part of WFA installation. Local tool access
+and cross-backend delegation depend on actual adapter mode and verified
+harness capability. No Web profile is installed or auto-selected by WFA.
+Astra and non-Instant Web models are excluded. Keep mandatory code review,
+local edits, tests, and release gates on verified native routes. Record
+BLOCKED if a required native route is unavailable. Never use Web as an
+implicit substitute.
+
 ## Activation
 
-For WFA itself, open the trusted repository in Codex with Sol medium, and
+For WFA itself, open the trusted repository in Codex with native GPT-5.6 Sol medium, and
 explicitly enable the token-saving policy for the task. For other projects,
 copy the three named TOML files to `.codex/agents/` (project scope) or
 `~/.codex/agents/` (user scope), then incorporate
