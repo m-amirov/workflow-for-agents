@@ -4,8 +4,8 @@ Apply only when the WFA custom agents `wfa_explorer`, `wfa_worker` and
 `wfa_reviewer` are available and the owner has enabled this policy. Keep
 the root on Sol (medium by default); no Astra. For a tiny task or a known
 command, work directly; never spawn an agent just to run a script.
-Delegate one bounded, context-heavy read to `wfa_explorer` (Luna low);
-delegate a clearly specified SMALL/LOW-risk edit to `wfa_worker` (Luna low)
+Delegate one bounded, context-heavy read to `wfa_explorer` (GPT-5.6 Luna low);
+delegate a clearly specified SMALL/LOW-risk edit to `wfa_worker` (GPT-5.6 Luna low)
 only if it saves root context or replaces substantial root work. Keep
 ambiguous, medium/high/unknown-risk and architecture work on the root.
 Run required independent review through `wfa_reviewer` (Sol medium) or

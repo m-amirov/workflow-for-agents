@@ -7,14 +7,19 @@ recommendation; existing root configuration is not changed.
 | Profile | Model | Effort | Use |
 | --- | --- | --- | --- |
 | Root | gpt-6.2-sol | medium | Planning, complex work, integration |
-| wfa_explorer | gpt-6-luna | low | Bounded read with context savings |
-| wfa_worker | gpt-6-luna | low | SMALL/LOW-risk scoped change |
+| wfa_explorer | gpt-5.6-luna | low | Bounded read with context savings |
+| wfa_worker | gpt-5.6-luna | low | SMALL/LOW-risk scoped change |
 | wfa_reviewer | gpt-6.2-sol | medium | Independent review when required |
 
 Definitions are in the repository's `.codex/agents/`. The model IDs and
 native format follow https://developers.openai.com/codex/subagents and
 https://developers.openai.com/api/docs/models . Actual client/account
-availability must be checked. Lower model price is not lower token count:
+availability must be checked. The default lightweight model is GPT-5.6 Luna
+(`gpt-5.6-luna`), observed in the owner's ChatGPT-authenticated Codex model
+picker on 2026-11-24. The previous GPT-6 Luna ID was rejected by that runtime.
+API model availability is not proof of Codex account support. Check both
+lightweight and reviewer routes with the actual account before delegation;
+do not treat a static test or a picker entry as a successful invocation. Lower model price is not lower token count:
 subagents repeat context and have their own tool/LLM work. Avoid fan-out.
 
 ## Activation

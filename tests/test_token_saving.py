@@ -43,8 +43,8 @@ class TokenSavingTests(unittest.TestCase):
             router.token_plan(self.route(), "ANYTHING")
 
     def test_native_profiles(self):
-        expected = {"wfa_explorer": ("gpt-6-luna", "low"),
-                    "wfa_worker": ("gpt-6-luna", "low"),
+        expected = {"wfa_explorer": ("gpt-5.6-luna", "low"),
+                    "wfa_worker": ("gpt-5.6-luna", "low"),
                     "wfa_reviewer": ("gpt-6.2-sol", "medium")}
         for name, (model, effort) in expected.items():
             with self.subTest(name=name):
